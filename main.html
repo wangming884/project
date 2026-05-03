@@ -232,6 +232,10 @@
         </div>
     </main>
 
+    <!-- 引入 API 配置和工具函数 -->
+    <script src="js/api-config.js"></script>
+    <script src="js/api-utils.js"></script>
+    
     <script>
         // ================= 网站运行计时器逻辑 =================
         function updateTimer() {
@@ -252,27 +256,76 @@
         updateTimer(); // 立即执行一次，防止初始显示"计算中..."
 
         // ================= 签到领积分逻辑 =================
-        let userPoints = parseInt(localStorage.getItem('userPoints')) || 0;
-        let lastSignInDate = localStorage.getItem('lastSignInDate');
+        let userPoints = 0;
+        let lastSignInDate = null;
 
         // 初始化页面状态
-        function initSignInStatus() {
-            document.getElementById('userPoints').innerText = `💰 积分: ${userPoints}`;
-            const today = new Date().toDateString();
-            if (lastSignInDate === today) {
-                const btn = document.getElementById('signInBtn');
-                btn.innerText = "今日已签到";
-                btn.disabled = true;
+        async function initSignInStatus() {
+            try {
+                // 从后端获取积分余额
+                const response = await get(API_ENDPOINTS.points.getBalance);
+                if (response.success) {
+                    userPoints = response.data.balance || 0;
+                    lastSignInDate = response.data.lastSignInDate;
+                    
+                    document.getElementById('userPoints').innerText = `💰 积分: ${userPoints}`;
+                    
+                    const today = new Date().toDateString();
+                    if (lastSignInDate && new Date(lastSignInDate).toDateString() === today) {
+                        const btn = document.getElementById('signInBtn');
+                        btn.innerText = "今日已签到";
+                        btn.disabled = true;
+                    }
+                }
+            } catch (error) {
+                // 如果后端未连接，使用本地存储作为降级方案
+                console.warn('后端未连接，使用本地存储');
+                userPoints = parseInt(localStorage.getItem('userPoints')) || 0;
+                lastSignInDate = localStorage.getItem('lastSignInDate');
+                
+                document.getElementById('userPoints').innerText = `💰 积分: ${userPoints}`;
+                const today = new Date().toDateString();
+                if (lastSignInDate === today) {
+                    const btn = document.getElementById('signInBtn');
+                    btn.innerText = "今日已签到";
+                    btn.disabled = true;
+                }
             }
         }
 
         // 签到按钮点击事件
-        function handleSignIn() {
-            userPoints += 1; // 每次签到奖励1积分
-            localStorage.setItem('userPoints', userPoints);
-            localStorage.setItem('lastSignInDate', new Date().toDateString());
-            initSignInStatus();
-            alert('签到成功！获得 1 积分 🎉');
+        async function handleSignIn() {
+            try {
+                showLoading('签到中...');
+                
+                // 调用签到 API
+                const response = await post(API_ENDPOINTS.points.dailySignIn);
+                
+                hideLoading();
+                
+                if (response.success) {
+                    userPoints = response.data.balance;
+                    const earnedPoints = response.data.earnedPoints || 1;
+                    
+                    localStorage.setItem('userPoints', userPoints);
+                    localStorage.setItem('lastSignInDate', new Date().toDateString());
+                    
+                    initSignInStatus();
+                    showMessage(`签到成功！获得 ${earnedPoints} 积分 🎉`, 'success');
+                } else {
+                    showMessage(response.message || '签到失败', 'error');
+                }
+            } catch (error) {
+                // 降级到本地处理
+                hideLoading();
+                console.warn('后端未连接，使用本地签到');
+                
+                userPoints += 1;
+                localStorage.setItem('userPoints', userPoints);
+                localStorage.setItem('lastSignInDate', new Date().toDateString());
+                initSignInStatus();
+                showMessage('签到成功！获得 1 积分 🎉', 'success');
+            }
         }
 
         // 页面加载完成后初始化

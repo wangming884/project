@@ -81,8 +81,7 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
             <h2>用户登录</h2>
-            <!-- 注意: 这里的 onsubmit 仅做前端演示，实际需要连接后端 -->
-            <form onsubmit="event.preventDefault(); alert('登录信息已提交，待接入后端 API'); closeModal('loginModal');">
+            <form onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label for="login-username">用户名 / 邮箱</label>
                     <input type="text" id="login-username" required>
@@ -104,8 +103,7 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('registerModal')">&times;</span>
             <h2>创建新账号</h2>
-            <!-- 注意: 这里的 onsubmit 仅做前端演示，实际需要连接后端 -->
-            <form onsubmit="event.preventDefault(); alert('注册信息已提交，待接入后端 API'); closeModal('registerModal');">
+            <form onsubmit="handleRegister(event)">
                 <div class="form-group">
                     <label for="reg-username">用户名</label>
                     <input type="text" id="reg-username" required>
@@ -116,7 +114,7 @@
                 </div>
                 <div class="form-group">
                     <label for="reg-password">设置密码</label>
-                    <input type="password" id="reg-password" required>
+                    <input type="password" id="reg-password" required minlength="6">
                 </div>
                 <button type="submit" class="submit-btn">立即注册</button>
                 <div class="modal-footer">
@@ -126,6 +124,10 @@
         </div>
     </div>
 
+    <!-- 引入 API 配置和工具函数 -->
+    <script src="js/api-config.js"></script>
+    <script src="js/api-utils.js"></script>
+    
     <!-- 引入 particles.js 库 -->
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script>
@@ -169,6 +171,108 @@
         window.onclick = function(event) {
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';
+            }
+        }
+
+        // ==================== 登录处理 ====================
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            
+            if (!username || !password) {
+                showMessage('请填写完整的登录信息', 'warning');
+                return;
+            }
+            
+            try {
+                showLoading('登录中...');
+                
+                // 调用登录 API
+                const response = await post(API_ENDPOINTS.auth.login, {
+                    username,
+                    password,
+                });
+                
+                hideLoading();
+                
+                if (response.success) {
+                    // 保存登录信息
+                    if (response.token) {
+                        setStorage('authToken', response.token);
+                    }
+                    if (response.user) {
+                        setStorage('userInfo', response.user);
+                    }
+                    
+                    showMessage('登录成功！', 'success');
+                    closeModal('loginModal');
+                    
+                    // 跳转到主页
+                    setTimeout(() => {
+                        window.location.href = 'main.html';
+                    }, 1000);
+                } else {
+                    showMessage(response.message || '登录失败', 'error');
+                }
+            } catch (error) {
+                handleError(error, '登录失败，请检查用户名和密码');
+            }
+        }
+
+        // ==================== 注册处理 ====================
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('reg-username').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            
+            // 前端验证
+            if (!username || !email || !password) {
+                showMessage('请填写完整的注册信息', 'warning');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showMessage('请输入有效的邮箱地址', 'warning');
+                return;
+            }
+            
+            if (!validatePassword(password)) {
+                showMessage('密码长度至少为6位', 'warning');
+                return;
+            }
+            
+            try {
+                showLoading('注册中...');
+                
+                // 调用注册 API
+                const response = await post(API_ENDPOINTS.auth.register, {
+                    username,
+                    email,
+                    password,
+                });
+                
+                hideLoading();
+                
+                if (response.success) {
+                    showMessage('注册成功！请登录', 'success');
+                    closeModal('registerModal');
+                    
+                    // 自动填充用户名到登录表单
+                    document.getElementById('login-username').value = username;
+                    
+                    // 打开登录弹窗
+                    setTimeout(() => {
+                        openModal('loginModal');
+                    }, 1000);
+                } else {
+                    showMessage(response.message || '注册失败', 'error');
+                }
+            } catch (error) {
+                handleError(error, '注册失败，请稍后重试');
             }
         }
     </script>

@@ -103,6 +103,10 @@
         </div>
     </div>
 
+    <!-- 引入 API 配置和工具函数 -->
+    <script src="js/api-config.js"></script>
+    <script src="js/api-utils.js"></script>
+    
     <script>
         // 时间动态更新
         function updateTime() {
@@ -131,23 +135,78 @@
         }
 
         // 执行签到操作
-        function doCheckIn() {
-            const account = document.getElementById('account').value;
-            const dorm = document.getElementById('dorm').value;
+        async function doCheckIn() {
+            const account = document.getElementById('account').value.trim();
+            const password = document.getElementById('password').value;
+            const dorm = document.getElementById('dorm').value.trim();
             
-            if (userPoints < 10) {
-                alert('❌ 积分不足！晚寝签到需要 10 积分。\n请先返回服务大厅进行每日签到获取积分。');
+            if (!account || !password || !dorm) {
+                showMessage('请填写完整的签到信息', 'warning');
                 return;
             }
             
-            // 扣除积分并记录今天已签到
-            userPoints -= 10;
-            localStorage.setItem('userPoints', userPoints);
-            localStorage.setItem('lastNightCheckIn', today);
-            lastNightCheckIn = today;
+            if (userPoints < 10) {
+                showMessage('❌ 积分不足！晚寝签到需要 10 积分。\n请先返回服务大厅进行每日签到获取积分。', 'error');
+                return;
+            }
             
-            initStatus(); // 刷新界面
-            alert(`✅ 晚寝签到成功！\n打卡账号：${account}\n所在楼栋：${dorm}\n已扣除 10 积分，祝您晚安🌙`);
+            try {
+                showLoading('签到中...');
+                
+                // 获取地理位置（可选）
+                let location = null;
+                if (navigator.geolocation) {
+                    try {
+                        const position = await new Promise((resolve, reject) => {
+                            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                                timeout: 5000,
+                                enableHighAccuracy: false
+                            });
+                        });
+                        location = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                        };
+                    } catch (geoError) {
+                        console.warn('无法获取地理位置:', geoError);
+                    }
+                }
+                
+                // 调用签到 API
+                const response = await post(API_ENDPOINTS.checkIn.submit, {
+                    account,
+                    password,
+                    dorm,
+                    location,
+                });
+                
+                hideLoading();
+                
+                if (response.success) {
+                    // 更新积分
+                    userPoints = response.data.remainingPoints || (userPoints - 10);
+                    localStorage.setItem('userPoints', userPoints);
+                    localStorage.setItem('lastNightCheckIn', today);
+                    lastNightCheckIn = today;
+                    
+                    initStatus();
+                    showMessage(`✅ 晚寝签到成功！\n打卡账号：${account}\n所在楼栋：${dorm}\n已扣除 10 积分，祝您晚安🌙`, 'success');
+                } else {
+                    showMessage(response.message || '签到失败', 'error');
+                }
+            } catch (error) {
+                // 降级到本地处理
+                hideLoading();
+                console.warn('后端未连接，使用本地签到');
+                
+                userPoints -= 10;
+                localStorage.setItem('userPoints', userPoints);
+                localStorage.setItem('lastNightCheckIn', today);
+                lastNightCheckIn = today;
+                
+                initStatus();
+                showMessage(`✅ 晚寝签到成功！\n打卡账号：${account}\n所在楼栋：${dorm}\n已扣除 10 积分，祝您晚安🌙`, 'success');
+            }
         }
         
         document.addEventListener('DOMContentLoaded', initStatus);
@@ -164,15 +223,35 @@
 
         function handleRedeem() {
             const code = document.getElementById('redeemCode').value.trim();
-            if (code) {
-                // 模拟兑换逻辑 (任意非空代码都兑换 50 积分)
-                const addedPoints = 50; 
-                userPoints += addedPoints;
-                localStorage.setItem('userPoints', userPoints);
-                initStatus(); // 刷新可用积分显示
-                alert(`🎉 兑换成功！您已获得 ${addedPoints} 积分。`);
-                closeRedeemModal();
+            if (!code) {
+                showMessage('请输入兑换码', 'warning');
+                return;
             }
+            
+            // 调用兑换 API
+            post(API_ENDPOINTS.points.redeem, { code })
+                .then(response => {
+                    if (response.success) {
+                        const addedPoints = response.data.points || 50;
+                        userPoints += addedPoints;
+                        localStorage.setItem('userPoints', userPoints);
+                        initStatus();
+                        showMessage(`🎉 兑换成功！您已获得 ${addedPoints} 积分。`, 'success');
+                        closeRedeemModal();
+                    } else {
+                        showMessage(response.message || '兑换失败', 'error');
+                    }
+                })
+                .catch(error => {
+                    // 降级到本地处理
+                    console.warn('后端未连接，使用本地兑换');
+                    const addedPoints = 50;
+                    userPoints += addedPoints;
+                    localStorage.setItem('userPoints', userPoints);
+                    initStatus();
+                    showMessage(`🎉 兑换成功！您已获得 ${addedPoints} 积分。`, 'success');
+                    closeRedeemModal();
+                });
         }
 
         // 点击弹窗外部半透明背景关闭弹窗

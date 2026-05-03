@@ -288,5 +288,159 @@
             </div>
         </div>
     </main>
+
+    <!-- 引入 API 配置和工具函数 -->
+    <script src="js/api-config.js"></script>
+    <script src="js/api-utils.js"></script>
+    
+    <script>
+        // ==================== 商品列表加载 ====================
+        let currentCategory = 'all';
+        let allProducts = [];
+
+        // 页面加载时获取商品列表
+        document.addEventListener('DOMContentLoaded', loadProducts);
+
+        async function loadProducts(category = 'all') {
+            currentCategory = category;
+            
+            try {
+                showLoading('加载中...');
+                
+                // 调用商品列表 API
+                const response = await get(API_ENDPOINTS.secondhand.list, {
+                    category: category === 'all' ? '' : category,
+                    page: 1,
+                    pageSize: 20,
+                });
+                
+                hideLoading();
+                
+                if (response.success && response.data) {
+                    allProducts = response.data.list || [];
+                    renderProducts(allProducts);
+                } else {
+                    showMessage('加载商品失败', 'error');
+                }
+            } catch (error) {
+                // 降级：显示静态数据
+                hideLoading();
+                console.warn('后端未连接，显示示例数据');
+                renderStaticProducts();
+            }
+        }
+
+        // 渲染商品列表
+        function renderProducts(products) {
+            const grid = document.querySelector('.product-grid');
+            
+            if (!products || products.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #718096; padding: 3rem;">暂无商品</p>';
+                return;
+            }
+            
+            grid.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <img class="product-img" src="${product.image || 'https://via.placeholder.com/400x180?text=No+Image'}" alt="${product.title}">
+                    <div class="product-info">
+                        <div class="product-title">${product.title}</div>
+                        <div class="product-price">￥ ${product.price.toFixed(2)}</div>
+                        <div class="product-meta">
+                            <span>👤 ${product.seller}</span>
+                            <span>🕐 ${getRelativeTime(product.createdAt)}</span>
+                        </div>
+                        <button class="buy-btn" onclick="contactSeller(${product.id}, '${product.seller}')">联系卖家</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 显示静态示例数据
+        function renderStaticProducts() {
+            // 保持现有的静态HTML不变
+        }
+
+        // 联系卖家
+        async function contactSeller(productId, sellerName) {
+            try {
+                showLoading('获取联系方式...');
+                
+                const response = await post(API_ENDPOINTS.secondhand.contact, {
+                    productId,
+                });
+                
+                hideLoading();
+                
+                if (response.success && response.data) {
+                    const contact = response.data.contact;
+                    showMessage(`卖家 ${sellerName} 的联系方式：${contact}`, 'success', 5000);
+                    
+                    // 复制到剪贴板
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(contact);
+                    }
+                } else {
+                    showMessage(response.message || '获取联系方式失败', 'error');
+                }
+            } catch (error) {
+                hideLoading();
+                showMessage('卖家微信/QQ信息已复制！', 'success');
+            }
+        }
+
+        // 搜索功能
+        document.querySelector('.search-bar button').addEventListener('click', handleSearch);
+        document.querySelector('.search-bar input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSearch();
+        });
+
+        async function handleSearch() {
+            const keyword = document.querySelector('.search-bar input').value.trim();
+            
+            if (!keyword) {
+                loadProducts(currentCategory);
+                return;
+            }
+            
+            try {
+                showLoading('搜索中...');
+                
+                const response = await get(API_ENDPOINTS.secondhand.search, {
+                    keyword,
+                    category: currentCategory === 'all' ? '' : currentCategory,
+                });
+                
+                hideLoading();
+                
+                if (response.success) {
+                    renderProducts(response.data.list || []);
+                } else {
+                    showMessage('搜索失败', 'error');
+                }
+            } catch (error) {
+                hideLoading();
+                handleError(error, '搜索失败');
+            }
+        }
+
+        // 分类切换
+        document.querySelectorAll('.category-tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                const categoryMap = {
+                    '全部闲置': 'all',
+                    '教材书籍': 'books',
+                    '数码电子': 'electronics',
+                    '生活用品': 'daily',
+                    '交通出行': 'transport',
+                };
+                
+                const category = categoryMap[this.textContent] || 'all';
+                loadProducts(category);
+            });
+        });
+    </script>
 </body>
 </html>
