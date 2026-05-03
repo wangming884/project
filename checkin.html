@@ -19,8 +19,29 @@
         .info-text { color: #718096; margin-bottom: 2rem; line-height: 1.6; }
         .time-display { font-family: monospace; font-size: 1.2rem; color: #3182ce; font-weight: bold; background: #ebf8ff; padding: 5px 15px; border-radius: 20px; display: inline-block; margin-top: 10px; }
         
-        .points-box { margin: 2rem 0; padding: 1rem; background: #fffff0; border: 1px solid #fefcbf; border-radius: 12px; color: #d69e2e; font-weight: 600; }
+        .form-group { margin-bottom: 1.5rem; text-align: left; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4a5568; font-size: 0.95rem; }
+        .form-group input { width: 100%; padding: 0.8rem 1rem; border: 1px solid #cbd5e0; border-radius: 8px; box-sizing: border-box; font-size: 1rem; transition: border-color 0.2s; }
+        .form-group input:focus { border-color: #3182ce; outline: none; box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2); }
+        .form-group input:disabled { background: #f7fafc; cursor: not-allowed; }
         
+        .points-box { margin: 1.5rem 0; padding: 1.2rem 1rem; background: #fffff0; border: 1px solid #fefcbf; border-radius: 12px; color: #d69e2e; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .points-actions { display: flex; gap: 15px; }
+        .btn-small { background: #d69e2e; color: white; border: none; padding: 0.5rem 1.2rem; border-radius: 20px; cursor: pointer; font-size: 0.9rem; transition: background 0.3s; font-weight: bold; }
+        .btn-small:hover { background: #b7791f; }
+        .btn-small.buy-btn { background: #38b2ac; }
+        .btn-small.buy-btn:hover { background: #319795; }
+        
+        /* 弹窗样式 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; text-align: left; }
+        .modal-content { background: white; padding: 2rem; border-radius: 12px; width: 100%; max-width: 320px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .close-btn { position: absolute; top: 12px; right: 15px; font-size: 1.5rem; color: #999; cursor: pointer; transition: color 0.2s; }
+        .close-btn:hover { color: #333; }
+        .modal-content h2 { margin-top: 0; text-align: center; color: #333; margin-bottom: 1.5rem; font-size: 1.5rem; }
+        .submit-btn { width: 100%; padding: 0.8rem; background: #3182ce; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; margin-top: 1rem; transition: all 0.3s ease; font-weight: bold; }
+        .submit-btn:hover { background: #2b6cb0; }
+
         .checkin-btn { width: 100%; background: #3182ce; color: white; border: none; padding: 1.2rem; font-size: 1.1rem; font-weight: bold; border-radius: 30px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(49, 130, 206, 0.3); }
         .checkin-btn:hover:not(:disabled) { background: #2b6cb0; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(49, 130, 206, 0.4); }
         .checkin-btn:disabled { background: #cbd5e0; cursor: not-allowed; box-shadow: none; color: #718096; }
@@ -36,16 +57,50 @@
         <div class="location-icon">📍🌙</div>
         <h1 class="title">晚寝定位打卡</h1>
         <p class="info-text">
-            检测到当前位置：学生公寓（匹配成功）
+            请确认您的身份及寝室所在楼栋信息
             <br>
             <span class="time-display" id="currentTime">--:--:--</span>
         </p>
         
-        <div class="points-box">
-            当前可用积分：<span id="currentPoints">0</span>
-        </div>
+        <form id="checkinForm" onsubmit="event.preventDefault(); doCheckIn();">
+            <div class="form-group">
+                <label for="account">账号 (学号)</label>
+                <input type="text" id="account" placeholder="请输入您的学号" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" placeholder="请输入系统密码" required>
+            </div>
+            <div class="form-group">
+                <label for="dorm">寝室地址</label>
+                <input type="text" id="dorm" placeholder="例如：男生公寓 3 栋" required>
+            </div>
 
-        <button id="checkinBtn" class="checkin-btn" onclick="doCheckIn()">立即签到 (扣除 10 积分)</button>
+            <div class="points-box">
+                <div>当前可用积分：<span id="currentPoints">0</span></div>
+                <div class="points-actions">
+                    <button type="button" class="btn-small buy-btn" onclick="window.location.href='buy_points.html'">购买积分</button>
+                    <button type="button" class="btn-small" onclick="openRedeemModal()">兑换积分</button>
+                </div>
+            </div>
+
+            <button type="submit" id="checkinBtn" class="checkin-btn">立即签到 (扣除 10 积分)</button>
+        </form>
+    </div>
+
+    <!-- 兑换积分弹窗 -->
+    <div id="redeemModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeRedeemModal()">&times;</span>
+            <h2>兑换积分</h2>
+            <form id="redeemForm" onsubmit="event.preventDefault(); handleRedeem();">
+                <div class="form-group">
+                    <label for="redeemCode">兑换码</label>
+                    <input type="text" id="redeemCode" placeholder="请输入积分兑换码" required>
+                </div>
+                <button type="submit" class="submit-btn">确认兑换</button>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -67,11 +122,19 @@
                 const btn = document.getElementById('checkinBtn');
                 btn.innerText = "今晚已完成签到，早点休息吧！";
                 btn.disabled = true;
+                
+                // 签到完成后禁用输入框
+                document.getElementById('account').disabled = true;
+                document.getElementById('password').disabled = true;
+                document.getElementById('dorm').disabled = true;
             }
         }
 
         // 执行签到操作
         function doCheckIn() {
+            const account = document.getElementById('account').value;
+            const dorm = document.getElementById('dorm').value;
+            
             if (userPoints < 10) {
                 alert('❌ 积分不足！晚寝签到需要 10 积分。\n请先返回服务大厅进行每日签到获取积分。');
                 return;
@@ -84,10 +147,41 @@
             lastNightCheckIn = today;
             
             initStatus(); // 刷新界面
-            alert('✅ 晚寝签到成功！已扣除 10 积分，祝您晚安🌙');
+            alert(`✅ 晚寝签到成功！\n打卡账号：${account}\n所在楼栋：${dorm}\n已扣除 10 积分，祝您晚安🌙`);
         }
         
         document.addEventListener('DOMContentLoaded', initStatus);
+
+        // ================= 弹窗及兑换逻辑 =================
+        function openRedeemModal() {
+            document.getElementById('redeemModal').style.display = 'flex';
+        }
+
+        function closeRedeemModal() {
+            document.getElementById('redeemModal').style.display = 'none';
+            document.getElementById('redeemCode').value = ''; // 清空输入框
+        }
+
+        function handleRedeem() {
+            const code = document.getElementById('redeemCode').value.trim();
+            if (code) {
+                // 模拟兑换逻辑 (任意非空代码都兑换 50 积分)
+                const addedPoints = 50; 
+                userPoints += addedPoints;
+                localStorage.setItem('userPoints', userPoints);
+                initStatus(); // 刷新可用积分显示
+                alert(`🎉 兑换成功！您已获得 ${addedPoints} 积分。`);
+                closeRedeemModal();
+            }
+        }
+
+        // 点击弹窗外部半透明背景关闭弹窗
+        window.onclick = function(event) {
+            const modal = document.getElementById('redeemModal');
+            if (event.target === modal) {
+                closeRedeemModal();
+            }
+        }
     </script>
 </body>
 </html>

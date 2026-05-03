@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>学习资料库 - 校园综合服务平台</title>
+    <title>学习资源中心 - 校园综合服务平台</title>
     <style>
         /* 基础样式与导航栏 */
         body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f4f7f6; color: #333; min-height: 100vh; }
@@ -12,88 +12,45 @@
         .btn-outline { background: transparent; color: #4a5568; border: 1px solid #cbd5e0; padding: 0.5rem 1.2rem; border-radius: 20px; text-decoration: none; transition: all 0.3s ease; }
         .btn-outline:hover { background: #edf2f7; color: #2d3748; }
         
-        /* 页面主体与搜索栏 */
+        /* 页面主体与分类卡片 */
         .container { max-width: 1200px; margin: 0 auto; padding: 2rem 5%; }
-        .search-bar { display: flex; max-width: 700px; margin: 0 auto 3rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 30px; overflow: hidden; background: white; }
-        .search-bar input { flex: 1; border: none; padding: 1.2rem 1.5rem; font-size: 1rem; outline: none; }
-        .search-bar button { background: #3182ce; color: white; border: none; padding: 0 2.5rem; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.3s; }
-        .search-bar button:hover { background: #2b6cb0; }
-        
-        /* 资源网格与卡片 */
-        .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.8rem; }
-        .resource-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: flex; align-items: flex-start; gap: 15px; transition: transform 0.3s, box-shadow 0.3s; }
-        .resource-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
-        
-        .resource-icon { font-size: 2.8rem; line-height: 1; }
-        .resource-info { flex: 1; display: flex; flex-direction: column; height: 100%; }
-        .resource-title { font-size: 1.05rem; font-weight: 600; color: #2d3748; margin: 0 0 0.5rem 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .resource-meta { font-size: 0.85rem; color: #718096; margin-bottom: 1.2rem; }
-        
-        .download-btn { display: inline-block; padding: 0.5rem 1rem; background: #ebf8ff; color: #3182ce; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: background 0.2s; text-align: center; margin-top: auto; }
-        .download-btn:hover { background: #3182ce; color: white; }
+        .page-header { text-align: center; margin-bottom: 3.5rem; }
+        .page-header h1 { color: #2d3748; font-size: 2.2rem; margin-bottom: 0.8rem; }
+        .page-header p { color: #718096; font-size: 1.1rem; }
+
+        .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; max-width: 900px; margin: 0 auto; }
+        .category-card { background: white; border-radius: 16px; padding: 3rem 2rem; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.04); transition: all 0.3s ease; cursor: pointer; border: 1px solid transparent; }
+        .category-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(49, 130, 206, 0.1); border-color: rgba(49, 130, 206, 0.2); }
+        .category-icon { font-size: 4rem; margin-bottom: 1.5rem; display: inline-block; }
+        .category-card h3 { font-size: 1.5rem; color: #2d3748; margin-bottom: 1rem; }
+        .category-card p { color: #718096; font-size: 1rem; line-height: 1.6; }
     </style>
 </head>
 <body>
     <header>
-        <a href="main.html" class="logo">MyBrand校园 - 资料库</a>
+        <a href="main.html" class="logo">MyBrand校园 - 学习资源</a>
         <a href="main.html" class="btn-outline">返回大厅</a>
     </header>
 
     <main class="container">
-        <div class="search-bar">
-            <input type="text" placeholder="搜索历年真题、期末复习提纲、课件 PPT...">
-            <button>全库搜索</button>
+        <div class="page-header">
+            <h1>📥 学习资源中心</h1>
+            <p>请选择您需要的资源类型，快速获取学习助力！</p>
         </div>
 
-        <div class="resource-grid">
-            <!-- 资料 1 -->
-            <div class="resource-card">
-                <div class="resource-icon">📄</div>
-                <div class="resource-info">
-                    <h3 class="resource-title">2023-2024 高等数学A 期末复习提纲及押题</h3>
-                    <div class="resource-meta">PDF · 2.4 MB · 1.2k次下载</div>
-                    <a href="#" class="download-btn" onclick="alert('开始下载《高等数学A 期末复习提纲》...')">⬇️ 极速下载</a>
-                </div>
+        <div class="category-grid">
+            <!-- 学习资料入口 -->
+            <div class="category-card" onclick="window.location.href='learning_materials.html'">
+                <div class="category-icon">📚</div>
+                <h3>学习资料</h3>
+                <p>历年真题、复习提纲、课件PPT、考研笔记等各类文档快速下载，助你期末不挂科。</p>
             </div>
 
-            <!-- 资料 2 -->
-            <div class="resource-card">
-                <div class="resource-icon">📊</div>
-                <div class="resource-info">
-                    <h3 class="resource-title">C语言程序设计 - 谭浩强课后习题答案全集</h3>
-                    <div class="resource-meta">DOCX · 1.1 MB · 850次下载</div>
-                    <a href="#" class="download-btn" onclick="alert('开始下载《C语言课后习题答案》...')">⬇️ 极速下载</a>
-                </div>
-            </div>
-
-            <!-- 资料 3 -->
-            <div class="resource-card">
-                <div class="resource-icon">🗂️</div>
-                <div class="resource-info">
-                    <h3 class="resource-title">计算机网络（第七版）全套复习PPT及实验报告归档</h3>
-                    <div class="resource-meta">ZIP · 45 MB · 500次下载</div>
-                    <a href="#" class="download-btn" onclick="alert('开始下载《计网全套资料》...')">⬇️ 极速下载</a>
-                </div>
-            </div>
-
-            <!-- 资料 4 -->
-            <div class="resource-card">
-                <div class="resource-icon">🎧</div>
-                <div class="resource-info">
-                    <h3 class="resource-title">英语四六级 高频词汇与历年真题听力原音音频</h3>
-                    <div class="resource-meta">RAR · 120 MB · 3.2k次下载</div>
-                    <a href="#" class="download-btn" onclick="alert('开始下载《英语四六级资料包》...')">⬇️ 极速下载</a>
-                </div>
-            </div>
-            
-            <!-- 资料 5 -->
-            <div class="resource-card">
-                <div class="resource-icon">📝</div>
-                <div class="resource-info">
-                    <h3 class="resource-title">2024考研政治 肖秀荣核心考点背诵笔记提取</h3>
-                    <div class="resource-meta">PDF · 8 MB · 2.1k次下载</div>
-                    <a href="#" class="download-btn" onclick="alert('开始下载《考研政治笔记》...')">⬇️ 极速下载</a>
-                </div>
+            <!-- 学习软件入口 -->
+            <div class="category-card" onclick="window.location.href='learning_software.html'">
+                <div class="category-icon">💻</div>
+                <h3>学习软件</h3>
+                <p>专业必备软件、正版办公套件、编程IDE及效率工具下载，含详细安装教程。</p>
             </div>
         </div>
     </main>
