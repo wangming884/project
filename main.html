@@ -203,28 +203,28 @@
             </div>
 
             <!-- 模块 2: 代课平台 -->
-            <div class="service-card" onclick="alert('即将进入：互助代课平台')">
+            <div class="service-card" onclick="window.location.href='substitute.html'">
                 <div class="service-icon">🤝</div>
                 <h3>互助代课平台</h3>
                 <p>合理协调时间，同学互助代课，发布需求快速匹配，让校园生活更从容。</p>
             </div>
 
             <!-- 模块 3: 晚寝签到 -->
-            <div class="service-card" onclick="alert('签到成功！您今晚已安全归寝。')">
+            <div class="service-card" onclick="window.location.href='checkin.html'">
                 <div class="service-icon">🌙</div>
                 <h3>晚寝快速签到</h3>
                 <p>定位+一键打卡，每日晚寝签到省时省心，辅导员查看更直观。</p>
             </div>
 
             <!-- 模块 4: 站长好物 -->
-            <div class="service-card" onclick="alert('即将进入：站长好物推荐')">
+            <div class="service-card" onclick="window.location.href='recommend.html'">
                 <div class="service-icon">🎁</div>
                 <h3>站长好物</h3>
                 <p>精选校园实用好物推荐，每日特价福利，提升宿舍生活品质。</p>
             </div>
 
             <!-- 模块 5: 学习资源下载 -->
-            <div class="service-card" onclick="alert('即将进入：学习资源库')">
+            <div class="service-card" onclick="window.location.href='resources.html'">
                 <div class="service-icon">📥</div>
                 <h3>学习资料库</h3>
                 <p>收录各专业历年真题、复习笔记与考证资料，一键极速下载，期末不挂科。</p>
@@ -268,11 +268,11 @@
 
         // 签到按钮点击事件
         function handleSignIn() {
-            userPoints += 10; // 每次签到奖励10积分
+            userPoints += 1; // 每次签到奖励1积分
             localStorage.setItem('userPoints', userPoints);
             localStorage.setItem('lastSignInDate', new Date().toDateString());
             initSignInStatus();
-            alert('签到成功！获得 10 积分 🎉');
+            alert('签到成功！获得 1 积分 🎉');
         }
 
         // 页面加载完成后初始化

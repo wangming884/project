@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>晚寝快速签到 - 校园综合服务平台</title>
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f4f7f6; color: #333; min-height: 100vh; }
+        header { background: #ffffff; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #3182ce; text-decoration: none; }
+        .btn-outline { background: transparent; color: #4a5568; border: 1px solid #cbd5e0; padding: 0.5rem 1.2rem; border-radius: 20px; text-decoration: none; transition: all 0.3s; }
+        .btn-outline:hover { background: #edf2f7; color: #2d3748; }
+        
+        .container { max-width: 500px; margin: 4rem auto; padding: 3rem 2rem; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; }
+        .location-icon { font-size: 5rem; margin-bottom: 1rem; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-15px); } 60% { transform: translateY(-7px); } }
+        
+        .title { color: #2d3748; margin-bottom: 0.5rem; font-size: 1.8rem; }
+        .info-text { color: #718096; margin-bottom: 2rem; line-height: 1.6; }
+        .time-display { font-family: monospace; font-size: 1.2rem; color: #3182ce; font-weight: bold; background: #ebf8ff; padding: 5px 15px; border-radius: 20px; display: inline-block; margin-top: 10px; }
+        
+        .points-box { margin: 2rem 0; padding: 1rem; background: #fffff0; border: 1px solid #fefcbf; border-radius: 12px; color: #d69e2e; font-weight: 600; }
+        
+        .checkin-btn { width: 100%; background: #3182ce; color: white; border: none; padding: 1.2rem; font-size: 1.1rem; font-weight: bold; border-radius: 30px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(49, 130, 206, 0.3); }
+        .checkin-btn:hover:not(:disabled) { background: #2b6cb0; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(49, 130, 206, 0.4); }
+        .checkin-btn:disabled { background: #cbd5e0; cursor: not-allowed; box-shadow: none; color: #718096; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="main.html" class="logo">MyBrand校园 - 晚寝签到</a>
+        <a href="main.html" class="btn-outline">返回大厅</a>
+    </header>
+
+    <div class="container">
+        <div class="location-icon">📍🌙</div>
+        <h1 class="title">晚寝定位打卡</h1>
+        <p class="info-text">
+            检测到当前位置：学生公寓（匹配成功）
+            <br>
+            <span class="time-display" id="currentTime">--:--:--</span>
+        </p>
+        
+        <div class="points-box">
+            当前可用积分：<span id="currentPoints">0</span>
+        </div>
+
+        <button id="checkinBtn" class="checkin-btn" onclick="doCheckIn()">立即签到 (扣除 10 积分)</button>
+    </div>
+
+    <script>
+        // 时间动态更新
+        function updateTime() {
+            document.getElementById('currentTime').innerText = new Date().toLocaleTimeString();
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // 积分及签到状态初始化
+        let userPoints = parseInt(localStorage.getItem('userPoints')) || 0;
+        let lastNightCheckIn = localStorage.getItem('lastNightCheckIn');
+        let today = new Date().toDateString();
+        
+        function initStatus() {
+            document.getElementById('currentPoints').innerText = userPoints;
+            if (lastNightCheckIn === today) {
+                const btn = document.getElementById('checkinBtn');
+                btn.innerText = "今晚已完成签到，早点休息吧！";
+                btn.disabled = true;
+            }
+        }
+
+        // 执行签到操作
+        function doCheckIn() {
+            if (userPoints < 10) {
+                alert('❌ 积分不足！晚寝签到需要 10 积分。\n请先返回服务大厅进行每日签到获取积分。');
+                return;
+            }
+            
+            // 扣除积分并记录今天已签到
+            userPoints -= 10;
+            localStorage.setItem('userPoints', userPoints);
+            localStorage.setItem('lastNightCheckIn', today);
+            lastNightCheckIn = today;
+            
+            initStatus(); // 刷新界面
+            alert('✅ 晚寝签到成功！已扣除 10 积分，祝您晚安🌙');
+        }
+        
+        document.addEventListener('DOMContentLoaded', initStatus);
+    </script>
+</body>
+</html>
