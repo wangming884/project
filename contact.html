@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>联系作者 - 校园综合服务平台</title>
+    <style>
+        /* 基础样式重置 */
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: #f4f7f6; 
+            color: #333; 
+            min-height: 100vh; 
+        }
+        header { 
+            background: #ffffff; 
+            padding: 1rem 5%; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+        }
+        .logo { 
+            font-size: 1.5rem; 
+            font-weight: bold; 
+            color: #3182ce; 
+            letter-spacing: 0.5px; 
+            text-decoration: none;
+        }
+        .back-btn {
+            background: transparent; 
+            color: #4a5568; 
+            border: 1px solid #cbd5e0; 
+            padding: 0.4rem 1rem; 
+            cursor: pointer; 
+            border-radius: 20px; 
+            font-size: 0.9rem; 
+            transition: all 0.3s ease; 
+            text-decoration: none;
+        }
+        .back-btn:hover {
+            background: #edf2f7;
+            color: #2d3748;
+        }
+        .container {
+            max-width: 800px;
+            margin: 3rem auto;
+            padding: 0 5%;
+        }
+        .contact-card {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        }
+        .contact-card h1 {
+            margin-top: 0;
+            color: #1a202c;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .contact-card p.subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 2.5rem;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        .info-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+        .info-icon { font-size: 2rem; margin-bottom: 1rem; }
+        .info-title { font-weight: 600; color: #2d3748; margin-bottom: 0.5rem; }
+        .info-detail { color: #4a5568; font-size: 0.95rem; }
+        
+        /* 留言表单样式 */
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #4a5568; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 0.8rem; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; font-size: 1rem; font-family: inherit;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: #3182ce; outline: none; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+        .submit-btn {
+            width: 100%; padding: 1rem; background: #3182ce; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: 600; transition: all 0.3s ease;
+        }
+        .submit-btn:hover { background: #2b6cb0; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(49, 130, 206, 0.2); }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="main.html" class="logo">MyBrand校园</a>
+        <a href="main.html" class="back-btn">返回服务大厅</a>
+    </header>
+
+    <main class="container">
+        <div class="contact-card">
+            <h1>联系作者</h1>
+            <p class="subtitle">欢迎提供宝贵建议，或者与我们探讨合作机会</p>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-icon">📧</div>
+                    <div class="info-title">电子邮箱</div>
+                    <div class="info-detail">admin@mybrand.com</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">💬</div>
+                    <div class="info-title">微信客服</div>
+                    <div class="info-detail">MyBrand_Admin</div>
+                </div>
+            </div>
+
+            <!-- 留言表单，前端演示 -->
+            <form onsubmit="event.preventDefault(); alert('感谢您的反馈！您的留言我们已收到。'); this.reset();">
+                <div class="form-group">
+                    <label for="name">您的称呼</label>
+                    <input type="text" id="name" required placeholder="请输入您的姓名或昵称">
+                </div>
+                <div class="form-group">
+                    <label for="email">联系邮箱</label>
+                    <input type="email" id="email" required placeholder="请输入您的电子邮箱">
+                </div>
+                <div class="form-group">
+                    <label for="message">留言内容</label>
+                    <textarea id="message" rows="5" required placeholder="请输入您的建议或想说的话..."></textarea>
+                </div>
+                <button type="submit" class="submit-btn">发送留言</button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>

@@ -16,15 +16,15 @@
         .auth-buttons button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
         /* 首页主体内容 */
-        .hero { display: flex; align-items: center; justify-content: space-between; padding: 8rem 5%; max-width: 1200px; margin: 0 auto; text-align: left; gap: 4rem; }
+        .hero { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: 10rem 5%; max-width: 1280px; margin: 0 auto; text-align: left; gap: 6rem; }
         .hero-text { flex: 1; }
-        .hero h1 { font-size: 3.2rem; margin-bottom: 1.2rem; color: #2d3748; line-height: 1.2; }
+        .hero h1 { font-size: 3.8rem; margin-bottom: 1.5rem; color: #1a202c; line-height: 1.15; font-weight: 800; letter-spacing: -1px; }
         .hero h1 span { color: #3182ce; }
-        .hero p { font-size: 1.15rem; color: #4a5568; line-height: 1.8; margin-bottom: 2.5rem; }
-        .cta-btn { display: inline-block; padding: 0.8rem 2.5rem; background: #3182ce; color: white; font-size: 1.1rem; border-radius: 30px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(49, 130, 206, 0.3); }
-        .cta-btn:hover { background: #2b6cb0; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(49, 130, 206, 0.4); }
-        .hero-image { flex: 1; max-width: 50%; width: 500px; height: auto; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); transition: transform 0.4s ease, box-shadow 0.4s ease; }
-        .hero-image:hover { transform: translateY(-5px); box-shadow: 0 25px 50px rgba(0,0,0,0.12); }
+        .hero p { font-size: 1.25rem; color: #4a5568; line-height: 1.9; margin-bottom: 3rem; }
+        .cta-btn { display: inline-block; padding: 1rem 2.8rem; background: #3182ce; color: white; font-size: 1.15rem; font-weight: 600; border-radius: 40px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(49, 130, 206, 0.3); }
+        .cta-btn:hover { background: #2b6cb0; transform: translateY(-3px); box-shadow: 0 15px 35px rgba(49, 130, 206, 0.4); }
+        .hero-image { flex: 1; max-width: 50%; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 24px; box-shadow: 0 30px 60px rgba(0,0,0,0.12); transition: transform 0.5s ease, box-shadow 0.5s ease; }
+        .hero-image:hover { transform: translateY(-8px); box-shadow: 0 40px 80px rgba(0,0,0,0.18); }
         
         /* 弹窗背景 (默认隐藏) */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
@@ -52,9 +52,13 @@
         .modal-footer { margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: #666; border-top: 1px solid #eee; padding-top: 1rem; }
         .modal-footer a { color: #3182ce; text-decoration: none; font-weight: bold; cursor: pointer; transition: color 0.2s; }
         .modal-footer a:hover { color: #2b6cb0; text-decoration: underline; }
+        
+        /* 粒子特效背景 */
+        #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 0; pointer-events: none; }
     </style>
 </head>
 <body>
+    <div id="particles-js"></div>
     <header>
         <div class="logo">MyBrand</div>
         <div class="auth-buttons">
@@ -65,11 +69,11 @@
 
     <main class="hero">
         <div class="hero-text">
-            <h1>欢迎来到我们的<span>全新平台</span></h1>
+            <h1>欢迎来到我们的<span>平台</span></h1>
             <p>探索无限可能。加入我们的社区，即可解锁全部专属功能，体验前所未有的服务。</p>
             <a class="cta-btn" onclick="openModal('registerModal')">立即开始体验</a>
         </div>
-        <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1000&q=80" alt="现代办公环境展示图" class="hero-image">
+        <img src="view.jpg" alt="园区风景展示图" class="hero-image">
     </main>
 
     <!-- 登录弹窗 -->
@@ -122,7 +126,35 @@
         </div>
     </div>
 
+    <!-- 引入 particles.js 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script>
+        // 初始化粒子特效
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#3182ce" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.4, "random": false },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#3182ce", "opacity": 0.3, "width": 1 },
+                "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": { "enable": true, "mode": "grab" },
+                    "onclick": { "enable": true, "mode": "push" },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": { "distance": 140, "line_linked": { "opacity": 0.8 } },
+                    "push": { "particles_nb": 3 }
+                }
+            },
+            "retina_detect": true
+        });
+
         // 打开弹窗的函数
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
