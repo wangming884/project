@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发布闲置 - 校园二手集市</title>
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f4f7f6; color: #333; min-height: 100vh; }
+        header { background: #ffffff; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #3182ce; text-decoration: none; }
+        .btn-outline { background: transparent; color: #4a5568; border: 1px solid #cbd5e0; padding: 0.5rem 1.2rem; border-radius: 20px; text-decoration: none; transition: all 0.3s; }
+        .btn-outline:hover { background: #edf2f7; color: #2d3748; }
+
+        .container { max-width: 800px; margin: 2rem auto; padding: 2rem 5%; }
+        .page-header { text-align: center; margin-bottom: 2.5rem; }
+        .page-header h1 { font-size: 2rem; color: #2d3748; margin-bottom: 0.5rem; }
+        .page-header p { color: #718096; }
+
+        .publish-form { background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.05); }
+        .form-group { margin-bottom: 1.8rem; }
+        .form-group label { display: block; margin-bottom: 0.8rem; font-weight: 600; color: #4a5568; font-size: 1rem; }
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: #3182ce;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
+        }
+        .form-group textarea { resize: vertical; }
+
+        .image-upload-box {
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            color: #a0aec0;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .image-upload-box:hover {
+            border-color: #3182ce;
+            background: #ebf8ff;
+            color: #3182ce;
+        }
+        .image-upload-box span { font-size: 2.5rem; font-weight: 300; }
+        .image-upload-box p { margin: 0.5rem 0 0; font-size: 0.9rem; }
+        .image-upload-box input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #3182ce;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+        .submit-btn:hover {
+            background: #2b6cb0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(49, 130, 206, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="main.html" class="logo">MyBrand校园 - 发布闲置</a>
+        <a href="secondhand.html" class="btn-outline">返回集市</a>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>发布您的闲置宝贝</h1>
+            <p>填写详细信息，让您的宝贝更快找到新主人。</p>
+        </div>
+
+        <form class="publish-form" onsubmit="event.preventDefault(); handleSubmit();">
+            <div class="form-group">
+                <label for="item-title">宝贝标题</label>
+                <input type="text" id="item-title" placeholder="例如：九成新 高等数学（第七版）上下册" required>
+            </div>
+            <div class="form-group">
+                <label for="item-description">详细描述</label>
+                <textarea id="item-description" rows="5" placeholder="描述一下宝贝的新旧程度、使用情况、有无瑕疵等..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="item-price">期望价格 (元)</label>
+                <input type="number" id="item-price" step="0.01" min="0" placeholder="0.00" required>
+            </div>
+             <div class="form-group">
+                <label for="item-contact">联系方式</label>
+                <input type="text" id="item-contact" placeholder="您的微信/QQ号，方便买家联系" required>
+            </div>
+            <div class="form-group">
+                <label>上传宝贝图片 (可选)</label>
+                <div class="image-upload-box">
+                    <span>+</span>
+                    <p>点击或拖拽上传图片</p>
+                    <input type="file" id="item-image" accept="image/*">
+                </div>
+            </div>
+            <button type="submit" class="submit-btn">确认发布</button>
+        </form>
+    </main>
+
+    <script>
+        function handleSubmit() {
+            // 在实际应用中，这里会使用 FormData 来收集数据并发送到后端
+            alert('🎉 发布成功！您的闲置宝贝已在集市展示。\n（此为前端演示，数据未实际提交）');
+            // 成功后跳转回二手市场页面
+            window.location.href = 'secondhand.html';
+        }
+    </script>
+</body>
+</html>

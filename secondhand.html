@@ -153,12 +153,11 @@
             box-shadow: 0 12px 25px rgba(0,0,0,0.08);
         }
         .product-img {
+            width: 100%;
             height: 180px;
+            object-fit: cover;
             background: #edf2f7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
+            display: block;
         }
         .product-info {
             padding: 1.2rem;
@@ -211,7 +210,7 @@
     <header>
         <a href="main.html" class="logo">MyBrand校园 - 二手集市</a>
         <div class="header-actions">
-            <button class="btn btn-primary" onclick="alert('即将打开闲置发布表单...')">➕ 发布闲置</button>
+            <button class="btn btn-primary" onclick="window.location.href='publish.html'">➕ 发布闲置</button>
             <a href="main.html" class="btn btn-outline">返回大厅</a>
         </div>
     </header>
@@ -234,7 +233,7 @@
         <div class="product-grid">
             <!-- 商品 1 -->
             <div class="product-card">
-                <div class="product-img">📚</div>
+                <img class="product-img" src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=400" alt="高等数学教材">
                 <div class="product-info">
                     <div class="product-title">高等数学（第七版）上下册 几乎全新</div>
                     <div class="product-price">￥ 25.00</div>
@@ -248,7 +247,7 @@
 
             <!-- 商品 2 -->
             <div class="product-card">
-                <div class="product-img">🎧</div>
+                <img class="product-img" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400" alt="降噪耳机">
                 <div class="product-info">
                     <div class="product-title">九成新 索尼降噪耳机 毕业出清</div>
                     <div class="product-price">￥ 450.00</div>
@@ -262,7 +261,7 @@
 
             <!-- 商品 3 -->
             <div class="product-card">
-                <div class="product-img">🚴‍♂️</div>
+                <img class="product-img" src="https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&q=80&w=400" alt="代步自行车">
                 <div class="product-info">
                     <div class="product-title">校园代步自行车 送车锁打气筒</div>
                     <div class="product-price">￥ 120.00</div>
@@ -276,7 +275,7 @@
 
             <!-- 商品 4 -->
             <div class="product-card">
-                <div class="product-img">🎸</div>
+                <img class="product-img" src="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&q=80&w=400" alt="民谣吉他">
                 <div class="product-info">
                     <div class="product-title">民谣吉他 适合新手入门 音质好</div>
                     <div class="product-price">￥ 180.00</div>
