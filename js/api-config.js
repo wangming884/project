@@ -25,7 +25,13 @@ const API_ENDPOINTS = {
         getBalance: `${API_BASE_URL}/points/balance`,          // GET - 获取积分余额
         dailySignIn: `${API_BASE_URL}/points/sign-in`,         // POST - 每日签到
         redeem: `${API_BASE_URL}/points/redeem`,               // POST - 兑换积分码
+        purchase: `${API_BASE_URL}/points/purchase`,           // POST - 购买积分套餐
         getHistory: `${API_BASE_URL}/points/history`,          // GET - 积分历史记录
+    },
+
+    // 公告相关
+    announcement: {
+        latest: `${API_BASE_URL}/announcement/latest`,         // GET - 获取最新公告
     },
 
     // 晚寝签到相关
@@ -62,6 +68,9 @@ const API_ENDPOINTS = {
         list: `${API_BASE_URL}/recommend/list`,                // GET - 获取推荐商品列表
         detail: `${API_BASE_URL}/recommend/detail`,            // GET - 获取商品详情
         getCoupon: `${API_BASE_URL}/recommend/coupon`,         // POST - 领取优惠券
+        adminList: `${API_BASE_URL}/recommend/admin/list`,     // GET - 管理员查询好物
+        adminCreate: `${API_BASE_URL}/recommend/admin/create`, // POST - 管理员上架好物
+        adminStatusBase: `${API_BASE_URL}/recommend/admin`,    // POST - 管理员上下架
     },
 
     // 学习资源相关
@@ -102,6 +111,11 @@ const API_ENDPOINTS = {
         pointsHistory: `${API_BASE_URL}/points/admin/history`,  // GET - 管理员查看积分流水
         resourceUploadMaterial: `${API_BASE_URL}/resources/admin/materials/upload`, // POST - 管理员上传学习资料
         resourceUploadSoftware: `${API_BASE_URL}/resources/admin/software/upload`, // POST - 管理员上传学习软件
+        recommendAdminList: `${API_BASE_URL}/recommend/admin/list`, // GET - 管理员查询好物
+        recommendAdminCreate: `${API_BASE_URL}/recommend/admin/create`, // POST - 管理员上架好物
+        recommendAdminStatusBase: `${API_BASE_URL}/recommend/admin`, // POST - 管理员上下架
+        announcementAdminList: `${API_BASE_URL}/announcement/admin/list`, // GET - 管理员查询公告
+        announcementPublish: `${API_BASE_URL}/announcement/admin/publish`, // POST - 管理员发布公告
     },
 };
 

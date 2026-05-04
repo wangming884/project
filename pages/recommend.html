@@ -10,48 +10,45 @@
         .logo { font-size: 1.5rem; font-weight: bold; color: #3182ce; text-decoration: none; }
         .btn-outline { background: transparent; color: #4a5568; border: 1px solid #cbd5e0; padding: 0.5rem 1.2rem; border-radius: 20px; text-decoration: none; transition: all 0.3s ease; }
         .btn-outline:hover { background: #edf2f7; color: #2d3748; }
-        
-        .container { max-width: 1200px; margin: 0 auto; padding: 3rem 5%; }
+
+        .announcement { max-width: 1200px; margin: 1rem auto 0; padding: 0 5%; }
+        .announcement-card { display: none; background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; border-radius: 10px; padding: 0.75rem 0.9rem; font-size: 0.92rem; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem 5% 3rem; }
         .page-header { text-align: center; margin-bottom: 2rem; }
         .page-header h1 { color: #2d3748; font-size: 2.2rem; margin-bottom: 0.8rem; }
         .page-header p { color: #718096; font-size: 1.1rem; }
-        
-        /* 好物积分显示与弹窗样式 */
-        .points-container { display: flex; flex-direction: column; align-items: center; margin: 0 auto 3rem; padding: 1.2rem; background: #fff5f5; border: 1px solid #fed7d7; border-radius: 12px; max-width: 400px; color: #c53030; font-weight: 600; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+
+        .points-container { display: flex; flex-direction: column; align-items: center; margin: 0 auto 2rem; padding: 1.2rem; background: #fff5f5; border: 1px solid #fed7d7; border-radius: 12px; max-width: 400px; color: #c53030; font-weight: 600; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         .points-actions { display: flex; gap: 15px; margin-top: 10px; }
         .btn-small { background: #e53e3e; color: white; border: none; padding: 0.5rem 1.2rem; border-radius: 20px; cursor: pointer; font-size: 0.9rem; transition: background 0.3s; font-weight: bold; }
         .btn-small:hover { background: #c53030; }
         .btn-small.buy-btn { background: #ed8936; }
         .btn-small.buy-btn:hover { background: #dd6b20; }
-        
+
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; text-align: left; }
-        .modal-content { background: white; padding: 2rem; border-radius: 12px; width: 100%; max-width: 320px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease-out; }
+        .modal-content { background: white; padding: 2rem; border-radius: 12px; width: 100%; max-width: 340px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         .close-btn { position: absolute; top: 12px; right: 15px; font-size: 1.5rem; color: #999; cursor: pointer; transition: color 0.2s; }
         .close-btn:hover { color: #333; }
-        .modal-content h2 { margin-top: 0; text-align: center; color: #333; margin-bottom: 1.5rem; font-size: 1.5rem; }
-        .form-group { margin-bottom: 1.5rem; }
+        .modal-content h2 { margin-top: 0; text-align: center; color: #333; margin-bottom: 1.5rem; font-size: 1.4rem; }
+        .form-group { margin-bottom: 1.2rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4a5568; font-size: 0.95rem; }
-        .form-group input { width: 100%; padding: 0.8rem 1rem; border: 1px solid #cbd5e0; border-radius: 8px; box-sizing: border-box; font-size: 1rem; transition: border-color 0.2s; }
-        .form-group input:focus { border-color: #3182ce; outline: none; box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2); }
-        .submit-btn { width: 100%; padding: 0.8rem; background: #e53e3e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; margin-top: 1rem; transition: all 0.3s ease; font-weight: bold; }
+        .form-group input, .form-group select { width: 100%; padding: 0.8rem 1rem; border: 1px solid #cbd5e0; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        .submit-btn { width: 100%; padding: 0.8rem; background: #e53e3e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; margin-top: 0.5rem; transition: all 0.3s ease; font-weight: bold; }
         .submit-btn:hover { background: #c53030; }
 
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
-        
         .product-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; }
         .product-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
-        
         .product-img { height: 220px; background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%); display: flex; align-items: center; justify-content: center; font-size: 6rem; position: relative; }
         .badge { position: absolute; top: 15px; right: 15px; background: #e53e3e; color: white; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: bold; }
-        
         .product-info { padding: 1.5rem; display: flex; flex-direction: column; flex: 1; }
         .product-title { font-size: 1.2rem; font-weight: 600; color: #2d3748; margin-bottom: 0.5rem; }
         .product-desc { font-size: 0.95rem; color: #718096; margin-bottom: 1.5rem; line-height: 1.6; }
         .price-row { display: flex; justify-content: space-between; align-items: center; margin-top: auto; margin-bottom: 1rem; }
         .price { font-size: 1.5rem; color: #e53e3e; font-weight: bold; }
         .original-price { font-size: 0.9rem; color: #a0aec0; text-decoration: line-through; }
-        
         .buy-btn { text-align: center; background: #38b2ac; color: white; border: none; padding: 0.8rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: background 0.3s; text-decoration: none; display: block; }
         .buy-btn:hover { background: #319795; }
     </style>
@@ -62,6 +59,10 @@
         <a href="main.html" class="btn-outline">返回大厅</a>
     </header>
 
+    <div class="announcement">
+        <div id="recommendAnnouncement" class="announcement-card"></div>
+    </div>
+
     <main class="container">
         <div class="page-header">
             <h1>🎁 站长精选宿舍神器</h1>
@@ -69,67 +70,23 @@
         </div>
 
         <div class="points-container">
-            <div>当前好物积分：<span id="currentShopPoints">0</span></div>
+            <div>当前积分：<span id="currentShopPoints">0</span></div>
             <div class="points-actions">
-                <button type="button" class="btn-small buy-btn" onclick="openRedeemCodeShop()">外站购买兑换码</button>
+                <button type="button" class="btn-small buy-btn" onclick="openShopPurchaseModal()">购买积分</button>
                 <button type="button" class="btn-small" onclick="openShopRedeemModal()">兑换积分</button>
             </div>
         </div>
 
-        <div class="product-grid">
-            <!-- 好物 1 -->
-            <div class="product-card">
-                <div class="product-img">
-                    <span class="badge">爆款推荐</span>
-                    💡
-                </div>
-                <div class="product-info">
-                    <div class="product-title">非对称光源屏幕挂灯</div>
-                    <div class="product-desc">宿舍熄灯后熬夜赶Due必备，非对称光线设计不反光，有效保护视力。</div>
-                    <div class="price-row">
-                        <span class="price">￥ 69.00</span>
-                        <span class="original-price">￥ 129.00</span>
-                    </div>
-                    <a href="#" class="buy-btn" onclick="alert('已复制专属优惠券，即将跳转至购买页面...')">抢购领券</a>
-                </div>
-            </div>
-
-            <!-- 好物 2 -->
-            <div class="product-card">
-                <div class="product-img">💺</div>
-                <div class="product-info">
-                    <div class="product-title">太空记忆棉护腰靠垫</div>
-                    <div class="product-desc">拯救久坐党，人体工学设计，完美贴合腰椎曲线，看书打游戏不腰疼。</div>
-                    <div class="price-row">
-                        <span class="price">￥ 45.00</span>
-                        <span class="original-price">￥ 88.00</span>
-                    </div>
-                    <a href="#" class="buy-btn" onclick="alert('已复制专属优惠券，即将跳转至购买页面...')">抢购领券</a>
-                </div>
-            </div>
-
-            <!-- 好物 3 -->
-            <div class="product-card">
-                <div class="product-img">🎧</div>
-                <div class="product-info">
-                    <div class="product-title">零压感隔音睡眠耳塞</div>
-                    <div class="product-desc">宿舍防呼噜/防噪音神器。慢回弹海绵材质，侧睡佩戴无异物感。</div>
-                    <div class="price-row">
-                        <span class="price">￥ 9.90</span>
-                        <span class="original-price">￥ 19.90</span>
-                    </div>
-                    <a href="#" class="buy-btn" onclick="alert('已复制专属优惠券，即将跳转至购买页面...')">抢购领券</a>
-                </div>
-            </div>
+        <div class="product-grid" id="recommendGrid">
+            <div style="grid-column:1/-1;text-align:center;color:#718096;padding:2.5rem 0;">加载中...</div>
         </div>
     </main>
 
-    <!-- 兑换好物积分弹窗 -->
     <div id="shopRedeemModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeShopRedeemModal()">&times;</span>
             <h2>兑换积分</h2>
-            <form id="shopRedeemForm" onsubmit="event.preventDefault(); handleShopRedeem();">
+            <form onsubmit="event.preventDefault(); handleShopRedeem();">
                 <div class="form-group">
                     <label for="shopRedeemCode">兑换码</label>
                     <input type="text" id="shopRedeemCode" placeholder="请输入好物兑换码" required>
@@ -139,16 +96,39 @@
         </div>
     </div>
 
+    <div id="shopPurchaseModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeShopPurchaseModal()">&times;</span>
+            <h2>购买积分</h2>
+            <form onsubmit="event.preventDefault(); handleShopPurchase();">
+                <div class="form-group">
+                    <label for="shopPurchasePackage">选择套餐</label>
+                    <select id="shopPurchasePackage">
+                        <option value="basic">基础包：100积分（￥10）</option>
+                        <option value="plus">进阶包：300积分（￥25）</option>
+                        <option value="pro">尊享包：800积分（￥60）</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">确认购买</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/api-config.js"></script>
+    <script src="../js/api-utils.js"></script>
     <script>
-        const REDEEM_CODE_SHOP_URL = 'https://example.com/redeem-codes';
-
-        function openRedeemCodeShop() {
-            window.open(REDEEM_CODE_SHOP_URL, '_blank', 'noopener,noreferrer');
-            alert('已跳转到外部网站购买兑换码，本站不参与任何金钱交易。');
-        }
-
-        // 使用专门的键名 shopPoints 存储，与晚寝签到积分区分开
+        const recommendGrid = document.getElementById('recommendGrid');
+        const announcementEl = document.getElementById('recommendAnnouncement');
         let shopPoints = parseInt(localStorage.getItem('shopPoints')) || 0;
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
 
         function initShopPoints() {
             document.getElementById('currentShopPoints').innerText = shopPoints;
@@ -160,30 +140,195 @@
 
         function closeShopRedeemModal() {
             document.getElementById('shopRedeemModal').style.display = 'none';
-            document.getElementById('shopRedeemCode').value = ''; // 清空输入框
+            document.getElementById('shopRedeemCode').value = '';
+        }
+
+        function openShopPurchaseModal() {
+            document.getElementById('shopPurchaseModal').style.display = 'flex';
+        }
+
+        function closeShopPurchaseModal() {
+            document.getElementById('shopPurchaseModal').style.display = 'none';
+        }
+
+        async function syncPointsBalance() {
+            const token = getStorage('authToken');
+            if (!token) {
+                initShopPoints();
+                return;
+            }
+            try {
+                const response = await get(API_ENDPOINTS.points.getBalance);
+                if (response.success && response.data) {
+                    shopPoints = Number(response.data.balance ?? shopPoints);
+                    localStorage.setItem('shopPoints', shopPoints);
+                }
+            } catch (error) {
+                // ignore
+            }
+            initShopPoints();
         }
 
         function handleShopRedeem() {
             const code = document.getElementById('shopRedeemCode').value.trim();
-            if (code) {
-                const addedPoints = 100; // 模拟兑换增加 100 积分
-                shopPoints += addedPoints;
+            const token = getStorage('authToken');
+            if (!token) {
+                showMessage('请先登录后再兑换积分', 'warning');
+                return;
+            }
+            if (!code) {
+                showMessage('请输入兑换码', 'warning');
+                return;
+            }
+
+            post(API_ENDPOINTS.points.redeem, { code }).then((response) => {
+                if (!response.success) {
+                    showMessage(response.message || '兑换失败', 'error');
+                    return;
+                }
+                const balance = Number(response.data?.balance ?? shopPoints);
+                const added = Number(response.data?.points ?? 0);
+                shopPoints = balance;
                 localStorage.setItem('shopPoints', shopPoints);
                 initShopPoints();
-                alert(`🎉 兑换成功！您已获得 ${addedPoints} 好物积分。`);
+                showMessage(`兑换成功，获得 ${added} 积分`, 'success');
                 closeShopRedeemModal();
+            }).catch(() => {
+                showMessage('兑换失败，请稍后重试', 'error');
+            });
+        }
+
+        function handleShopPurchase() {
+            const packageType = document.getElementById('shopPurchasePackage').value;
+            const token = getStorage('authToken');
+            if (!token) {
+                showMessage('请先登录后再购买积分', 'warning');
+                return;
+            }
+
+            post(API_ENDPOINTS.points.purchase, { packageType }).then((response) => {
+                if (!response.success) {
+                    showMessage(response.message || '购买失败', 'error');
+                    return;
+                }
+                const balance = Number(response.data?.balance ?? shopPoints);
+                const points = Number(response.data?.points ?? 0);
+                shopPoints = balance;
+                localStorage.setItem('shopPoints', shopPoints);
+                initShopPoints();
+                showMessage(`购买成功，已到账 ${points} 积分`, 'success');
+                closeShopPurchaseModal();
+            }).catch(() => {
+                showMessage('购买失败，请稍后重试', 'error');
+            });
+        }
+
+        function renderRecommendProducts(list) {
+            if (!Array.isArray(list) || !list.length) {
+                recommendGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#718096;padding:2.5rem 0;">当前暂无上架商品</div>';
+                return;
+            }
+
+            recommendGrid.innerHTML = list.map((item) => `
+                <div class="product-card">
+                    <div class="product-img">
+                        ${item.badge ? `<span class="badge">${escapeHtml(item.badge)}</span>` : ''}
+                        ${escapeHtml(item.imageEmoji || '🎁')}
+                    </div>
+                    <div class="product-info">
+                        <div class="product-title">${escapeHtml(item.title)}</div>
+                        <div class="product-desc">${escapeHtml(item.description || '')}</div>
+                        <div class="price-row">
+                            <span class="price">￥ ${escapeHtml(item.price ?? '0')}</span>
+                            <span class="original-price">￥ ${escapeHtml(item.originalPrice ?? item.price ?? '0')}</span>
+                        </div>
+                        <a href="#" class="buy-btn" data-product-id="${escapeHtml(item.id)}">抢购领券</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadRecommendProducts() {
+            try {
+                const response = await get(API_ENDPOINTS.recommend.list, { page: 1, pageSize: 100 });
+                if (!response.success || !response.data) {
+                    renderRecommendProducts([]);
+                    return;
+                }
+                renderRecommendProducts(response.data.list || []);
+            } catch (error) {
+                renderRecommendProducts([]);
             }
         }
 
-        // 点击弹窗外部半透明背景关闭弹窗
+        async function claimCoupon(productId) {
+            try {
+                const response = await post(API_ENDPOINTS.recommend.getCoupon, { productId });
+                if (!response.success || !response.data) {
+                    showMessage(response.message || '领取失败，请稍后重试', 'error');
+                    return;
+                }
+                const couponCode = response.data.couponCode || '';
+                const buyUrl = response.data.buyUrl || '';
+
+                if (couponCode) {
+                    try {
+                        await navigator.clipboard.writeText(couponCode);
+                        showMessage('优惠券已复制，即将跳转', 'success');
+                    } catch (e) {
+                        showMessage(`优惠券：${couponCode}`, 'info');
+                    }
+                }
+
+                if (buyUrl) {
+                    window.open(buyUrl, '_blank', 'noopener,noreferrer');
+                }
+            } catch (error) {
+                showMessage('领取失败，请稍后重试', 'error');
+            }
+        }
+
+        async function loadAnnouncement() {
+            try {
+                const response = await get(API_ENDPOINTS.announcement.latest, { scope: 'recommend' });
+                if (!response.success || !response.data || !response.data.announcement) {
+                    announcementEl.style.display = 'none';
+                    return;
+                }
+                const notice = response.data.announcement;
+                announcementEl.textContent = `公告：${notice.title} - ${notice.content}`;
+                announcementEl.style.display = 'block';
+            } catch (error) {
+                announcementEl.style.display = 'none';
+            }
+        }
+
         window.onclick = function(event) {
-            const modal = document.getElementById('shopRedeemModal');
-            if (event.target === modal) {
+            const redeemModal = document.getElementById('shopRedeemModal');
+            const purchaseModal = document.getElementById('shopPurchaseModal');
+            if (event.target === redeemModal) {
                 closeShopRedeemModal();
             }
-        }
+            if (event.target === purchaseModal) {
+                closeShopPurchaseModal();
+            }
+        };
 
-        document.addEventListener('DOMContentLoaded', initShopPoints);
+        recommendGrid.addEventListener('click', (event) => {
+            const target = event.target;
+            const productId = Number(target.dataset.productId);
+            if (!productId) {
+                return;
+            }
+            event.preventDefault();
+            claimCoupon(productId);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            syncPointsBalance();
+            loadAnnouncement();
+            loadRecommendProducts();
+        });
     </script>
 </body>
 </html>

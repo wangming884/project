@@ -56,8 +56,10 @@
         .form-group label { font-size: 0.82rem; color: var(--muted); }
         .form-group input { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; }
         .form-group select { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; background: #fff; }
+        .form-group textarea { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; background: #fff; min-height: 96px; resize: vertical; font-family: inherit; }
         .form-group input:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
         .form-group select:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
+        .form-group textarea:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
         .adjust-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
         .empty { color: var(--muted); font-size: 0.9rem; padding: 0.5rem 0; }
         .upload-result { margin-top: 0.7rem; padding: 0.7rem; background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; font-size: 0.84rem; color: #334155; }
@@ -142,6 +144,8 @@
                     <div class="perm-item">查看全站积分流水</div>
                     <div class="perm-item">管理员强制状态修改</div>
                     <div class="perm-item">上传学习资料/学习软件</div>
+                    <div class="perm-item">上架/下架站长好物</div>
+                    <div class="perm-item">编辑发布前台公告</div>
                 </div>
                 <p class="empty" style="margin-top:0.8rem;">提示：管理员登录后签发专属 token，并具备超级权限（后端 `userId=0`）。</p>
             </aside>
@@ -256,6 +260,106 @@
             </div>
             <div id="resourceUploadResult" class="upload-result">提示：当前为 Google Drive 预留接入模式，上传成功后会返回预留会话信息。</div>
         </section>
+
+        <section class="panel">
+            <h2>站长好物上架管理（管理员）</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="recommendTitleInput">商品标题</label>
+                    <input id="recommendTitleInput" type="text" placeholder="例如：护眼台灯">
+                </div>
+                <div class="form-group">
+                    <label for="recommendPriceInput">现价（元）</label>
+                    <input id="recommendPriceInput" type="number" step="0.01" placeholder="例如：69.00">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="recommendOriginalPriceInput">原价（元）</label>
+                    <input id="recommendOriginalPriceInput" type="number" step="0.01" placeholder="例如：129.00">
+                </div>
+                <div class="form-group">
+                    <label for="recommendBadgeInput">角标文案（可选）</label>
+                    <input id="recommendBadgeInput" type="text" placeholder="例如：爆款推荐">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="recommendEmojiInput">展示 Emoji（可选）</label>
+                    <input id="recommendEmojiInput" type="text" placeholder="例如：💡">
+                </div>
+                <div class="form-group">
+                    <label for="recommendBuyUrlInput">外部购买链接（可选）</label>
+                    <input id="recommendBuyUrlInput" type="text" placeholder="https://example.com/product/xxx">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="recommendDescInput">商品描述</label>
+                <input id="recommendDescInput" type="text" placeholder="简要描述卖点（1-2句）">
+            </div>
+            <div class="adjust-actions">
+                <button class="btn btn-primary" type="button" id="submitRecommendCreateBtn">上架商品</button>
+                <button class="btn btn-muted" type="button" id="refreshRecommendBtn">刷新好物列表</button>
+            </div>
+            <div class="table-wrap" style="margin-top:1rem;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>标题</th>
+                            <th>价格</th>
+                            <th>状态</th>
+                            <th>更新时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recommendTableBody">
+                        <tr><td colspan="6" class="empty">加载中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>公告发布（管理员）</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="announcementScopeSelect">发布范围</label>
+                    <select id="announcementScopeSelect">
+                        <option value="all">全站通用</option>
+                        <option value="recommend">站长好物页</option>
+                        <option value="substitute">代课平台页</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="announcementTitleInput">公告标题</label>
+                    <input id="announcementTitleInput" type="text" placeholder="例如：期末周服务时间调整">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="announcementContentInput">公告内容</label>
+                <textarea id="announcementContentInput" placeholder="请输入要发布给前台用户的公告内容"></textarea>
+            </div>
+            <div class="adjust-actions">
+                <button class="btn btn-primary" type="button" id="publishAnnouncementBtn">发布公告</button>
+                <button class="btn btn-muted" type="button" id="refreshAnnouncementBtn">刷新公告</button>
+            </div>
+            <div class="table-wrap" style="margin-top:1rem;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>范围</th>
+                            <th>标题</th>
+                            <th>内容</th>
+                            <th>发布时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="announcementTableBody">
+                        <tr><td colspan="4" class="empty">加载中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </main>
 
     <script src="../js/api-config.js"></script>
@@ -266,6 +370,8 @@
         let users = [];
         let selectedUser = null;
         let pointsHistory = [];
+        let recommendProducts = [];
+        let announcements = {};
 
         function extractRows(payload) {
             if (!payload) return [];
@@ -327,6 +433,65 @@
             `).join('');
         }
 
+        function renderRecommendTable() {
+            const body = document.getElementById('recommendTableBody');
+            if (!recommendProducts.length) {
+                body.innerHTML = '<tr><td colspan="6" class="empty">暂无好物商品</td></tr>';
+                return;
+            }
+
+            body.innerHTML = recommendProducts.map((item) => {
+                const isOn = (item.status || '').toLowerCase() === 'on';
+                return `
+                    <tr>
+                        <td>${item.id ?? '-'}</td>
+                        <td>${item.title ?? '-'}</td>
+                        <td>￥${item.price ?? 0}</td>
+                        <td>
+                            <span class="status-pill ${isOn ? 'status-enabled' : 'status-disabled'}">
+                                ${isOn ? '上架中' : '已下架'}
+                            </span>
+                        </td>
+                        <td>${item.updatedAt ?? '-'}</td>
+                        <td>
+                            <div class="ops">
+                                <button type="button" class="${isOn ? 'btn-ban' : 'btn-enable'}" data-recommend-id="${item.id}" data-action="toggle-recommend" data-status="${isOn ? 'off' : 'on'}">
+                                    ${isOn ? '下架' : '上架'}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderAnnouncementTable() {
+            const body = document.getElementById('announcementTableBody');
+            const rows = ['all', 'recommend', 'substitute']
+                .map((scope) => ({ scope, item: announcements?.[scope] }))
+                .filter((row) => !!row.item);
+
+            const scopeLabel = {
+                all: '全站通用',
+                recommend: '站长好物页',
+                substitute: '代课平台页',
+            };
+
+            if (!rows.length) {
+                body.innerHTML = '<tr><td colspan="4" class="empty">暂无公告</td></tr>';
+                return;
+            }
+
+            body.innerHTML = rows.map((row) => `
+                <tr>
+                    <td>${scopeLabel[row.scope] || row.scope}</td>
+                    <td>${row.item.title ?? '-'}</td>
+                    <td>${row.item.content ?? '-'}</td>
+                    <td>${row.item.publishedAt ?? '-'}</td>
+                </tr>
+            `).join('');
+        }
+
         async function reviewCheckin(recordId, status) {
             try {
                 showLoading('提交审核中...');
@@ -375,6 +540,141 @@
             } catch (error) {
                 renderPendingTable();
                 showMessage('后台数据加载失败，请检查后端是否已启动', 'warning');
+            }
+        }
+
+        async function loadRecommendProducts() {
+            try {
+                const response = await get(API_ENDPOINTS.admin.recommendAdminList, { page: 1, pageSize: 100 });
+                if (!response.success || !response.data) {
+                    recommendProducts = [];
+                    renderRecommendTable();
+                    return;
+                }
+                recommendProducts = response.data.list || [];
+                renderRecommendTable();
+            } catch (error) {
+                recommendProducts = [];
+                renderRecommendTable();
+                showMessage('好物列表加载失败', 'warning');
+            }
+        }
+
+        async function loadAnnouncements() {
+            try {
+                const response = await get(API_ENDPOINTS.admin.announcementAdminList);
+                if (!response.success || !response.data) {
+                    announcements = {};
+                    renderAnnouncementTable();
+                    return;
+                }
+                announcements = response.data || {};
+                renderAnnouncementTable();
+            } catch (error) {
+                announcements = {};
+                renderAnnouncementTable();
+                showMessage('公告加载失败', 'warning');
+            }
+        }
+
+        async function submitRecommendCreate() {
+            const title = document.getElementById('recommendTitleInput').value.trim();
+            const description = document.getElementById('recommendDescInput').value.trim();
+            const price = Number(document.getElementById('recommendPriceInput').value);
+            const originalPriceRaw = document.getElementById('recommendOriginalPriceInput').value.trim();
+            const originalPrice = originalPriceRaw ? Number(originalPriceRaw) : null;
+            const badge = document.getElementById('recommendBadgeInput').value.trim();
+            const imageEmoji = document.getElementById('recommendEmojiInput').value.trim();
+            const buyUrl = document.getElementById('recommendBuyUrlInput').value.trim();
+
+            if (!title) {
+                showMessage('请输入商品标题', 'warning');
+                return;
+            }
+            if (!Number.isFinite(price) || price <= 0) {
+                showMessage('请输入正确的商品价格', 'warning');
+                return;
+            }
+
+            try {
+                showLoading('正在上架商品...');
+                const response = await post(API_ENDPOINTS.admin.recommendAdminCreate, {
+                    title,
+                    description,
+                    price,
+                    originalPrice,
+                    badge,
+                    imageEmoji,
+                    buyUrl,
+                });
+                hideLoading();
+                if (!response.success) {
+                    showMessage(response.message || '上架失败', 'error');
+                    return;
+                }
+                showMessage('站长好物上架成功', 'success');
+
+                document.getElementById('recommendTitleInput').value = '';
+                document.getElementById('recommendDescInput').value = '';
+                document.getElementById('recommendPriceInput').value = '';
+                document.getElementById('recommendOriginalPriceInput').value = '';
+                document.getElementById('recommendBadgeInput').value = '';
+                document.getElementById('recommendEmojiInput').value = '';
+                document.getElementById('recommendBuyUrlInput').value = '';
+                await loadRecommendProducts();
+            } catch (error) {
+                hideLoading();
+                handleError(error, '上架失败');
+            }
+        }
+
+        async function updateRecommendStatus(productId, status) {
+            try {
+                showLoading(status === 'on' ? '正在上架...' : '正在下架...');
+                const url = `${API_ENDPOINTS.admin.recommendAdminStatusBase}/${productId}/status`;
+                const response = await post(url, { status });
+                hideLoading();
+                if (!response.success) {
+                    showMessage(response.message || '状态更新失败', 'error');
+                    return;
+                }
+                showMessage(status === 'on' ? '已上架' : '已下架', 'success');
+                await loadRecommendProducts();
+            } catch (error) {
+                hideLoading();
+                handleError(error, '状态更新失败');
+            }
+        }
+
+        async function publishAnnouncement() {
+            const scope = document.getElementById('announcementScopeSelect').value;
+            const title = document.getElementById('announcementTitleInput').value.trim();
+            const content = document.getElementById('announcementContentInput').value.trim();
+
+            if (!title) {
+                showMessage('请输入公告标题', 'warning');
+                return;
+            }
+            if (!content) {
+                showMessage('请输入公告内容', 'warning');
+                return;
+            }
+
+            try {
+                showLoading('正在发布公告...');
+                const response = await post(API_ENDPOINTS.admin.announcementPublish, { scope, title, content });
+                hideLoading();
+                if (!response.success) {
+                    showMessage(response.message || '公告发布失败', 'error');
+                    return;
+                }
+                showMessage('公告发布成功', 'success');
+                document.getElementById('announcementTitleInput').value = '';
+                document.getElementById('announcementContentInput').value = '';
+                await loadAnnouncements();
+            } catch (error) {
+                hideLoading();
+                handleError(error, '公告发布失败');
             }
         }
 
@@ -630,6 +930,8 @@
             initAdminIdentity();
             loadDashboardData();
             loadUsers();
+            loadRecommendProducts();
+            loadAnnouncements();
             renderHistoryTable();
 
             document.getElementById('refreshBtn').addEventListener('click', loadDashboardData);
@@ -650,6 +952,10 @@
             document.getElementById('pickResourceFileBtn').addEventListener('click', pickResourceFile);
             document.getElementById('submitResourceUploadBtn').addEventListener('click', submitResourceUpload);
             document.getElementById('resourceFileInput').addEventListener('change', handleResourceFilePicked);
+            document.getElementById('submitRecommendCreateBtn').addEventListener('click', submitRecommendCreate);
+            document.getElementById('refreshRecommendBtn').addEventListener('click', loadRecommendProducts);
+            document.getElementById('publishAnnouncementBtn').addEventListener('click', publishAnnouncement);
+            document.getElementById('refreshAnnouncementBtn').addEventListener('click', loadAnnouncements);
             document.getElementById('pendingTableBody').addEventListener('click', (event) => {
                 const target = event.target;
                 const recordId = target.dataset.id;
@@ -682,6 +988,16 @@
                     await fillSelectedUser(user);
                     await updateUserStatus(Number(target.dataset.status));
                 }
+            });
+            document.getElementById('recommendTableBody').addEventListener('click', async (event) => {
+                const target = event.target;
+                const action = target.dataset.action;
+                const productId = Number(target.dataset.recommendId);
+                const status = target.dataset.status;
+                if (action !== 'toggle-recommend' || !productId || !status) {
+                    return;
+                }
+                await updateRecommendStatus(productId, status);
             });
         });
     </script>

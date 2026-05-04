@@ -138,6 +138,22 @@ public class PointsController {
     }
 
     /**
+     * 购买积分
+     */
+    @PostMapping("/purchase")
+    public Result<Map<String, Object>> purchase(
+            Authentication authentication,
+            @RequestBody PurchaseRequest request) {
+        try {
+            Long userId = (Long) authentication.getPrincipal();
+            Map<String, Object> data = pointsService.purchase(userId, request.getPackageType());
+            return Result.success("购买成功", data);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
      * 管理员：积分增减
      */
     @PostMapping("/admin/adjust")
@@ -233,6 +249,11 @@ public class PointsController {
     @Data
     static class RedeemRequest {
         private String code;
+    }
+
+    @Data
+    static class PurchaseRequest {
+        private String packageType;
     }
 
     @Data

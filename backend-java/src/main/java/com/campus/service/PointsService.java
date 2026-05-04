@@ -128,6 +128,54 @@ public class PointsService {
     }
 
     /**
+     * 购买积分（当前为模拟下单，后续可接入真实支付）
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> purchase(Long userId, String packageType) {
+        String type = packageType == null ? "" : packageType.trim().toLowerCase();
+        int points;
+        int amountYuan;
+        if ("basic".equals(type)) {
+            points = 100;
+            amountYuan = 10;
+        } else if ("plus".equals(type)) {
+            points = 300;
+            amountYuan = 25;
+        } else if ("pro".equals(type)) {
+            points = 800;
+            amountYuan = 60;
+        } else {
+            throw new RuntimeException("积分套餐不存在，仅支持 basic / plus / pro");
+        }
+
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
+
+        int current = user.getPoints() == null ? 0 : user.getPoints();
+        int next = current + points;
+        user.setPoints(next);
+        userMapper.updateById(user);
+
+        PointsHistory history = new PointsHistory();
+        history.setUserId(userId);
+        history.setType("purchase");
+        history.setAmount(points);
+        history.setBalance(next);
+        history.setDescription("购买积分套餐(" + type + ")，支付￥" + amountYuan);
+        pointsHistoryMapper.insert(history);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("packageType", type);
+        result.put("paidAmount", amountYuan);
+        result.put("points", points);
+        result.put("balance", next);
+        result.put("orderNo", "PO-" + System.currentTimeMillis());
+        return result;
+    }
+
+    /**
      * 积分历史记录
      */
     public Page<PointsHistory> getHistory(Long userId, int page, int pageSize) {

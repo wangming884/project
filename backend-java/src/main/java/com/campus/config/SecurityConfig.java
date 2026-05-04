@@ -69,6 +69,9 @@ public class SecurityConfig {
                     "/secondhand/search",
                     "/substitute/list",
                     "/recommend/list",
+                    "/recommend/detail",
+                    "/recommend/coupon",
+                    "/announcement/latest",
                     "/resources/**",
                     "/contact/submit"
                 ).permitAll()
