@@ -44,9 +44,19 @@
         .btn-ok, .btn-no { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; }
         .btn-ok { background: #dcfce7; color: #166534; }
         .btn-no { background: #fee2e2; color: #991b1b; }
+        .btn-pick { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #dbeafe; color: #1d4ed8; }
+        .point-tool-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.7rem; }
+        .form-group label { font-size: 0.82rem; color: var(--muted); }
+        .form-group input { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; }
+        .form-group input:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
+        .adjust-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
         .empty { color: var(--muted); font-size: 0.9rem; padding: 0.5rem 0; }
         @media (max-width: 980px) {
             .grid { grid-template-columns: 1fr; }
+            .point-tool-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -82,6 +92,10 @@
             <article class="card">
                 <h3>管理员权限</h3>
                 <div class="num" style="color:#2563eb;">ALL</div>
+            </article>
+            <article class="card">
+                <h3>平台用户数</h3>
+                <div class="num" id="userCount">0</div>
             </article>
         </section>
 
@@ -119,6 +133,63 @@
                 <p class="empty" style="margin-top:0.8rem;">提示：管理员登录后签发专属 token，并具备超级权限（后端 `userId=0`）。</p>
             </aside>
         </section>
+
+        <section class="panel">
+            <h2>用户积分管理（管理员）</h2>
+            <div class="point-tool-grid">
+                <div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="userSearchInput">搜索用户（用户名/邮箱）</label>
+                            <input id="userSearchInput" type="text" placeholder="例如：demo 或 demo@example.com">
+                        </div>
+                        <div class="form-group" style="justify-content:flex-end;">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-primary" type="button" id="userSearchBtn">查询用户</button>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>用户名</th>
+                                    <th>邮箱</th>
+                                    <th>当前积分</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <tr><td colspan="5" class="empty">加载中...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label for="targetUserId">目标用户ID</label>
+                        <input id="targetUserId" type="text" placeholder="请先从左侧选择用户" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="targetUserName">目标用户名</label>
+                        <input id="targetUserName" type="text" placeholder="请先从左侧选择用户" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="deltaInput">调整积分（正数增加，负数扣除）</label>
+                        <input id="deltaInput" type="number" placeholder="例如：20 或 -10">
+                    </div>
+                    <div class="form-group">
+                        <label for="reasonInput">调整原因</label>
+                        <input id="reasonInput" type="text" placeholder="例如：活动奖励 / 违规扣分">
+                    </div>
+                    <div class="adjust-actions">
+                        <button class="btn btn-primary" type="button" id="submitAdjustBtn">确认调整</button>
+                        <button class="btn btn-muted" type="button" id="quickAddBtn">+10</button>
+                        <button class="btn btn-muted" type="button" id="quickSubBtn">-10</button>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <script src="../js/api-config.js"></script>
@@ -126,6 +197,8 @@
     <script src="../js/admin-auth.js"></script>
     <script>
         let pendingRecords = [];
+        let users = [];
+        let selectedUser = null;
 
         function extractRows(payload) {
             if (!payload) return [];
@@ -217,6 +290,84 @@
             }
         }
 
+        function renderUsersTable() {
+            const body = document.getElementById('usersTableBody');
+            if (!users.length) {
+                body.innerHTML = '<tr><td colspan="5" class="empty">没有匹配的用户</td></tr>';
+                return;
+            }
+
+            body.innerHTML = users.map((item) => `
+                <tr>
+                    <td>${item.id ?? '-'}</td>
+                    <td>${item.username ?? '-'}</td>
+                    <td>${item.email ?? '-'}</td>
+                    <td>${item.points ?? 0}</td>
+                    <td><button type="button" class="btn-pick" data-user-id="${item.id}">选择</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function fillSelectedUser(user) {
+            selectedUser = user;
+            document.getElementById('targetUserId').value = user?.id ?? '';
+            document.getElementById('targetUserName').value = user?.username ?? '';
+        }
+
+        async function loadUsers(keyword = '') {
+            try {
+                const response = await get(API_ENDPOINTS.admin.pointsUsers, { keyword, page: 1, pageSize: 20 });
+                if (!response.success || !response.data) {
+                    users = [];
+                    renderUsersTable();
+                    return;
+                }
+                users = response.data.list || [];
+                document.getElementById('userCount').textContent = response.data.total ?? users.length;
+                renderUsersTable();
+            } catch (error) {
+                users = [];
+                renderUsersTable();
+                showMessage('用户列表加载失败', 'warning');
+            }
+        }
+
+        async function submitPointsAdjust() {
+            const userId = Number(document.getElementById('targetUserId').value);
+            const delta = Number(document.getElementById('deltaInput').value);
+            const reason = document.getElementById('reasonInput').value.trim();
+
+            if (!userId) {
+                showMessage('请先选择目标用户', 'warning');
+                return;
+            }
+            if (!Number.isFinite(delta) || delta === 0) {
+                showMessage('请输入非0的积分调整值', 'warning');
+                return;
+            }
+            if (!reason) {
+                showMessage('请填写调整原因', 'warning');
+                return;
+            }
+
+            try {
+                showLoading('积分调整中...');
+                const response = await post(API_ENDPOINTS.admin.pointsAdjust, { userId, delta, reason });
+                hideLoading();
+                if (!response.success) {
+                    showMessage(response.message || '积分调整失败', 'error');
+                    return;
+                }
+                showMessage('积分调整成功', 'success');
+                document.getElementById('deltaInput').value = '';
+                document.getElementById('reasonInput').value = '';
+                await loadUsers(document.getElementById('userSearchInput').value.trim());
+            } catch (error) {
+                hideLoading();
+                handleError(error, '积分调整失败');
+            }
+        }
+
         function initAdminIdentity() {
             const session = getAdminSession();
             const modeText = session?.mode === 'offline' ? '离线模式' : '服务端模式';
@@ -230,9 +381,20 @@
 
             initAdminIdentity();
             loadDashboardData();
+            loadUsers();
 
             document.getElementById('refreshBtn').addEventListener('click', loadDashboardData);
             document.getElementById('logoutBtn').addEventListener('click', adminLogout);
+            document.getElementById('userSearchBtn').addEventListener('click', () => {
+                loadUsers(document.getElementById('userSearchInput').value.trim());
+            });
+            document.getElementById('submitAdjustBtn').addEventListener('click', submitPointsAdjust);
+            document.getElementById('quickAddBtn').addEventListener('click', () => {
+                document.getElementById('deltaInput').value = 10;
+            });
+            document.getElementById('quickSubBtn').addEventListener('click', () => {
+                document.getElementById('deltaInput').value = -10;
+            });
             document.getElementById('pendingTableBody').addEventListener('click', (event) => {
                 const target = event.target;
                 const recordId = target.dataset.id;
@@ -241,6 +403,18 @@
                     return;
                 }
                 reviewCheckin(recordId, status);
+            });
+            document.getElementById('usersTableBody').addEventListener('click', (event) => {
+                const target = event.target;
+                const userId = Number(target.dataset.userId);
+                if (!userId) {
+                    return;
+                }
+                const user = users.find((item) => Number(item.id) === userId);
+                if (user) {
+                    fillSelectedUser(user);
+                    showMessage(`已选择用户：${user.username}`, 'info');
+                }
             });
         });
     </script>

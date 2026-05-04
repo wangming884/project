@@ -3,12 +3,15 @@ package com.campus.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.campus.common.Result;
 import com.campus.entity.PointsHistory;
+import com.campus.entity.User;
 import com.campus.service.PointsService;
 import lombok.Data;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -92,10 +95,82 @@ public class PointsController {
         }
     }
 
+    /**
+     * 管理员：用户列表
+     */
+    @GetMapping("/admin/users")
+    public Result<Map<String, Object>> listUsersForAdmin(
+            Authentication authentication,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int pageSize) {
+        try {
+            Long operatorUserId = (Long) authentication.getPrincipal();
+            if (operatorUserId == null || operatorUserId != 0L) {
+                return Result.error(403, "无管理员权限");
+            }
+
+            Page<User> pageInfo = pointsService.listUsersForAdmin(keyword, page, pageSize);
+
+            List<Map<String, Object>> list = new ArrayList<>();
+            for (User user : pageInfo.getRecords()) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", user.getId());
+                item.put("username", user.getUsername());
+                item.put("email", user.getEmail());
+                item.put("points", user.getPoints());
+                item.put("status", user.getStatus());
+                item.put("createdAt", user.getCreatedAt());
+                list.add(item);
+            }
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("list", list);
+            data.put("total", pageInfo.getTotal());
+            data.put("page", pageInfo.getCurrent());
+            data.put("pageSize", pageInfo.getSize());
+            return Result.success(data);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 管理员：积分增减
+     */
+    @PostMapping("/admin/adjust")
+    public Result<Map<String, Object>> adminAdjustPoints(
+            Authentication authentication,
+            @RequestBody AdminAdjustRequest request) {
+        try {
+            Long operatorUserId = (Long) authentication.getPrincipal();
+            Map<String, Object> result = pointsService.adminAdjustPoints(
+                operatorUserId,
+                request.getUserId(),
+                request.getDelta(),
+                request.getReason()
+            );
+            return Result.success("积分调整成功", result);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
     // ==================== 请求对象 ====================
     
     @Data
     static class RedeemRequest {
         private String code;
+    }
+
+    @Data
+    static class AdminAdjustRequest {
+        private Long userId;
+        private Integer delta;
+        private String reason;
+
+        public int getDelta() {
+            return delta == null ? 0 : delta;
+        }
     }
 }

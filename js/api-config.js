@@ -88,6 +88,8 @@ const API_ENDPOINTS = {
         checkinApproveBase: `${API_BASE_URL}/checkin/approve`, // POST - 审核签到
         secondhandProducts: `${API_BASE_URL}/secondhand/products`, // GET - 商品列表
         substituteTasks: `${API_BASE_URL}/substitute/tasks`,   // GET - 任务列表
+        pointsUsers: `${API_BASE_URL}/points/admin/users`,      // GET - 管理员查询用户列表
+        pointsAdjust: `${API_BASE_URL}/points/admin/adjust`,    // POST - 管理员增减积分
     },
 };
 

@@ -133,6 +133,73 @@ public class PointsService {
         
         return pointsHistoryMapper.selectPage(pageInfo, query);
     }
+
+    /**
+     * 管理员分页查询用户列表
+     */
+    public Page<User> listUsersForAdmin(String keyword, int page, int pageSize) {
+        Page<User> pageInfo = new Page<>(page, pageSize);
+        LambdaQueryWrapper<User> query = new LambdaQueryWrapper<>();
+        query.eq(User::getDeleted, 0);
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            String k = keyword.trim();
+            query.and(wrapper -> wrapper
+                .like(User::getUsername, k)
+                .or()
+                .like(User::getEmail, k)
+            );
+        }
+
+        query.orderByDesc(User::getCreatedAt);
+        return userMapper.selectPage(pageInfo, query);
+    }
+
+    /**
+     * 管理员调整用户积分（正数增加，负数扣除）
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> adminAdjustPoints(Long operatorUserId, Long targetUserId, int delta, String reason) {
+        if (operatorUserId == null || operatorUserId != 0L) {
+            throw new RuntimeException("无管理员权限");
+        }
+        if (targetUserId == null || targetUserId <= 0) {
+            throw new RuntimeException("目标用户ID不合法");
+        }
+        if (delta == 0) {
+            throw new RuntimeException("积分调整值不能为 0");
+        }
+
+        User target = userMapper.selectById(targetUserId);
+        if (target == null) {
+            throw new RuntimeException("目标用户不存在");
+        }
+
+        int currentPoints = target.getPoints() == null ? 0 : target.getPoints();
+        int nextPoints = currentPoints + delta;
+        if (nextPoints < 0) {
+            throw new RuntimeException("扣除失败，用户当前积分不足");
+        }
+
+        target.setPoints(nextPoints);
+        userMapper.updateById(target);
+
+        PointsHistory history = new PointsHistory();
+        history.setUserId(targetUserId);
+        history.setType("admin_adjust");
+        history.setAmount(delta);
+        history.setBalance(nextPoints);
+        history.setDescription((reason == null || reason.isBlank() ? "管理员积分调整" : reason) + "（管理员操作）");
+        pointsHistoryMapper.insert(history);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("userId", targetUserId);
+        result.put("username", target.getUsername());
+        result.put("delta", delta);
+        result.put("balance", nextPoints);
+        result.put("reason", reason);
+        return result;
+    }
     
     /**
      * 增加积分（内部方法）
