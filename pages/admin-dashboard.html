@@ -45,6 +45,11 @@
         .btn-ok { background: #dcfce7; color: #166534; }
         .btn-no { background: #fee2e2; color: #991b1b; }
         .btn-pick { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #dbeafe; color: #1d4ed8; }
+        .btn-ban { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #fee2e2; color: #991b1b; }
+        .btn-enable { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #dcfce7; color: #166534; }
+        .status-pill { display: inline-block; font-size: 0.75rem; padding: 0.1rem 0.45rem; border-radius: 999px; font-weight: 700; }
+        .status-enabled { background: #dcfce7; color: #166534; }
+        .status-disabled { background: #fee2e2; color: #991b1b; }
         .point-tool-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1rem; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
         .form-group { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.7rem; }
@@ -129,6 +134,10 @@
                     <div class="perm-item">访问全模块页面</div>
                     <div class="perm-item">执行状态变更操作</div>
                     <div class="perm-item">管理员专属登录态</div>
+                    <div class="perm-item">启用/禁用用户账号</div>
+                    <div class="perm-item">重置用户签到连续记录</div>
+                    <div class="perm-item">查看全站积分流水</div>
+                    <div class="perm-item">管理员强制状态修改</div>
                 </div>
                 <p class="empty" style="margin-top:0.8rem;">提示：管理员登录后签发专属 token，并具备超级权限（后端 `userId=0`）。</p>
             </aside>
@@ -156,11 +165,12 @@
                                     <th>用户名</th>
                                     <th>邮箱</th>
                                     <th>当前积分</th>
+                                    <th>账号状态</th>
                                     <th>操作</th>
                                 </tr>
                             </thead>
                             <tbody id="usersTableBody">
-                                <tr><td colspan="5" class="empty">加载中...</td></tr>
+                                <tr><td colspan="6" class="empty">加载中...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -186,8 +196,28 @@
                         <button class="btn btn-primary" type="button" id="submitAdjustBtn">确认调整</button>
                         <button class="btn btn-muted" type="button" id="quickAddBtn">+10</button>
                         <button class="btn btn-muted" type="button" id="quickSubBtn">-10</button>
+                        <button class="btn btn-muted" type="button" id="enableUserBtn">启用账号</button>
+                        <button class="btn btn-danger" type="button" id="disableUserBtn">禁用账号</button>
+                        <button class="btn btn-muted" type="button" id="resetSigninBtn">重置签到</button>
                     </div>
                 </div>
+            </div>
+            <div class="table-wrap" style="margin-top:1rem;">
+                <h2 style="margin-top:0;">所选用户积分流水</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>类型</th>
+                            <th>变动</th>
+                            <th>余额</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr><td colspan="5" class="empty">请选择用户后加载</td></tr>
+                    </tbody>
+                </table>
             </div>
         </section>
     </main>
@@ -199,6 +229,7 @@
         let pendingRecords = [];
         let users = [];
         let selectedUser = null;
+        let pointsHistory = [];
 
         function extractRows(payload) {
             if (!payload) return [];
@@ -239,6 +270,27 @@
             `).join('');
         }
 
+        function renderHistoryTable() {
+            const body = document.getElementById('historyTableBody');
+            if (!selectedUser) {
+                body.innerHTML = '<tr><td colspan="5" class="empty">请选择用户后加载</td></tr>';
+                return;
+            }
+            if (!pointsHistory.length) {
+                body.innerHTML = '<tr><td colspan="5" class="empty">该用户暂无积分流水</td></tr>';
+                return;
+            }
+            body.innerHTML = pointsHistory.map((item) => `
+                <tr>
+                    <td>${item.createdAt ?? '-'}</td>
+                    <td>${item.type ?? '-'}</td>
+                    <td>${item.amount ?? 0}</td>
+                    <td>${item.balance ?? 0}</td>
+                    <td>${item.description ?? '-'}</td>
+                </tr>
+            `).join('');
+        }
+
         async function reviewCheckin(recordId, status) {
             try {
                 showLoading('提交审核中...');
@@ -271,8 +323,8 @@
             try {
                 const [pendingRes, productRes, taskRes] = await Promise.all([
                     get(API_ENDPOINTS.admin.checkinPending, { page: 1, pageSize: 20 }),
-                    get(API_ENDPOINTS.admin.secondhandProducts, { page: 1, pageSize: 1 }),
-                    get(API_ENDPOINTS.admin.substituteTasks, { page: 1, pageSize: 1 }),
+                    get(API_ENDPOINTS.admin.secondhandAdminProducts, { page: 1, pageSize: 1 }),
+                    get(API_ENDPOINTS.admin.substituteAdminTasks, { page: 1, pageSize: 1 }),
                 ]);
 
                 pendingRecords = extractRows(pendingRes?.data);
@@ -293,25 +345,41 @@
         function renderUsersTable() {
             const body = document.getElementById('usersTableBody');
             if (!users.length) {
-                body.innerHTML = '<tr><td colspan="5" class="empty">没有匹配的用户</td></tr>';
+                body.innerHTML = '<tr><td colspan="6" class="empty">没有匹配的用户</td></tr>';
                 return;
             }
 
-            body.innerHTML = users.map((item) => `
-                <tr>
-                    <td>${item.id ?? '-'}</td>
-                    <td>${item.username ?? '-'}</td>
-                    <td>${item.email ?? '-'}</td>
-                    <td>${item.points ?? 0}</td>
-                    <td><button type="button" class="btn-pick" data-user-id="${item.id}">选择</button></td>
-                </tr>
-            `).join('');
+            body.innerHTML = users.map((item) => {
+                const enabled = Number(item.status) === 1;
+                return `
+                    <tr>
+                        <td>${item.id ?? '-'}</td>
+                        <td>${item.username ?? '-'}</td>
+                        <td>${item.email ?? '-'}</td>
+                        <td>${item.points ?? 0}</td>
+                        <td>
+                            <span class="status-pill ${enabled ? 'status-enabled' : 'status-disabled'}">
+                                ${enabled ? '正常' : '禁用'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="ops">
+                                <button type="button" class="btn-pick" data-user-id="${item.id}" data-action="select">选择</button>
+                                <button type="button" class="${enabled ? 'btn-ban' : 'btn-enable'}" data-user-id="${item.id}" data-action="toggle-status" data-status="${enabled ? 0 : 1}">
+                                    ${enabled ? '禁用' : '启用'}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        function fillSelectedUser(user) {
+        async function fillSelectedUser(user) {
             selectedUser = user;
             document.getElementById('targetUserId').value = user?.id ?? '';
             document.getElementById('targetUserName').value = user?.username ?? '';
+            await loadSelectedUserHistory();
         }
 
         async function loadUsers(keyword = '') {
@@ -325,10 +393,43 @@
                 users = response.data.list || [];
                 document.getElementById('userCount').textContent = response.data.total ?? users.length;
                 renderUsersTable();
+
+                if (selectedUser) {
+                    const refreshOne = users.find((item) => Number(item.id) === Number(selectedUser.id));
+                    if (refreshOne) {
+                        selectedUser = refreshOne;
+                    }
+                }
             } catch (error) {
                 users = [];
                 renderUsersTable();
                 showMessage('用户列表加载失败', 'warning');
+            }
+        }
+
+        async function loadSelectedUserHistory() {
+            if (!selectedUser || !selectedUser.id) {
+                pointsHistory = [];
+                renderHistoryTable();
+                return;
+            }
+            try {
+                const response = await get(API_ENDPOINTS.admin.pointsHistory, {
+                    userId: selectedUser.id,
+                    page: 1,
+                    pageSize: 20,
+                });
+                if (!response.success || !response.data) {
+                    pointsHistory = [];
+                    renderHistoryTable();
+                    return;
+                }
+                pointsHistory = response.data.list || [];
+                renderHistoryTable();
+            } catch (error) {
+                pointsHistory = [];
+                renderHistoryTable();
+                showMessage('积分流水加载失败', 'warning');
             }
         }
 
@@ -362,9 +463,60 @@
                 document.getElementById('deltaInput').value = '';
                 document.getElementById('reasonInput').value = '';
                 await loadUsers(document.getElementById('userSearchInput').value.trim());
+                await loadSelectedUserHistory();
             } catch (error) {
                 hideLoading();
                 handleError(error, '积分调整失败');
+            }
+        }
+
+        async function updateUserStatus(status) {
+            const userId = Number(document.getElementById('targetUserId').value);
+            const reason = document.getElementById('reasonInput').value.trim() || '管理员操作';
+            if (!userId) {
+                showMessage('请先选择目标用户', 'warning');
+                return;
+            }
+            try {
+                showLoading(status === 1 ? '正在启用账号...' : '正在禁用账号...');
+                const url = `${API_ENDPOINTS.admin.pointsUserStatusBase}/${userId}/status`;
+                const response = await post(url, { status, reason });
+                hideLoading();
+                if (!response.success) {
+                    showMessage(response.message || '账号状态更新失败', 'error');
+                    return;
+                }
+                showMessage(status === 1 ? '账号已启用' : '账号已禁用', 'success');
+                await loadUsers(document.getElementById('userSearchInput').value.trim());
+                await loadSelectedUserHistory();
+            } catch (error) {
+                hideLoading();
+                handleError(error, '账号状态更新失败');
+            }
+        }
+
+        async function resetSelectedUserSignin() {
+            const userId = Number(document.getElementById('targetUserId').value);
+            const reason = document.getElementById('reasonInput').value.trim() || '管理员重置';
+            if (!userId) {
+                showMessage('请先选择目标用户', 'warning');
+                return;
+            }
+            try {
+                showLoading('正在重置签到信息...');
+                const url = `${API_ENDPOINTS.admin.pointsResetSigninBase}/${userId}/reset-signin`;
+                const response = await post(url, { reason });
+                hideLoading();
+                if (!response.success) {
+                    showMessage(response.message || '重置失败', 'error');
+                    return;
+                }
+                showMessage('签到信息重置成功', 'success');
+                await loadUsers(document.getElementById('userSearchInput').value.trim());
+                await loadSelectedUserHistory();
+            } catch (error) {
+                hideLoading();
+                handleError(error, '重置签到失败');
             }
         }
 
@@ -382,6 +534,7 @@
             initAdminIdentity();
             loadDashboardData();
             loadUsers();
+            renderHistoryTable();
 
             document.getElementById('refreshBtn').addEventListener('click', loadDashboardData);
             document.getElementById('logoutBtn').addEventListener('click', adminLogout);
@@ -395,6 +548,9 @@
             document.getElementById('quickSubBtn').addEventListener('click', () => {
                 document.getElementById('deltaInput').value = -10;
             });
+            document.getElementById('enableUserBtn').addEventListener('click', () => updateUserStatus(1));
+            document.getElementById('disableUserBtn').addEventListener('click', () => updateUserStatus(0));
+            document.getElementById('resetSigninBtn').addEventListener('click', resetSelectedUserSignin);
             document.getElementById('pendingTableBody').addEventListener('click', (event) => {
                 const target = event.target;
                 const recordId = target.dataset.id;
@@ -404,16 +560,28 @@
                 }
                 reviewCheckin(recordId, status);
             });
-            document.getElementById('usersTableBody').addEventListener('click', (event) => {
+            document.getElementById('usersTableBody').addEventListener('click', async (event) => {
                 const target = event.target;
                 const userId = Number(target.dataset.userId);
-                if (!userId) {
+                const action = target.dataset.action;
+                if (!userId || !action) {
                     return;
                 }
+
                 const user = users.find((item) => Number(item.id) === userId);
-                if (user) {
-                    fillSelectedUser(user);
+                if (!user) {
+                    return;
+                }
+
+                if (action === 'select') {
+                    await fillSelectedUser(user);
                     showMessage(`已选择用户：${user.username}`, 'info');
+                    return;
+                }
+
+                if (action === 'toggle-status') {
+                    await fillSelectedUser(user);
+                    await updateUserStatus(Number(target.dataset.status));
                 }
             });
         });

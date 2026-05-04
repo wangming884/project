@@ -236,4 +236,79 @@ public class SecondhandService {
         
         return result;
     }
+
+    /**
+     * 管理员查询商品（可按状态筛选，默认全量）
+     */
+    public Page<SecondhandProduct> adminGetProducts(Long operatorUserId, String status, String keyword, int page, int pageSize) {
+        if (!isAdmin(operatorUserId)) {
+            throw new RuntimeException("无管理员权限");
+        }
+
+        Page<SecondhandProduct> pageInfo = new Page<>(page, pageSize);
+        LambdaQueryWrapper<SecondhandProduct> query = new LambdaQueryWrapper<>();
+
+        if (status != null && !status.isBlank()) {
+            query.eq(SecondhandProduct::getStatus, status.trim());
+        }
+        if (keyword != null && !keyword.isBlank()) {
+            String key = keyword.trim();
+            query.and(wrapper -> wrapper
+                .like(SecondhandProduct::getTitle, key)
+                .or()
+                .like(SecondhandProduct::getDescription, key)
+                .or()
+                .like(SecondhandProduct::getSellerName, key));
+        }
+        query.orderByDesc(SecondhandProduct::getCreatedAt);
+        return productMapper.selectPage(pageInfo, query);
+    }
+
+    /**
+     * 管理员强制修改商品状态
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> adminForceStatus(Long operatorUserId, Long productId, String status) {
+        if (!isAdmin(operatorUserId)) {
+            throw new RuntimeException("无管理员权限");
+        }
+        if (status == null || status.isBlank()) {
+            throw new RuntimeException("状态不能为空");
+        }
+        if (!"available".equals(status) && !"sold".equals(status) && !"removed".equals(status)) {
+            throw new RuntimeException("状态仅支持 available / sold / removed");
+        }
+
+        SecondhandProduct product = productMapper.selectById(productId);
+        if (product == null) {
+            throw new RuntimeException("商品不存在");
+        }
+
+        product.setStatus(status);
+        productMapper.updateById(product);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("productId", productId);
+        result.put("status", status);
+        return result;
+    }
+
+    /**
+     * 管理员强制删除商品
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> adminForceDelete(Long operatorUserId, Long productId) {
+        if (!isAdmin(operatorUserId)) {
+            throw new RuntimeException("无管理员权限");
+        }
+        SecondhandProduct product = productMapper.selectById(productId);
+        if (product == null) {
+            throw new RuntimeException("商品不存在");
+        }
+        productMapper.deleteById(productId);
+        Map<String, Object> result = new HashMap<>();
+        result.put("productId", productId);
+        result.put("message", "管理员删除成功");
+        return result;
+    }
 }

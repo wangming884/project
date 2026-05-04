@@ -26,6 +26,14 @@ public class SubstituteController {
     public SubstituteController(SubstituteService substituteService) {
         this.substituteService = substituteService;
     }
+
+    private Long currentUserId(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof Long) {
+            return (Long) principal;
+        }
+        return Long.parseLong(authentication.getName());
+    }
     
     /**
      * 发布代课任务
@@ -153,5 +161,46 @@ public class SubstituteController {
         Long userId = Long.parseLong(authentication.getName());
         Map<String, Object> statistics = substituteService.getStatistics(userId);
         return Result.success(statistics);
+    }
+
+    /**
+     * 管理员：查询全量任务
+     */
+    @GetMapping("/admin/tasks")
+    public Result<Page<SubstituteTask>> adminGetTasks(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "latest") String sortBy,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int pageSize,
+            Authentication authentication) {
+        try {
+            Long operatorUserId = currentUserId(authentication);
+            if (operatorUserId != 0L) {
+                return Result.error(403, "无管理员权限");
+            }
+            Page<SubstituteTask> tasks = substituteService.getTasks(status, keyword, sortBy, page, pageSize);
+            return Result.success(tasks);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 管理员：强制修改任务状态
+     */
+    @PostMapping("/admin/tasks/{taskId}/status")
+    public Result<Map<String, Object>> adminForceStatus(
+            @PathVariable Long taskId,
+            @RequestBody Map<String, String> request,
+            Authentication authentication) {
+        try {
+            Long operatorUserId = currentUserId(authentication);
+            String status = request.get("status");
+            Map<String, Object> result = substituteService.adminForceStatus(operatorUserId, taskId, status);
+            return Result.success("任务状态更新成功", result);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
     }
 }

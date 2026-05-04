@@ -86,10 +86,20 @@ const API_ENDPOINTS = {
     admin: {
         checkinPending: `${API_BASE_URL}/checkin/pending`,     // GET - 待审核签到记录
         checkinApproveBase: `${API_BASE_URL}/checkin/approve`, // POST - 审核签到
+        checkinRecords: `${API_BASE_URL}/checkin/admin/records`, // GET - 管理员查询签到记录
+        checkinForceStatusBase: `${API_BASE_URL}/checkin/admin/records`, // POST - 管理员强制签到状态
         secondhandProducts: `${API_BASE_URL}/secondhand/products`, // GET - 商品列表
+        secondhandAdminProducts: `${API_BASE_URL}/secondhand/admin/products`, // GET - 管理员查询全量商品
+        secondhandAdminStatusBase: `${API_BASE_URL}/secondhand/admin/products`, // POST - 管理员强制商品状态
+        secondhandAdminDeleteBase: `${API_BASE_URL}/secondhand/admin/products`, // DELETE - 管理员删除商品
         substituteTasks: `${API_BASE_URL}/substitute/tasks`,   // GET - 任务列表
+        substituteAdminTasks: `${API_BASE_URL}/substitute/admin/tasks`, // GET - 管理员查询全量任务
+        substituteAdminStatusBase: `${API_BASE_URL}/substitute/admin/tasks`, // POST - 管理员强制任务状态
         pointsUsers: `${API_BASE_URL}/points/admin/users`,      // GET - 管理员查询用户列表
         pointsAdjust: `${API_BASE_URL}/points/admin/adjust`,    // POST - 管理员增减积分
+        pointsUserStatusBase: `${API_BASE_URL}/points/admin/users`, // POST - 管理员启用/禁用用户
+        pointsResetSigninBase: `${API_BASE_URL}/points/admin/users`, // POST - 管理员重置签到信息
+        pointsHistory: `${API_BASE_URL}/points/admin/history`,  // GET - 管理员查看积分流水
     },
 };
 

@@ -28,6 +28,12 @@ public class PointsService {
         this.userMapper = userMapper;
         this.pointsHistoryMapper = pointsHistoryMapper;
     }
+
+    private void assertAdmin(Long operatorUserId) {
+        if (operatorUserId == null || operatorUserId != 0L) {
+            throw new RuntimeException("无管理员权限");
+        }
+    }
     
     /**
      * 获取积分余额
@@ -160,9 +166,7 @@ public class PointsService {
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> adminAdjustPoints(Long operatorUserId, Long targetUserId, int delta, String reason) {
-        if (operatorUserId == null || operatorUserId != 0L) {
-            throw new RuntimeException("无管理员权限");
-        }
+        assertAdmin(operatorUserId);
         if (targetUserId == null || targetUserId <= 0) {
             throw new RuntimeException("目标用户ID不合法");
         }
@@ -199,6 +203,98 @@ public class PointsService {
         result.put("balance", nextPoints);
         result.put("reason", reason);
         return result;
+    }
+
+    /**
+     * 管理员修改用户账号状态
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> adminUpdateUserStatus(Long operatorUserId, Long targetUserId, Integer status, String reason) {
+        assertAdmin(operatorUserId);
+        if (targetUserId == null || targetUserId <= 0) {
+            throw new RuntimeException("目标用户ID不合法");
+        }
+        if (status == null || (status != 0 && status != 1)) {
+            throw new RuntimeException("状态参数不合法，仅支持 0(禁用) / 1(启用)");
+        }
+
+        User target = userMapper.selectById(targetUserId);
+        if (target == null) {
+            throw new RuntimeException("目标用户不存在");
+        }
+
+        target.setStatus(status);
+        userMapper.updateById(target);
+
+        PointsHistory history = new PointsHistory();
+        history.setUserId(targetUserId);
+        history.setType("admin_user_status");
+        history.setAmount(0);
+        history.setBalance(target.getPoints() == null ? 0 : target.getPoints());
+        history.setDescription((status == 1 ? "管理员启用账号" : "管理员禁用账号")
+            + ((reason == null || reason.isBlank()) ? "" : ("，原因：" + reason)));
+        pointsHistoryMapper.insert(history);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("userId", targetUserId);
+        result.put("username", target.getUsername());
+        result.put("status", status);
+        result.put("reason", reason);
+        return result;
+    }
+
+    /**
+     * 管理员重置用户签到连续信息
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> adminResetUserSignIn(Long operatorUserId, Long targetUserId, String reason) {
+        assertAdmin(operatorUserId);
+        if (targetUserId == null || targetUserId <= 0) {
+            throw new RuntimeException("目标用户ID不合法");
+        }
+
+        User target = userMapper.selectById(targetUserId);
+        if (target == null) {
+            throw new RuntimeException("目标用户不存在");
+        }
+
+        target.setLastSignInDate(null);
+        target.setContinuousDays(0);
+        userMapper.updateById(target);
+
+        PointsHistory history = new PointsHistory();
+        history.setUserId(targetUserId);
+        history.setType("admin_sign_reset");
+        history.setAmount(0);
+        history.setBalance(target.getPoints() == null ? 0 : target.getPoints());
+        history.setDescription("管理员重置签到记录"
+            + ((reason == null || reason.isBlank()) ? "" : ("，原因：" + reason)));
+        pointsHistoryMapper.insert(history);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("userId", targetUserId);
+        result.put("username", target.getUsername());
+        result.put("lastSignInDate", target.getLastSignInDate());
+        result.put("continuousDays", target.getContinuousDays());
+        return result;
+    }
+
+    /**
+     * 管理员查看积分流水
+     */
+    public Page<PointsHistory> adminGetHistory(Long operatorUserId, Long userId, String type, int page, int pageSize) {
+        assertAdmin(operatorUserId);
+
+        Page<PointsHistory> pageInfo = new Page<>(page, pageSize);
+        LambdaQueryWrapper<PointsHistory> query = new LambdaQueryWrapper<>();
+        if (userId != null && userId > 0) {
+            query.eq(PointsHistory::getUserId, userId);
+        }
+        if (type != null && !type.isBlank()) {
+            query.eq(PointsHistory::getType, type.trim());
+        }
+        query.orderByDesc(PointsHistory::getCreatedAt);
+        return pointsHistoryMapper.selectPage(pageInfo, query);
     }
     
     /**

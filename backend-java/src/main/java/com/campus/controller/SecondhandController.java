@@ -28,6 +28,14 @@ public class SecondhandController {
         this.secondhandService = secondhandService;
     }
 
+    private Long currentUserId(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof Long) {
+            return (Long) principal;
+        }
+        return Long.parseLong(authentication.getName());
+    }
+
     private Map<String, Object> toLegacyProduct(SecondhandProduct product) {
         Map<String, Object> item = new HashMap<>();
         item.put("id", product.getId());
@@ -228,5 +236,59 @@ public class SecondhandController {
         data.put("contact", contact);
         data.put("seller", product.getSellerName());
         return Result.success(data);
+    }
+
+    /**
+     * 管理员：查询全量商品（可按状态筛选）
+     */
+    @GetMapping("/admin/products")
+    public Result<Page<SecondhandProduct>> adminGetProducts(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int pageSize,
+            Authentication authentication) {
+        try {
+            Long operatorUserId = currentUserId(authentication);
+            Page<SecondhandProduct> products = secondhandService.adminGetProducts(
+                operatorUserId, status, keyword, page, pageSize);
+            return Result.success(products);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 管理员：强制修改商品状态
+     */
+    @PostMapping("/admin/products/{productId}/status")
+    public Result<Map<String, Object>> adminForceStatus(
+            @PathVariable Long productId,
+            @RequestBody Map<String, String> request,
+            Authentication authentication) {
+        try {
+            Long operatorUserId = currentUserId(authentication);
+            String status = request.get("status");
+            Map<String, Object> result = secondhandService.adminForceStatus(operatorUserId, productId, status);
+            return Result.success("状态更新成功", result);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 管理员：强制删除商品
+     */
+    @DeleteMapping("/admin/products/{productId}")
+    public Result<Map<String, Object>> adminForceDelete(
+            @PathVariable Long productId,
+            Authentication authentication) {
+        try {
+            Long operatorUserId = currentUserId(authentication);
+            Map<String, Object> result = secondhandService.adminForceDelete(operatorUserId, productId);
+            return Result.success("删除成功", result);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
     }
 }

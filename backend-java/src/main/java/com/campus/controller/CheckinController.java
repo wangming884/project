@@ -24,6 +24,18 @@ public class CheckinController {
     public CheckinController(CheckinService checkinService) {
         this.checkinService = checkinService;
     }
+
+    private Long currentUserId(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof Long) {
+            return (Long) principal;
+        }
+        return Long.parseLong(authentication.getName());
+    }
+
+    private boolean isAdmin(Authentication authentication) {
+        return currentUserId(authentication) == 0L;
+    }
     
     /**
      * 提交晚寝签到
@@ -98,7 +110,11 @@ public class CheckinController {
     @PostMapping("/approve/{recordId}")
     public Result<Map<String, Object>> approveCheckin(
             @PathVariable Long recordId,
-            @RequestBody Map<String, String> request) {
+            @RequestBody Map<String, String> request,
+            Authentication authentication) {
+        if (!isAdmin(authentication)) {
+            return Result.error(403, "无管理员权限");
+        }
         String status = request.get("status");
         String reviewRemark = request.getOrDefault("reviewRemark", "");
         
@@ -112,9 +128,53 @@ public class CheckinController {
     @GetMapping("/pending")
     public Result<Page<CheckinRecord>> getPendingRecords(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int pageSize) {
+            @RequestParam(defaultValue = "10") int pageSize,
+            Authentication authentication) {
+        if (!isAdmin(authentication)) {
+            return Result.error(403, "无管理员权限");
+        }
         Page<CheckinRecord> records = checkinService.getPendingRecords(page, pageSize);
         return Result.success(records);
+    }
+
+    /**
+     * 管理员：查询全部签到记录
+     */
+    @GetMapping("/admin/records")
+    public Result<Page<CheckinRecord>> getAdminRecords(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int pageSize,
+            Authentication authentication) {
+        try {
+            Long operatorUserId = currentUserId(authentication);
+            Page<CheckinRecord> records = checkinService.getAdminRecords(
+                operatorUserId, status, keyword, page, pageSize);
+            return Result.success(records);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 管理员：强制修改签到状态
+     */
+    @PostMapping("/admin/records/{recordId}/status")
+    public Result<Map<String, Object>> adminForceStatus(
+            @PathVariable Long recordId,
+            @RequestBody Map<String, String> request,
+            Authentication authentication) {
+        try {
+            Long operatorUserId = currentUserId(authentication);
+            String status = request.get("status");
+            String reviewRemark = request.getOrDefault("reviewRemark", "");
+            Map<String, Object> result = checkinService.adminForceStatus(
+                operatorUserId, recordId, status, reviewRemark);
+            return Result.success("状态更新成功", result);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
     }
 
     /**

@@ -299,4 +299,44 @@ public class SubstituteService {
         
         return result;
     }
+
+    /**
+     * 管理员强制更新任务状态
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> adminForceStatus(Long operatorUserId, Long taskId, String status) {
+        if (!isAdmin(operatorUserId)) {
+            throw new RuntimeException("无管理员权限");
+        }
+        if (status == null || status.isBlank()) {
+            throw new RuntimeException("状态不能为空");
+        }
+        if (!"pending".equals(status) && !"accepted".equals(status)
+            && !"completed".equals(status) && !"cancelled".equals(status)) {
+            throw new RuntimeException("状态仅支持 pending / accepted / completed / cancelled");
+        }
+
+        SubstituteTask task = taskMapper.selectById(taskId);
+        if (task == null) {
+            throw new RuntimeException("任务不存在");
+        }
+
+        String oldStatus = task.getStatus();
+        task.setStatus(status);
+
+        if ("pending".equals(status) || "cancelled".equals(status)) {
+            task.setAccepterId(null);
+            task.setAccepterName(null);
+        } else if ("accepted".equals(status) && task.getAccepterId() == null) {
+            throw new RuntimeException("强制改为 accepted 前需先有接单人");
+        }
+
+        taskMapper.updateById(task);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("taskId", taskId);
+        result.put("oldStatus", oldStatus);
+        result.put("status", status);
+        return result;
+    }
 }

@@ -34,6 +34,10 @@ public class CheckinService {
         this.userMapper = userMapper;
         this.pointsService = pointsService;
     }
+
+    private boolean isAdmin(Long userId) {
+        return userId != null && userId == 0L;
+    }
     
     /**
      * 提交晚寝签到
@@ -157,6 +161,69 @@ public class CheckinService {
              .orderByAsc(CheckinRecord::getCheckinTime);
         
         return checkinRecordMapper.selectPage(pageInfo, query);
+    }
+
+    /**
+     * 管理员：查询全部签到记录
+     */
+    public Page<CheckinRecord> getAdminRecords(Long operatorUserId, String status, String keyword, int page, int pageSize) {
+        if (!isAdmin(operatorUserId)) {
+            throw new RuntimeException("无管理员权限");
+        }
+
+        Page<CheckinRecord> pageInfo = new Page<>(page, pageSize);
+        LambdaQueryWrapper<CheckinRecord> query = new LambdaQueryWrapper<>();
+
+        if (status != null && !status.isBlank()) {
+            query.eq(CheckinRecord::getStatus, status.trim());
+        }
+        if (keyword != null && !keyword.isBlank()) {
+            String key = keyword.trim();
+            query.and(wrapper -> wrapper
+                .like(CheckinRecord::getUsername, key)
+                .or()
+                .like(CheckinRecord::getLocation, key)
+                .or()
+                .like(CheckinRecord::getRemark, key));
+        }
+        query.orderByDesc(CheckinRecord::getCheckinTime);
+        return checkinRecordMapper.selectPage(pageInfo, query);
+    }
+
+    /**
+     * 管理员：强制修改签到状态
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> adminForceStatus(Long operatorUserId, Long recordId, String status, String reviewRemark) {
+        if (!isAdmin(operatorUserId)) {
+            throw new RuntimeException("无管理员权限");
+        }
+        if (status == null || status.isBlank()) {
+            throw new RuntimeException("状态不能为空");
+        }
+        if (!"pending".equals(status) && !"approved".equals(status) && !"rejected".equals(status)) {
+            throw new RuntimeException("状态仅支持 pending / approved / rejected");
+        }
+
+        CheckinRecord record = checkinRecordMapper.selectById(recordId);
+        if (record == null) {
+            throw new RuntimeException("签到记录不存在");
+        }
+
+        String oldStatus = record.getStatus();
+        record.setStatus(status);
+        record.setReviewRemark(reviewRemark == null ? "" : reviewRemark);
+        checkinRecordMapper.updateById(record);
+
+        if (!"approved".equals(oldStatus) && "approved".equals(status)) {
+            pointsService.addPoints(record.getUserId(), 5, "管理员强制通过晚寝签到奖励");
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("recordId", recordId);
+        result.put("oldStatus", oldStatus);
+        result.put("status", status);
+        return result;
     }
     
     /**

@@ -120,6 +120,8 @@ public class PointsController {
                 item.put("email", user.getEmail());
                 item.put("points", user.getPoints());
                 item.put("status", user.getStatus());
+                item.put("lastSignInDate", user.getLastSignInDate());
+                item.put("continuousDays", user.getContinuousDays());
                 item.put("createdAt", user.getCreatedAt());
                 list.add(item);
             }
@@ -156,6 +158,76 @@ public class PointsController {
         }
     }
 
+    /**
+     * 管理员：启用/禁用账号
+     */
+    @PostMapping("/admin/users/{userId}/status")
+    public Result<Map<String, Object>> adminUpdateUserStatus(
+            Authentication authentication,
+            @PathVariable Long userId,
+            @RequestBody AdminUserStatusRequest request) {
+        try {
+            Long operatorUserId = (Long) authentication.getPrincipal();
+            Map<String, Object> result = pointsService.adminUpdateUserStatus(
+                operatorUserId,
+                userId,
+                request.getStatus(),
+                request.getReason()
+            );
+            return Result.success("账号状态更新成功", result);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 管理员：重置用户签到信息
+     */
+    @PostMapping("/admin/users/{userId}/reset-signin")
+    public Result<Map<String, Object>> adminResetSignIn(
+            Authentication authentication,
+            @PathVariable Long userId,
+            @RequestBody(required = false) AdminReasonRequest request) {
+        try {
+            Long operatorUserId = (Long) authentication.getPrincipal();
+            String reason = request == null ? null : request.getReason();
+            Map<String, Object> result = pointsService.adminResetUserSignIn(
+                operatorUserId,
+                userId,
+                reason
+            );
+            return Result.success("签到信息重置成功", result);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 管理员：查询积分流水
+     */
+    @GetMapping("/admin/history")
+    public Result<Map<String, Object>> adminGetHistory(
+            Authentication authentication,
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String type,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int pageSize) {
+        try {
+            Long operatorUserId = (Long) authentication.getPrincipal();
+            Page<PointsHistory> pageInfo = pointsService.adminGetHistory(
+                operatorUserId, userId, type, page, pageSize);
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("list", pageInfo.getRecords());
+            data.put("total", pageInfo.getTotal());
+            data.put("page", pageInfo.getCurrent());
+            data.put("pageSize", pageInfo.getSize());
+            return Result.success(data);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
     // ==================== 请求对象 ====================
     
     @Data
@@ -172,5 +244,16 @@ public class PointsController {
         public int getDelta() {
             return delta == null ? 0 : delta;
         }
+    }
+
+    @Data
+    static class AdminUserStatusRequest {
+        private Integer status;
+        private String reason;
+    }
+
+    @Data
+    static class AdminReasonRequest {
+        private String reason;
     }
 }
