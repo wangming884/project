@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: campus-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: your_root_password
+      MYSQL_DATABASE: campus_platform
+      MYSQL_USER: campus
+      MYSQL_PASSWORD: your_password
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    networks:
+      - campus-network
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: campus-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --requirepass your_redis_password
+    networks:
+      - campus-network
+
+  # 后端应用
+  backend:
+    build: .
+    container_name: campus-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/campus_platform?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_USERNAME: campus
+      SPRING_DATASOURCE_PASSWORD: your_password
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PASSWORD: your_redis_password
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - campus-network
+
+volumes:
+  mysql-data:
+  redis-data:
+
+networks:
+  campus-network:
+    driver: bridge
