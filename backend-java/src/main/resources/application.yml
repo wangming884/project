@@ -69,6 +69,11 @@ google-drive:
   materials-folder-id: ""
   software-folder-id: ""
 
+# 自动化晚寝签到预留配置
+automation-checkin:
+  enabled: false
+  script-key: ""
+
 # 日志配置
 logging:
   level:

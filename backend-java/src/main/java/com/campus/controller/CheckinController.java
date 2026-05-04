@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.campus.common.Result;
 import com.campus.entity.CheckinRecord;
 import com.campus.service.CheckinService;
+import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +22,12 @@ import java.util.Map;
 public class CheckinController {
     
     private final CheckinService checkinService;
+
+    @Value("${automation-checkin.enabled:false}")
+    private boolean automationEnabled;
+
+    @Value("${automation-checkin.script-key:}")
+    private String automationScriptKey;
     
     public CheckinController(CheckinService checkinService) {
         this.checkinService = checkinService;
@@ -35,6 +43,12 @@ public class CheckinController {
 
     private boolean isAdmin(Authentication authentication) {
         return currentUserId(authentication) == 0L;
+    }
+
+    private boolean validAutomationKey(String input) {
+        return automationScriptKey != null
+            && !automationScriptKey.isBlank()
+            && automationScriptKey.equals(input);
     }
     
     /**
@@ -204,5 +218,75 @@ public class CheckinController {
         data.put("page", records.getCurrent());
         data.put("pageSize", records.getSize());
         return Result.success(data);
+    }
+
+    /**
+     * 自动化签到脚本接入说明（预留接口）
+     */
+    @GetMapping("/automation/spec")
+    public Result<Map<String, Object>> automationSpec() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("enabled", automationEnabled);
+        data.put("endpoint", "/api/checkin/automation/submit");
+        data.put("authHeader", "X-Automation-Key");
+        data.put("method", "POST");
+        data.put("requestBodyExample", Map.of(
+            "userId", 10001,
+            "dorm", "3号楼-402",
+            "remark", "自动化签到",
+            "scriptName", "night-checkin-cron",
+            "requestId", "job-20260504-230000"
+        ));
+        data.put("message", "该接口为自动化签到脚本预留，后续可接入定时脚本/机器人服务。");
+        return Result.success(data);
+    }
+
+    /**
+     * 自动化签到脚本入口（预留接口）
+     */
+    @PostMapping("/automation/submit")
+    public Result<Map<String, Object>> automationSubmit(
+            @RequestBody AutomationSubmitRequest request,
+            @RequestHeader(value = "X-Automation-Key", required = false) String scriptKey) {
+        try {
+            if (!automationEnabled) {
+                return Result.error(503, "自动化签到未启用，请先在配置中开启 automation-checkin.enabled");
+            }
+            if (!validAutomationKey(scriptKey)) {
+                return Result.error(401, "自动化脚本密钥无效");
+            }
+            if (request.getUserId() == null || request.getUserId() <= 0) {
+                return Result.error("userId 不合法");
+            }
+
+            String location = request.getDorm();
+            if (location == null || location.isBlank()) {
+                location = request.getLocation();
+            }
+            if (location == null || location.isBlank()) {
+                location = "自动化脚本未提供位置";
+            }
+
+            Map<String, Object> data = checkinService.submitCheckinByAutomation(
+                request.getUserId(),
+                location,
+                request.getRemark(),
+                request.getScriptName(),
+                request.getRequestId()
+            );
+            return Result.success("自动化签到提交成功", data);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    @Data
+    static class AutomationSubmitRequest {
+        private Long userId;
+        private String dorm;
+        private String location;
+        private String remark;
+        private String scriptName;
+        private String requestId;
     }
 }

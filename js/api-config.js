@@ -40,6 +40,8 @@ const API_ENDPOINTS = {
         getStatus: `${API_BASE_URL}/checkin/status`,           // GET - 获取签到状态
         getHistory: `${API_BASE_URL}/checkin/history`,         // GET - 签到历史记录
         getLocation: `${API_BASE_URL}/checkin/location`,       // GET - 获取定位信息
+        automationSpec: `${API_BASE_URL}/checkin/automation/spec`, // GET - 自动化签到接入说明
+        automationSubmit: `${API_BASE_URL}/checkin/automation/submit`, // POST - 自动化签到脚本入口
     },
 
     // 二手物品交易相关

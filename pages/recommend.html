@@ -72,7 +72,7 @@
         <div class="points-container">
             <div>当前积分：<span id="currentShopPoints">0</span></div>
             <div class="points-actions">
-                <button type="button" class="btn-small buy-btn" onclick="openShopPurchaseModal()">购买积分</button>
+                <button type="button" class="btn-small buy-btn" onclick="openShopPurchasePage()">购买积分</button>
                 <button type="button" class="btn-small" onclick="openShopRedeemModal()">兑换积分</button>
             </div>
         </div>
@@ -96,29 +96,12 @@
         </div>
     </div>
 
-    <div id="shopPurchaseModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeShopPurchaseModal()">&times;</span>
-            <h2>购买积分</h2>
-            <form onsubmit="event.preventDefault(); handleShopPurchase();">
-                <div class="form-group">
-                    <label for="shopPurchasePackage">选择套餐</label>
-                    <select id="shopPurchasePackage">
-                        <option value="basic">基础包：100积分（￥10）</option>
-                        <option value="plus">进阶包：300积分（￥25）</option>
-                        <option value="pro">尊享包：800积分（￥60）</option>
-                    </select>
-                </div>
-                <button type="submit" class="submit-btn">确认购买</button>
-            </form>
-        </div>
-    </div>
-
     <script src="../js/api-config.js"></script>
     <script src="../js/api-utils.js"></script>
     <script>
         const recommendGrid = document.getElementById('recommendGrid');
         const announcementEl = document.getElementById('recommendAnnouncement');
+        const POINTS_PURCHASE_URL = 'https://example.com/points-purchase';
         let shopPoints = parseInt(localStorage.getItem('shopPoints')) || 0;
 
         function escapeHtml(value) {
@@ -143,12 +126,9 @@
             document.getElementById('shopRedeemCode').value = '';
         }
 
-        function openShopPurchaseModal() {
-            document.getElementById('shopPurchaseModal').style.display = 'flex';
-        }
-
-        function closeShopPurchaseModal() {
-            document.getElementById('shopPurchaseModal').style.display = 'none';
+        function openShopPurchasePage() {
+            window.open(POINTS_PURCHASE_URL, '_blank', 'noopener,noreferrer');
+            showMessage('已跳转到外部网站购买积分', 'info');
         }
 
         async function syncPointsBalance() {
@@ -195,31 +175,6 @@
                 closeShopRedeemModal();
             }).catch(() => {
                 showMessage('兑换失败，请稍后重试', 'error');
-            });
-        }
-
-        function handleShopPurchase() {
-            const packageType = document.getElementById('shopPurchasePackage').value;
-            const token = getStorage('authToken');
-            if (!token) {
-                showMessage('请先登录后再购买积分', 'warning');
-                return;
-            }
-
-            post(API_ENDPOINTS.points.purchase, { packageType }).then((response) => {
-                if (!response.success) {
-                    showMessage(response.message || '购买失败', 'error');
-                    return;
-                }
-                const balance = Number(response.data?.balance ?? shopPoints);
-                const points = Number(response.data?.points ?? 0);
-                shopPoints = balance;
-                localStorage.setItem('shopPoints', shopPoints);
-                initShopPoints();
-                showMessage(`购买成功，已到账 ${points} 积分`, 'success');
-                closeShopPurchaseModal();
-            }).catch(() => {
-                showMessage('购买失败，请稍后重试', 'error');
             });
         }
 
@@ -305,12 +260,8 @@
 
         window.onclick = function(event) {
             const redeemModal = document.getElementById('shopRedeemModal');
-            const purchaseModal = document.getElementById('shopPurchaseModal');
             if (event.target === redeemModal) {
                 closeShopRedeemModal();
-            }
-            if (event.target === purchaseModal) {
-                closeShopPurchaseModal();
             }
         };
 

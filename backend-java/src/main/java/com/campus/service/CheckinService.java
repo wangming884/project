@@ -44,6 +44,34 @@ public class CheckinService {
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> submitCheckin(Long userId, String location, String remark) {
+        return doSubmitCheckin(userId, location, remark);
+    }
+
+    /**
+     * 脚本自动签到（预留）
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> submitCheckinByAutomation(
+            Long userId, String location, String remark, String scriptName, String requestId) {
+        String fullRemark = (remark == null ? "" : remark.trim());
+        String scriptPart = "自动化脚本: " + (scriptName == null || scriptName.isBlank() ? "unknown-script" : scriptName.trim());
+        if (!fullRemark.isBlank()) {
+            fullRemark = fullRemark + " | " + scriptPart;
+        } else {
+            fullRemark = scriptPart;
+        }
+        if (requestId != null && !requestId.isBlank()) {
+            fullRemark = fullRemark + " | requestId: " + requestId.trim();
+        }
+
+        Map<String, Object> result = doSubmitCheckin(userId, location, fullRemark);
+        result.put("source", "automation-script");
+        result.put("scriptName", scriptName);
+        result.put("requestId", requestId);
+        return result;
+    }
+
+    private Map<String, Object> doSubmitCheckin(Long userId, String location, String remark) {
         User user = userMapper.selectById(userId);
         if (user == null) {
             throw new RuntimeException("用户不存在");

@@ -65,6 +65,7 @@ public class SecurityConfig {
                     "/auth/login",
                     "/auth/admin-login",
                     "/auth/register",
+                    "/checkin/automation/**",
                     "/secondhand/list",
                     "/secondhand/search",
                     "/substitute/list",
