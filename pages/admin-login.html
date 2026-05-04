@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员登录 - 校园综合服务平台</title>
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: linear-gradient(150deg, #f8fbff 0%, #eef4fb 55%, #f7fbf8 100%); min-height: 100vh; color: #1a202c; }
+        .wrap { max-width: 980px; margin: 0 auto; padding: 4rem 5%; display: grid; grid-template-columns: 1.1fr 1fr; gap: 2.2rem; align-items: center; }
+        .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; line-height: 1.2; }
+        .hero p { color: #4a5568; line-height: 1.8; margin-bottom: 1.4rem; }
+        .hero .hint { color: #d69e2e; background: #fffff0; border: 1px solid #fefcbf; border-radius: 10px; padding: 0.75rem 0.95rem; font-size: 0.92rem; }
+        .card { background: #fff; border-radius: 16px; box-shadow: 0 18px 45px rgba(49, 130, 206, 0.12); padding: 1.6rem; }
+        .card h2 { margin-top: 0; margin-bottom: 1.2rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.45rem; color: #4a5568; font-size: 0.92rem; }
+        .form-group input { width: 100%; box-sizing: border-box; border: 1px solid #cbd5e0; border-radius: 10px; padding: 0.75rem; font-size: 1rem; }
+        .form-group input:focus { outline: none; border-color: #3182ce; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.18); }
+        .actions { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1.2rem; }
+        .btn { border: none; border-radius: 10px; cursor: pointer; font-size: 0.95rem; font-weight: 600; padding: 0.75rem 1.2rem; }
+        .btn-primary { background: #3182ce; color: #fff; }
+        .btn-primary:hover { background: #2b6cb0; }
+        .btn-muted { background: #edf2f7; color: #4a5568; text-decoration: none; display: inline-flex; align-items: center; }
+        .footer { margin-top: 1rem; color: #718096; font-size: 0.9rem; }
+        @media (max-width: 900px) {
+            .wrap { grid-template-columns: 1fr; padding-top: 2.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <main class="wrap">
+        <section class="hero">
+            <h1>管理员后台入口</h1>
+            <p>通过管理员账号密码登录后，可进入后台执行签到审核、任务管理、商品管理等操作。</p>
+            <div class="hint">生产环境请在后端 `application-prod.yml` 中修改 `ADMIN_USERNAME` 和 `ADMIN_PASSWORD`。</div>
+        </section>
+        <section class="card">
+            <h2>管理员登录</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="admin-username">管理员账号</label>
+                    <input id="admin-username" type="text" placeholder="请输入管理员账号" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">管理员密码</label>
+                    <input id="admin-password" type="password" placeholder="请输入管理员密码" required>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">登录后台</button>
+                    <a href="index.html" class="btn btn-muted">返回首页</a>
+                </div>
+            </form>
+            <div class="footer">默认管理员账号仅用于开发演示，请尽快修改。</div>
+        </section>
+    </main>
+
+    <script src="../js/api-config.js"></script>
+    <script src="../js/api-utils.js"></script>
+    <script src="../js/admin-auth.js"></script>
+    <script>
+        const LOCAL_ADMIN = {
+            username: 'admin',
+            password: 'Admin@123456',
+        };
+
+        function nextPage() {
+            const params = new URLSearchParams(window.location.search);
+            const from = params.get('from');
+            if (from && from.includes('admin-dashboard.html')) {
+                return 'admin-dashboard.html';
+            }
+            return 'admin-dashboard.html';
+        }
+
+        async function handleAdminLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('admin-username').value.trim();
+            const password = document.getElementById('admin-password').value;
+
+            if (!username || !password) {
+                showMessage('请输入管理员账号和密码', 'warning');
+                return;
+            }
+
+            try {
+                showLoading('验证管理员身份中...');
+                const response = await post(API_ENDPOINTS.auth.adminLogin, { username, password });
+                hideLoading();
+
+                if (!response.success || !response.data) {
+                    showMessage(response.message || '管理员登录失败', 'error');
+                    return;
+                }
+
+                setStorage('authToken', response.data.token);
+                setStorage('userInfo', response.data.user);
+                saveAdminSession({
+                    username: response.data.user.username || username,
+                    role: 'admin',
+                    mode: 'server',
+                });
+
+                showMessage('管理员登录成功', 'success');
+                setTimeout(() => {
+                    window.location.href = nextPage();
+                }, 600);
+            } catch (error) {
+                hideLoading();
+                if (username === LOCAL_ADMIN.username && password === LOCAL_ADMIN.password) {
+                    removeStorage('authToken');
+                    setStorage('userInfo', {
+                        userId: 0,
+                        username,
+                        role: 'admin',
+                        permissions: 'all',
+                    });
+                    saveAdminSession({
+                        username,
+                        role: 'admin',
+                        mode: 'offline',
+                    });
+                    showMessage('后端不可用，已进入离线管理模式', 'warning');
+                    setTimeout(() => {
+                        window.location.href = nextPage();
+                    }, 700);
+                    return;
+                }
+                handleError(error, '管理员登录失败');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (isAdminLoggedIn()) {
+                window.location.href = nextPage();
+                return;
+            }
+            document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
+        });
+    </script>
+</body>
+</html>

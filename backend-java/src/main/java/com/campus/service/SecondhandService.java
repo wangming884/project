@@ -28,6 +28,10 @@ public class SecondhandService {
         this.productMapper = productMapper;
         this.userMapper = userMapper;
     }
+
+    private boolean isAdmin(Long userId) {
+        return userId != null && userId == 0L;
+    }
     
     /**
      * 发布商品
@@ -144,7 +148,7 @@ public class SecondhandService {
             throw new RuntimeException("商品不存在");
         }
         
-        if (!product.getSellerId().equals(userId)) {
+        if (!isAdmin(userId) && !product.getSellerId().equals(userId)) {
             throw new RuntimeException("无权修改此商品");
         }
         
@@ -172,7 +176,7 @@ public class SecondhandService {
             throw new RuntimeException("商品不存在");
         }
         
-        if (!product.getSellerId().equals(userId)) {
+        if (!isAdmin(userId) && !product.getSellerId().equals(userId)) {
             throw new RuntimeException("无权修改此商品");
         }
         
@@ -196,7 +200,7 @@ public class SecondhandService {
             throw new RuntimeException("商品不存在");
         }
         
-        if (!product.getSellerId().equals(userId)) {
+        if (!isAdmin(userId) && !product.getSellerId().equals(userId)) {
             throw new RuntimeException("无权删除此商品");
         }
         

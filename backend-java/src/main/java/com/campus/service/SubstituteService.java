@@ -28,6 +28,10 @@ public class SubstituteService {
         this.taskMapper = taskMapper;
         this.userMapper = userMapper;
     }
+
+    private boolean isAdmin(Long userId) {
+        return userId != null && userId == 0L;
+    }
     
     /**
      * 发布代课任务
@@ -162,7 +166,7 @@ public class SubstituteService {
             throw new RuntimeException("任务不存在");
         }
         
-        if (!task.getAccepterId().equals(userId)) {
+        if (!isAdmin(userId) && (task.getAccepterId() == null || !task.getAccepterId().equals(userId))) {
             throw new RuntimeException("无权取消此任务");
         }
         
@@ -193,7 +197,7 @@ public class SubstituteService {
             throw new RuntimeException("任务不存在");
         }
         
-        if (!task.getPublisherId().equals(userId)) {
+        if (!isAdmin(userId) && !task.getPublisherId().equals(userId)) {
             throw new RuntimeException("只有发布者可以确认完成");
         }
         
@@ -222,7 +226,7 @@ public class SubstituteService {
             throw new RuntimeException("任务不存在");
         }
         
-        if (!task.getPublisherId().equals(userId)) {
+        if (!isAdmin(userId) && !task.getPublisherId().equals(userId)) {
             throw new RuntimeException("只有发布者可以取消任务");
         }
         

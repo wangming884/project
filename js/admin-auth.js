@@ -1,0 +1,47 @@
+/**
+ * 管理员认证工具
+ */
+
+const ADMIN_SESSION_KEY = 'adminSession';
+const ADMIN_SESSION_EXPIRES_HOURS = 8;
+
+function saveAdminSession(adminInfo) {
+    const expiresAt = Date.now() + ADMIN_SESSION_EXPIRES_HOURS * 60 * 60 * 1000;
+    setStorage(ADMIN_SESSION_KEY, {
+        ...adminInfo,
+        expiresAt,
+    });
+}
+
+function getAdminSession() {
+    const session = getStorage(ADMIN_SESSION_KEY);
+    if (!session || !session.expiresAt) {
+        return null;
+    }
+    if (Date.now() > Number(session.expiresAt)) {
+        removeStorage(ADMIN_SESSION_KEY);
+        return null;
+    }
+    return session;
+}
+
+function isAdminLoggedIn() {
+    return !!getAdminSession();
+}
+
+function requireAdminAuth() {
+    const session = getAdminSession();
+    if (!session) {
+        const from = encodeURIComponent(window.location.pathname);
+        window.location.href = `admin-login.html?from=${from}`;
+        return false;
+    }
+    return true;
+}
+
+function adminLogout() {
+    removeStorage(ADMIN_SESSION_KEY);
+    removeStorage('authToken');
+    removeStorage('userInfo');
+    window.location.href = 'admin-login.html';
+}

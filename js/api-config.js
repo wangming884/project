@@ -13,6 +13,7 @@ const API_ENDPOINTS = {
     // 用户认证相关
     auth: {
         login: `${API_BASE_URL}/auth/login`,           // POST - 用户登录
+        adminLogin: `${API_BASE_URL}/auth/admin-login`, // POST - 管理员登录
         register: `${API_BASE_URL}/auth/register`,     // POST - 用户注册
         logout: `${API_BASE_URL}/auth/logout`,         // POST - 用户登出
         checkAuth: `${API_BASE_URL}/auth/check`,       // GET - 检查登录状态
@@ -80,6 +81,14 @@ const API_ENDPOINTS = {
     // 联系作者相关
     contact: {
         submit: `${API_BASE_URL}/contact/submit`,              // POST - 提交联系表单
+    },
+
+    // 管理员后台专用接口（Java 后端）
+    admin: {
+        checkinPending: `${API_BASE_URL}/checkin/pending`,     // GET - 待审核签到记录
+        checkinApproveBase: `${API_BASE_URL}/checkin/approve`, // POST - 审核签到
+        secondhandProducts: `${API_BASE_URL}/secondhand/products`, // GET - 商品列表
+        substituteTasks: `${API_BASE_URL}/substitute/tasks`,   // GET - 任务列表
     },
 };
 

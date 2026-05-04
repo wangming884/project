@@ -55,6 +55,11 @@ jwt:
   header: Authorization
   prefix: Bearer 
 
+# 管理员登录配置（请在生产环境务必修改）
+admin:
+  username: admin
+  password: Admin@123456
+
 # 日志配置
 logging:
   level:

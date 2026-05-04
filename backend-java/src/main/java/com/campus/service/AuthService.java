@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.campus.entity.User;
 import com.campus.mapper.UserMapper;
 import com.campus.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,12 @@ public class AuthService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+
+    @Value("${admin.username:admin}")
+    private String adminUsername;
+
+    @Value("${admin.password:Admin@123456}")
+    private String adminPassword;
     
     public AuthService(UserMapper userMapper, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userMapper = userMapper;
@@ -106,6 +113,30 @@ public class AuthService {
         result.put("token", token);
         result.put("user", userData);
         
+        return result;
+    }
+
+    /**
+     * 管理员登录
+     */
+    public Map<String, Object> adminLogin(String username, String password) {
+        if (!adminUsername.equals(username) || !adminPassword.equals(password)) {
+            throw new RuntimeException("管理员账号或密码错误");
+        }
+
+        // 管理员使用保留ID=0，便于在业务层识别超级权限
+        String token = jwtUtil.generateToken(0L);
+
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("userId", 0);
+        userData.put("username", adminUsername);
+        userData.put("role", "admin");
+        userData.put("permissions", "all");
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("token", token);
+        result.put("user", userData);
+
         return result;
     }
     

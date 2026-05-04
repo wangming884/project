@@ -13,6 +13,8 @@
         .logo { font-size: 1.5rem; font-weight: bold; color: #3182ce; letter-spacing: 0.5px; }
         .auth-buttons button { background: #3182ce; color: white; border: none; padding: 0.5rem 1.2rem; margin-left: 0.8rem; cursor: pointer; border-radius: 20px; font-size: 1rem; transition: all 0.3s ease; }
         .auth-buttons button.register-btn { background: #38b2ac; }
+        .auth-buttons button.admin-btn { background: #1f2937; }
+        .auth-buttons button.admin-btn:hover { box-shadow: 0 4px 10px rgba(31,41,55,0.28); }
         .auth-buttons button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
         /* 首页主体内容 */
@@ -62,6 +64,7 @@
     <header>
         <div class="logo">MyBrand</div>
         <div class="auth-buttons">
+            <button class="admin-btn" onclick="window.location.href='admin-login.html'">管理员入口</button>
             <button onclick="openModal('loginModal')">登录</button>
             <button class="register-btn" onclick="openModal('registerModal')">注册</button>
         </div>
