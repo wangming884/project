@@ -2,7 +2,7 @@
 
 本项目是一个校园综合服务平台，当前采用「静态前端 + Java 后端」架构，支持用户系统、积分体系、晚寝签到、二手交易、代课任务、学习资源与管理员后台。
 
-最后更新：2026-05-04
+最后更新：2026-05-05
 
 ## 1. 功能概览
 
@@ -15,6 +15,7 @@
 5. 代课任务发布与接单
 6. 学习资料/学习软件下载入口
 7. 联系作者
+8. 代课“我的发布 / 我的接单”管理页：`pages/substitute-manage.html`
 
 ### 管理员侧
 
@@ -26,6 +27,8 @@
 6. 重置用户签到连续记录
 7. 查看用户积分流水
 8. 管理员上传学习资料/学习软件（当前为 Google Drive 预留上传会话）
+9. 代课大厅全量任务查看
+10. 代课任务强制状态流转（`pending / accepted / completed / cancelled`）
 
 ## 2. 技术栈
 
@@ -48,6 +51,7 @@
 │   ├── checkin.html
 │   ├── secondhand.html
 │   ├── substitute.html
+│   ├── substitute-manage.html
 │   ├── resources.html
 │   ├── learning_materials.html
 │   ├── learning_software.html
@@ -99,7 +103,28 @@ mvn spring-boot:run
 1. `admin.username=admin`
 2. `admin.password=Admin@123456`
 
-## 6. 学习资源与上传说明
+当前管理员能力说明：
+
+1. 管理员登录成功后，后端签发管理员专属 JWT，业务层以保留身份 `userId=0` 识别超级权限
+2. 前端 `pages/substitute.html` 会自动切换到管理员视图，展示全量代课任务
+3. 管理员可直接在代课大厅强制修改任务状态
+4. `pages/substitute-manage.html` 会自动锁定管理员的普通发布入口，避免误以超级身份发布用户任务
+
+## 6. 代课模块当前状态
+
+当前代课模块已接入 Java 后端，不再使用前端本地草稿：
+
+1. 大厅页：`pages/substitute.html`
+2. 发布/我的任务页：`pages/substitute-manage.html`
+3. 公开任务列表接口：`GET /api/substitute/tasks`
+4. 普通用户任务发布接口：`POST /api/substitute/publish`
+5. 我的发布：`GET /api/substitute/my-published`
+6. 我的接单：`GET /api/substitute/my-accepted`
+7. 任务统计：`GET /api/substitute/statistics`
+8. 管理员全量任务：`GET /api/substitute/admin/tasks`
+9. 管理员强制改状态：`POST /api/substitute/admin/tasks/{taskId}/status`
+
+## 7. 学习资源与上传说明
 
 当前学习资源模块已预留 Google Drive 接口，包含：
 
@@ -109,19 +134,23 @@ mvn spring-boot:run
 
 注意：当前是预留实现（Stub），返回标准化结构，后续可无缝替换为真实 Google Drive API 调用。
 
-## 7. 关键接口（节选）
+## 8. 关键接口（节选）
 
 1. 管理员登录：`POST /api/auth/admin-login`
-2. 管理员调整积分：`POST /api/points/admin/adjust`
-3. 管理员启用/禁用用户：`POST /api/points/admin/users/{userId}/status`
-4. 管理员重置签到：`POST /api/points/admin/users/{userId}/reset-signin`
-5. 管理员积分流水：`GET /api/points/admin/history`
-6. 管理员上传资料：`POST /api/resources/admin/materials/upload`
-7. 管理员上传软件：`POST /api/resources/admin/software/upload`
+2. 公开代课任务列表：`GET /api/substitute/tasks`
+3. 发布代课任务：`POST /api/substitute/publish`
+4. 管理员代课全量任务：`GET /api/substitute/admin/tasks`
+5. 管理员代课强制改状态：`POST /api/substitute/admin/tasks/{taskId}/status`
+6. 管理员调整积分：`POST /api/points/admin/adjust`
+7. 管理员启用/禁用用户：`POST /api/points/admin/users/{userId}/status`
+8. 管理员重置签到：`POST /api/points/admin/users/{userId}/reset-signin`
+9. 管理员积分流水：`GET /api/points/admin/history`
+10. 管理员上传资料：`POST /api/resources/admin/materials/upload`
+11. 管理员上传软件：`POST /api/resources/admin/software/upload`
 
 完整接口请查看：[docs/API-DOCUMENTATION.md](/e:/project/docs/API-DOCUMENTATION.md)
 
-## 8. 部署说明
+## 9. 部署说明
 
 生产部署请直接参考：
 

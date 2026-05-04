@@ -1,6 +1,6 @@
 # 宝塔部署保姆级教程（校园综合服务平台）
 
-适用版本：当前仓库（更新时间 2026-05-04）  
+适用版本：当前仓库（更新时间 2026-05-05）  
 适用架构：`pages/` 静态前端 + `backend-java/` Spring Boot 后端
 
 ## 1. 最终效果
@@ -9,8 +9,10 @@
 
 1. 前端首页：`https://你的域名/pages/index.html`
 2. 管理员登录页：`https://你的域名/pages/admin-login.html`
-3. API 地址：`https://你的域名/api/...`
-4. 宝塔面板地址：`https://服务器IP:宝塔端口`
+3. 代课大厅：`https://你的域名/pages/substitute.html`
+4. 代课发布/我的任务：`https://你的域名/pages/substitute-manage.html`
+5. API 地址：`https://你的域名/api/...`
+6. 宝塔面板地址：`https://服务器IP:宝塔端口`
 
 ## 2. 准备工作
 
@@ -55,6 +57,8 @@ SSH 登录服务器后执行官方安装命令（按系统选择），安装成�
 
 1. 前端页面目录存在：`/www/wwwroot/campus-web/pages`
 2. 后端目录存在：`/www/wwwroot/campus-backend/backend-java`
+3. 代课页面存在：`/www/wwwroot/campus-web/pages/substitute.html`
+4. 代课管理页存在：`/www/wwwroot/campus-web/pages/substitute-manage.html`
 
 ## 6. 初始化数据库
 
@@ -192,13 +196,17 @@ location ~* \.(css|js|jpg|jpeg|png|gif|svg|ico|woff|woff2)$ {
 
 1. `https://你的域名/pages/index.html`
 2. `https://你的域名/pages/admin-login.html`
-3. 登录后管理员后台可进入：`/pages/admin-dashboard.html`
+3. `https://你的域名/pages/substitute.html`
+4. `https://你的域名/pages/substitute-manage.html`
+5. 登录后管理员后台可进入：`/pages/admin-dashboard.html`
+6. 管理员登录后进入 `pages/substitute.html`，应自动切换为全量任务管理视图
 
 接口检查：
 
 ```bash
 curl -I https://你的域名
 curl https://你的域名/api/auth/check
+curl "https://你的域名/api/substitute/tasks?page=1&pageSize=5"
 ```
 
 服务检查：
@@ -233,7 +241,17 @@ pm2 logs campus-backend --lines 200
 
 检查 `ADMIN_USERNAME` / `ADMIN_PASSWORD` 是否与部署时设置一致。
 
-### 14.4 学习资源上传返回“预留模式”
+### 14.4 代课大厅能打开，但任务列表为空或报权限
+
+按顺序检查：
+
+1. Nginx `/api/` 反代是否生效
+2. 后端是否已经导入 `substitute_tasks` 表
+3. 普通大厅使用的是 `GET /api/substitute/tasks`
+4. 管理员全量视图使用的是 `GET /api/substitute/admin/tasks`
+5. 管理员是否通过 `pages/admin-login.html` 登录并拿到管理员 token
+
+### 14.5 学习资源上传返回“预留模式”
 
 这是当前设计：已打通管理员上传接口，但默认是 Google Drive Stub。  
 如需真实上传，需后续接入 Google Drive API 并填写完整凭据。
