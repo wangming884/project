@@ -19,12 +19,6 @@
         .announcement-card { display: none; background: #ecfeff; border: 1px solid #99f6e4; color: #115e59; border-radius: 10px; padding: 0.75rem 0.9rem; font-size: 0.92rem; }
 
         .container { max-width: 1000px; margin: 0 auto; padding: 1.2rem 5% 2rem; }
-        .points-card { display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
-        .points-num { font-size: 1.2rem; font-weight: 700; color: #be123c; }
-        .points-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-        .points-btn { border: none; border-radius: 20px; padding: 0.45rem 1rem; cursor: pointer; font-weight: 600; }
-        .points-buy { background: #f59e0b; color: #fff; }
-        .points-redeem { background: #e11d48; color: #fff; }
 
         .page-title { margin-bottom: 1rem; color: #2d3748; border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
         .task-list { display: flex; flex-direction: column; gap: 1.5rem; }
@@ -37,20 +31,13 @@
         .accept-btn { padding: 0.7rem 1.8rem; background: #e6fffa; color: #319795; border: 1px solid transparent; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: all 0.2s; }
         .accept-btn:hover { background: #319795; color: white; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #fff; width: 100%; max-width: 340px; border-radius: 12px; padding: 1.5rem; position: relative; }
-        .close-btn { position: absolute; right: 12px; top: 8px; font-size: 1.4rem; color: #999; cursor: pointer; }
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; color: #4a5568; font-size: 0.92rem; }
-        .form-group input, .form-group select { width: 100%; border: 1px solid #cbd5e0; border-radius: 8px; padding: 0.75rem; box-sizing: border-box; }
-        .submit-btn { width: 100%; border: none; border-radius: 8px; background: #0d9488; color: #fff; padding: 0.75rem; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
     <header>
         <a href="main.html" class="logo">MyBrand校园 - 代课平台</a>
         <div class="header-actions">
-            <button class="btn btn-primary" onclick="alert('即将打开发布代课需求表单...')">发布需求</button>
+            <button class="btn btn-primary" onclick="window.location.href='substitute-manage.html'">发布需求</button>
             <a href="main.html" class="btn btn-outline">返回大厅</a>
         </div>
     </header>
@@ -60,14 +47,6 @@
     </div>
 
     <main class="container">
-        <section class="points-card">
-            <div>当前积分：<span class="points-num" id="substitutePoints">0</span></div>
-            <div class="points-actions">
-                <button type="button" class="points-btn points-buy" onclick="openPurchaseModal()">购买积分</button>
-                <button type="button" class="points-btn points-redeem" onclick="openRedeemModal()">兑换积分</button>
-            </div>
-        </section>
-
         <div class="page-title">
             <h2>互助大厅任务列表</h2>
             <span style="color: #718096; font-size: 0.9rem;">共 2 个急单待接</span>
@@ -102,66 +81,10 @@
         </div>
     </main>
 
-    <div id="purchaseModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closePurchaseModal()">&times;</span>
-            <h3 style="margin-top:0;">购买积分</h3>
-            <form onsubmit="event.preventDefault(); submitPurchase();">
-                <div class="form-group">
-                    <label for="purchasePackage">选择套餐</label>
-                    <select id="purchasePackage">
-                        <option value="basic">基础包：100积分（￥10）</option>
-                        <option value="plus">进阶包：300积分（￥25）</option>
-                        <option value="pro">尊享包：800积分（￥60）</option>
-                    </select>
-                </div>
-                <button type="submit" class="submit-btn">确认购买</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="redeemModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeRedeemModal()">&times;</span>
-            <h3 style="margin-top:0;">兑换积分</h3>
-            <form onsubmit="event.preventDefault(); submitRedeem();">
-                <div class="form-group">
-                    <label for="redeemCodeInput">兑换码</label>
-                    <input id="redeemCodeInput" type="text" placeholder="请输入积分兑换码" required>
-                </div>
-                <button type="submit" class="submit-btn">确认兑换</button>
-            </form>
-        </div>
-    </div>
-
     <script src="../js/api-config.js"></script>
     <script src="../js/api-utils.js"></script>
     <script>
-        const pointsEl = document.getElementById('substitutePoints');
         const announcementEl = document.getElementById('substituteAnnouncement');
-        let pagePoints = parseInt(localStorage.getItem('substitutePoints')) || 0;
-
-        function renderPoints() {
-            pointsEl.textContent = pagePoints;
-        }
-
-        async function loadPoints() {
-            const token = getStorage('authToken');
-            if (!token) {
-                renderPoints();
-                return;
-            }
-            try {
-                const response = await get(API_ENDPOINTS.points.getBalance);
-                if (response.success && response.data) {
-                    pagePoints = Number(response.data.balance ?? pagePoints);
-                    localStorage.setItem('substitutePoints', pagePoints);
-                }
-            } catch (error) {
-                // ignore
-            }
-            renderPoints();
-        }
 
         async function loadAnnouncement() {
             try {
@@ -178,85 +101,8 @@
             }
         }
 
-        function openPurchaseModal() {
-            document.getElementById('purchaseModal').style.display = 'flex';
-        }
-
-        function closePurchaseModal() {
-            document.getElementById('purchaseModal').style.display = 'none';
-        }
-
-        function openRedeemModal() {
-            document.getElementById('redeemModal').style.display = 'flex';
-        }
-
-        function closeRedeemModal() {
-            document.getElementById('redeemModal').style.display = 'none';
-            document.getElementById('redeemCodeInput').value = '';
-        }
-
-        function submitPurchase() {
-            const token = getStorage('authToken');
-            if (!token) {
-                showMessage('请先登录后再购买积分', 'warning');
-                return;
-            }
-            const packageType = document.getElementById('purchasePackage').value;
-            post(API_ENDPOINTS.points.purchase, { packageType }).then((response) => {
-                if (!response.success) {
-                    showMessage(response.message || '购买失败', 'error');
-                    return;
-                }
-                pagePoints = Number(response.data?.balance ?? pagePoints);
-                localStorage.setItem('substitutePoints', pagePoints);
-                renderPoints();
-                showMessage(`购买成功，已到账 ${response.data?.points || 0} 积分`, 'success');
-                closePurchaseModal();
-            }).catch(() => {
-                showMessage('购买失败，请稍后重试', 'error');
-            });
-        }
-
-        function submitRedeem() {
-            const token = getStorage('authToken');
-            if (!token) {
-                showMessage('请先登录后再兑换积分', 'warning');
-                return;
-            }
-            const code = document.getElementById('redeemCodeInput').value.trim();
-            if (!code) {
-                showMessage('请输入兑换码', 'warning');
-                return;
-            }
-            post(API_ENDPOINTS.points.redeem, { code }).then((response) => {
-                if (!response.success) {
-                    showMessage(response.message || '兑换失败', 'error');
-                    return;
-                }
-                pagePoints = Number(response.data?.balance ?? pagePoints);
-                localStorage.setItem('substitutePoints', pagePoints);
-                renderPoints();
-                showMessage(`兑换成功，获得 ${response.data?.points || 0} 积分`, 'success');
-                closeRedeemModal();
-            }).catch(() => {
-                showMessage('兑换失败，请稍后重试', 'error');
-            });
-        }
-
-        window.addEventListener('click', (event) => {
-            const purchaseModal = document.getElementById('purchaseModal');
-            const redeemModal = document.getElementById('redeemModal');
-            if (event.target === purchaseModal) {
-                closePurchaseModal();
-            }
-            if (event.target === redeemModal) {
-                closeRedeemModal();
-            }
-        });
-
         document.addEventListener('DOMContentLoaded', () => {
             loadAnnouncement();
-            loadPoints();
         });
     </script>
 </body>
