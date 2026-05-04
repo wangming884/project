@@ -311,34 +311,10 @@ credentials: 'include'
 
 ---
 
-### 5. 购买积分
+### 5. 说明：本站不提供积分购买
 
-**接口**: `POST /api/points/purchase`
-
-**请求头**: 需要 token
-
-**请求参数**:
-
-```json
-{
-  "amount": 100,
-  "paymentMethod": "alipay"
-}
-```
-
-**响应示例**:
-
-```json
-{
-  "success": true,
-  "message": "购买成功",
-  "data": {
-    "orderId": "ORDER123456",
-    "amount": 100,
-    "balance": 251
-  }
-}
-```
+为避免站内金钱交易风险，平台不提供任何“购买积分”接口。  
+如需获取兑换码，请通过外部网站购买后，再在本站使用“兑换码”功能兑换积分。
 
 ---
 

@@ -71,7 +71,7 @@
         <div class="points-container">
             <div>当前好物积分：<span id="currentShopPoints">0</span></div>
             <div class="points-actions">
-                <button type="button" class="btn-small buy-btn" onclick="window.location.href='buy_shop_points.html'">购买积分</button>
+                <button type="button" class="btn-small buy-btn" onclick="openRedeemCodeShop()">外站购买兑换码</button>
                 <button type="button" class="btn-small" onclick="openShopRedeemModal()">兑换积分</button>
             </div>
         </div>
@@ -140,6 +140,13 @@
     </div>
 
     <script>
+        const REDEEM_CODE_SHOP_URL = 'https://example.com/redeem-codes';
+
+        function openRedeemCodeShop() {
+            window.open(REDEEM_CODE_SHOP_URL, '_blank', 'noopener,noreferrer');
+            alert('已跳转到外部网站购买兑换码，本站不参与任何金钱交易。');
+        }
+
         // 使用专门的键名 shopPoints 存储，与晚寝签到积分区分开
         let shopPoints = parseInt(localStorage.getItem('shopPoints')) || 0;
 

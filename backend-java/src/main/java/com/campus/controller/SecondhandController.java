@@ -8,6 +8,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +26,23 @@ public class SecondhandController {
     
     public SecondhandController(SecondhandService secondhandService) {
         this.secondhandService = secondhandService;
+    }
+
+    private Map<String, Object> toLegacyProduct(SecondhandProduct product) {
+        Map<String, Object> item = new HashMap<>();
+        item.put("id", product.getId());
+        item.put("title", product.getTitle());
+        item.put("price", product.getPrice());
+        item.put("seller", product.getSellerName());
+        item.put("createdAt", product.getCreatedAt());
+        item.put("category", product.getCategory());
+
+        String image = "";
+        if (product.getImages() != null && !product.getImages().isBlank()) {
+            image = product.getImages().split(",")[0].trim();
+        }
+        item.put("image", image);
+        return item;
     }
     
     /**
@@ -136,5 +156,77 @@ public class SecondhandController {
         Long userId = Long.parseLong(authentication.getName());
         Map<String, Object> statistics = secondhandService.getStatistics(userId);
         return Result.success(statistics);
+    }
+
+    /**
+     * 兼容旧版前端 - 商品列表
+     */
+    @GetMapping("/list")
+    public Result<Map<String, Object>> listCompat(
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int pageSize) {
+        Page<SecondhandProduct> pageInfo = secondhandService.getProducts(category, null, "latest", page, pageSize);
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (SecondhandProduct product : pageInfo.getRecords()) {
+            list.add(toLegacyProduct(product));
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("list", list);
+        data.put("total", pageInfo.getTotal());
+        data.put("page", pageInfo.getCurrent());
+        data.put("pageSize", pageInfo.getSize());
+        return Result.success(data);
+    }
+
+    /**
+     * 兼容旧版前端 - 搜索商品
+     */
+    @GetMapping("/search")
+    public Result<Map<String, Object>> searchCompat(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int pageSize) {
+        Page<SecondhandProduct> pageInfo = secondhandService.getProducts(category, keyword, "latest", page, pageSize);
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (SecondhandProduct product : pageInfo.getRecords()) {
+            list.add(toLegacyProduct(product));
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("list", list);
+        data.put("total", pageInfo.getTotal());
+        return Result.success(data);
+    }
+
+    /**
+     * 兼容旧版前端 - 联系卖家
+     */
+    @PostMapping("/contact")
+    public Result<Map<String, Object>> contactCompat(@RequestBody Map<String, Object> request) {
+        if (request.get("productId") == null) {
+            return Result.error("productId 不能为空");
+        }
+
+        Long productId = Long.valueOf(request.get("productId").toString());
+        Map<String, Object> detail = secondhandService.getProductDetail(productId);
+        SecondhandProduct product = (SecondhandProduct) detail.get("product");
+        if (product == null) {
+            return Result.error("商品不存在");
+        }
+
+        String contact = product.getContact();
+        if (contact == null || contact.isBlank()) {
+            contact = "请通过站内私信联系卖家";
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("contact", contact);
+        data.put("seller", product.getSellerName());
+        return Result.success(data);
     }
 }

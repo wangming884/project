@@ -79,7 +79,7 @@
             <div class="points-box">
                 <div>当前可用积分：<span id="currentPoints">0</span></div>
                 <div class="points-actions">
-                    <button type="button" class="btn-small buy-btn" onclick="window.location.href='buy_points.html'">购买积分</button>
+                    <button type="button" class="btn-small buy-btn" onclick="openRedeemCodeShop()">外站购买兑换码</button>
                     <button type="button" class="btn-small" onclick="openRedeemModal()">兑换积分</button>
                 </div>
             </div>
@@ -108,6 +108,13 @@
     <script src="../js/api-utils.js"></script>
     
     <script>
+        const REDEEM_CODE_SHOP_URL = 'https://example.com/redeem-codes';
+
+        function openRedeemCodeShop() {
+            window.open(REDEEM_CODE_SHOP_URL, '_blank', 'noopener,noreferrer');
+            showMessage('已跳转到外部网站购买兑换码，本站不参与任何金钱交易。', 'info');
+        }
+
         // 时间动态更新
         function updateTime() {
             document.getElementById('currentTime').innerText = new Date().toLocaleTimeString();

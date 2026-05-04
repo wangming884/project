@@ -120,7 +120,7 @@ public class PointsService {
         
         return result;
     }
-    
+
     /**
      * 积分历史记录
      */

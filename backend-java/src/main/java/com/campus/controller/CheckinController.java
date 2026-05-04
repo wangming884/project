@@ -7,6 +7,7 @@ import com.campus.service.CheckinService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,11 +30,30 @@ public class CheckinController {
      */
     @PostMapping("/submit")
     public Result<Map<String, Object>> submitCheckin(
-            @RequestBody Map<String, String> request,
+            @RequestBody Map<String, Object> request,
             Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        String location = request.get("location");
-        String remark = request.getOrDefault("remark", "");
+        String location = "";
+        Object dormObj = request.get("dorm");
+        if (dormObj instanceof String && !((String) dormObj).isBlank()) {
+            location = (String) dormObj;
+        } else {
+            Object locationObj = request.get("location");
+            if (locationObj instanceof String) {
+                location = (String) locationObj;
+            } else if (locationObj instanceof Map<?, ?> locationMap) {
+                Object lat = locationMap.get("latitude");
+                Object lng = locationMap.get("longitude");
+                location = String.format("定位坐标: %s, %s",
+                    lat != null ? lat : "-",
+                    lng != null ? lng : "-");
+            }
+        }
+        if (location.isBlank()) {
+            location = "未提供具体位置";
+        }
+
+        String remark = request.get("remark") instanceof String ? (String) request.get("remark") : "";
         
         Map<String, Object> result = checkinService.submitCheckin(userId, location, remark);
         return Result.success(result);
@@ -95,5 +115,34 @@ public class CheckinController {
             @RequestParam(defaultValue = "10") int pageSize) {
         Page<CheckinRecord> records = checkinService.getPendingRecords(page, pageSize);
         return Result.success(records);
+    }
+
+    /**
+     * 兼容旧版前端 - 获取签到状态
+     */
+    @GetMapping("/status")
+    public Result<Map<String, Object>> getStatus(Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
+        Map<String, Object> status = checkinService.getTodayStatus(userId);
+        return Result.success(status);
+    }
+
+    /**
+     * 兼容旧版前端 - 获取签到历史
+     */
+    @GetMapping("/history")
+    public Result<Map<String, Object>> getHistory(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
+            Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
+        Page<CheckinRecord> records = checkinService.getCheckinRecords(userId, page, pageSize);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("list", records.getRecords());
+        data.put("total", records.getTotal());
+        data.put("page", records.getCurrent());
+        data.put("pageSize", records.getSize());
+        return Result.success(data);
     }
 }

@@ -44,6 +44,10 @@ public class CheckinService {
         if (user == null) {
             throw new RuntimeException("用户不存在");
         }
+
+        if (user.getPoints() == null || user.getPoints() < 10) {
+            throw new RuntimeException("积分不足，晚寝签到需要 10 积分");
+        }
         
         String today = LocalDate.now().toString();
         
@@ -64,14 +68,18 @@ public class CheckinService {
         record.setCheckinTime(LocalDateTime.now());
         record.setStatus("pending");
         record.setRemark(remark);
-        
+
         checkinRecordMapper.insert(record);
-        
+
+        // 晚寝签到提交后先扣除积分
+        pointsService.deductPoints(userId, 10, "晚寝签到扣除");
+
         Map<String, Object> result = new HashMap<>();
         result.put("recordId", record.getId());
         result.put("checkinTime", record.getCheckinTime());
         result.put("status", record.getStatus());
-        
+        result.put("remainingPoints", user.getPoints() - 10);
+
         return result;
     }
     

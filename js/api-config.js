@@ -26,7 +26,6 @@ const API_ENDPOINTS = {
         dailySignIn: `${API_BASE_URL}/points/sign-in`,         // POST - 每日签到
         redeem: `${API_BASE_URL}/points/redeem`,               // POST - 兑换积分码
         getHistory: `${API_BASE_URL}/points/history`,          // GET - 积分历史记录
-        purchase: `${API_BASE_URL}/points/purchase`,           // POST - 购买积分
     },
 
     // 晚寝签到相关
