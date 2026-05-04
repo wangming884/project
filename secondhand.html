@@ -331,6 +331,20 @@
         }
 
         // 渲染商品列表
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function normalizePrice(value) {
+            const num = Number(value);
+            return Number.isFinite(num) ? num.toFixed(2) : '0.00';
+        }
+
         function renderProducts(products) {
             const grid = document.querySelector('.product-grid');
             
@@ -341,15 +355,15 @@
             
             grid.innerHTML = products.map(product => `
                 <div class="product-card">
-                    <img class="product-img" src="${product.image || 'https://via.placeholder.com/400x180?text=No+Image'}" alt="${product.title}">
+                    <img class="product-img" src="${escapeHtml(product.image || 'https://via.placeholder.com/400x180?text=No+Image')}" alt="${escapeHtml(product.title || '未命名商品')}">
                     <div class="product-info">
-                        <div class="product-title">${product.title}</div>
-                        <div class="product-price">￥ ${product.price.toFixed(2)}</div>
+                        <div class="product-title">${escapeHtml(product.title || '未命名商品')}</div>
+                        <div class="product-price">￥ ${normalizePrice(product.price)}</div>
                         <div class="product-meta">
-                            <span>👤 ${product.seller}</span>
-                            <span>🕐 ${getRelativeTime(product.createdAt)}</span>
+                            <span>👤 ${escapeHtml(product.seller || '匿名卖家')}</span>
+                            <span>🕐 ${escapeHtml(getRelativeTime(product.createdAt || Date.now()))}</span>
                         </div>
-                        <button class="buy-btn" onclick="contactSeller(${product.id}, '${product.seller}')">联系卖家</button>
+                        <button class="buy-btn" data-product-id="${escapeHtml(product.id)}" data-seller="${escapeHtml(product.seller || '匿名卖家')}">联系卖家</button>
                     </div>
                 </div>
             `).join('');
@@ -387,6 +401,14 @@
                 showMessage('卖家微信/QQ信息已复制！', 'success');
             }
         }
+
+        document.querySelector('.product-grid').addEventListener('click', (event) => {
+            const target = event.target;
+            if (!target.classList.contains('buy-btn') || !target.dataset.productId) {
+                return;
+            }
+            contactSeller(target.dataset.productId, target.dataset.seller || '匿名卖家');
+        });
 
         // 搜索功能
         document.querySelector('.search-bar button').addEventListener('click', handleSearch);

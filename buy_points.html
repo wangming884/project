@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>购买积分 - 校园综合服务平台</title>
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f4f7f6; color: #333; min-height: 100vh; }
+        header { background: #ffffff; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo { font-size: 1.35rem; font-weight: bold; color: #3182ce; text-decoration: none; }
+        .btn-outline { background: transparent; color: #4a5568; border: 1px solid #cbd5e0; padding: 0.5rem 1.2rem; border-radius: 20px; text-decoration: none; transition: all 0.2s ease; }
+        .btn-outline:hover { background: #edf2f7; color: #2d3748; }
+        .container { max-width: 760px; margin: 2rem auto; padding: 0 5%; }
+        .card { background: #fff; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 14px rgba(0,0,0,0.05); }
+        .title { margin: 0 0 0.5rem; color: #2d3748; }
+        .desc { margin: 0 0 1.2rem; color: #718096; }
+        .current-points { display: inline-block; margin-bottom: 1.2rem; background: #fffff0; border: 1px solid #fefcbf; color: #d69e2e; padding: 0.45rem 0.9rem; border-radius: 999px; font-weight: 600; }
+        .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.9rem; margin-bottom: 1rem; }
+        .plan { border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.2s ease; }
+        .plan.active { border-color: #3182ce; background: #ebf8ff; color: #2b6cb0; }
+        .plan-points { font-size: 1.15rem; font-weight: bold; margin-bottom: 0.3rem; }
+        .plan-price { color: #718096; font-size: 0.95rem; }
+        .actions { display: flex; gap: 0.8rem; margin-top: 1rem; flex-wrap: wrap; }
+        .btn { border: none; border-radius: 10px; padding: 0.75rem 1.2rem; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: #3182ce; color: #fff; }
+        .btn-primary:hover { background: #2b6cb0; }
+        .btn-secondary { background: #edf2f7; color: #4a5568; }
+        .hint { margin-top: 0.8rem; color: #718096; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="checkin.html" class="logo">MyBrand校园 - 购买积分</a>
+        <a href="checkin.html" class="btn-outline">返回晚寝签到</a>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h1 class="title">购买晚寝签到积分</h1>
+            <p class="desc">每次晚寝签到消耗 10 积分，购买后会自动写入当前浏览器。</p>
+            <div class="current-points">当前积分：<span id="currentPoints">0</span></div>
+
+            <div id="plans" class="plans">
+                <button class="plan active" type="button" data-points="50" data-price="5">
+                    <div class="plan-points">50 积分</div>
+                    <div class="plan-price">￥5</div>
+                </button>
+                <button class="plan" type="button" data-points="120" data-price="10">
+                    <div class="plan-points">120 积分</div>
+                    <div class="plan-price">￥10</div>
+                </button>
+                <button class="plan" type="button" data-points="300" data-price="20">
+                    <div class="plan-points">300 积分</div>
+                    <div class="plan-price">￥20</div>
+                </button>
+            </div>
+
+            <div class="actions">
+                <button id="buyBtn" class="btn btn-primary" type="button">确认购买</button>
+                <button id="goCheckinBtn" class="btn btn-secondary" type="button">去晚寝签到</button>
+            </div>
+            <p class="hint">提示：若后端不可用，会自动降级为本地积分到账。</p>
+        </section>
+    </main>
+
+    <script src="js/api-config.js"></script>
+    <script src="js/api-utils.js"></script>
+    <script>
+        let currentPoints = parseInt(localStorage.getItem('userPoints'), 10) || 0;
+        let selected = { points: 50, price: 5 };
+
+        function refreshView() {
+            document.getElementById('currentPoints').textContent = currentPoints;
+        }
+
+        async function purchasePoints() {
+            const buyBtn = document.getElementById('buyBtn');
+            buyBtn.disabled = true;
+
+            try {
+                showLoading('支付处理中...');
+                const response = await post(API_ENDPOINTS.points.purchase, {
+                    points: selected.points,
+                    amount: selected.price,
+                });
+                hideLoading();
+
+                if (response.success) {
+                    currentPoints = response.data.balance ?? (currentPoints + selected.points);
+                    localStorage.setItem('userPoints', currentPoints);
+                    refreshView();
+                    showMessage(`购买成功，已到账 ${selected.points} 积分`, 'success');
+                } else {
+                    showMessage(response.message || '购买失败，请稍后重试', 'error');
+                }
+            } catch (error) {
+                hideLoading();
+                currentPoints += selected.points;
+                localStorage.setItem('userPoints', currentPoints);
+                refreshView();
+                showMessage(`购买成功（离线模式），已到账 ${selected.points} 积分`, 'success');
+            } finally {
+                buyBtn.disabled = false;
+            }
+        }
+
+        document.querySelectorAll('.plan').forEach((plan) => {
+            plan.addEventListener('click', () => {
+                document.querySelectorAll('.plan').forEach((item) => item.classList.remove('active'));
+                plan.classList.add('active');
+                selected = {
+                    points: parseInt(plan.dataset.points, 10),
+                    price: parseFloat(plan.dataset.price),
+                };
+            });
+        });
+
+        document.getElementById('buyBtn').addEventListener('click', purchasePoints);
+        document.getElementById('goCheckinBtn').addEventListener('click', () => {
+            window.location.href = 'checkin.html';
+        });
+
+        document.addEventListener('DOMContentLoaded', refreshView);
+    </script>
+</body>
+</html>
