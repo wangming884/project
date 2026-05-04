@@ -29,6 +29,20 @@ function isAdminLoggedIn() {
     return !!getAdminSession();
 }
 
+function hasAdminPermission(permission = 'all') {
+    const session = getAdminSession();
+    if (!session) {
+        return false;
+    }
+    if (session.permissions === 'all') {
+        return true;
+    }
+    if (Array.isArray(session.permissions)) {
+        return session.permissions.includes(permission);
+    }
+    return session.permissions === permission;
+}
+
 function requireAdminAuth() {
     const session = getAdminSession();
     if (!session) {

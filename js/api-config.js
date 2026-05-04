@@ -57,12 +57,13 @@ const API_ENDPOINTS = {
 
     // 代课平台相关
     substitute: {
-        list: `${API_BASE_URL}/substitute/list`,               // GET - 获取代课任务列表
-        detail: `${API_BASE_URL}/substitute/detail`,           // GET - 获取任务详情
+        list: `${API_BASE_URL}/substitute/tasks`,              // GET - 获取代课任务列表
+        detailBase: `${API_BASE_URL}/substitute/tasks`,        // GET - 获取任务详情
         publish: `${API_BASE_URL}/substitute/publish`,         // POST - 发布代课需求
-        accept: `${API_BASE_URL}/substitute/accept`,           // POST - 接受代课任务
-        complete: `${API_BASE_URL}/substitute/complete`,       // POST - 完成任务
-        cancel: `${API_BASE_URL}/substitute/cancel`,           // POST - 取消任务
+        taskBase: `${API_BASE_URL}/substitute/tasks`,          // POST - 任务操作基础路径
+        myPublished: `${API_BASE_URL}/substitute/my-published`, // GET - 我发布的任务
+        myAccepted: `${API_BASE_URL}/substitute/my-accepted`,  // GET - 我接受的任务
+        statistics: `${API_BASE_URL}/substitute/statistics`,   // GET - 任务统计
     },
 
     // 站长好物相关

@@ -6,34 +6,89 @@
     <title>代课发布管理 - 校园综合服务平台</title>
     <style>
         :root {
-            --bg: #f4f7f6;
-            --surface: #ffffff;
-            --text: #1f2937;
-            --muted: #6b7280;
-            --brand: #0d9488;
-            --brand-soft: #ccfbf1;
-            --demand: #2563eb;
+            --bg: #eef6f7;
+            --surface: rgba(255, 255, 255, 0.95);
+            --surface-strong: #ffffff;
+            --text: #18324a;
+            --muted: #64748b;
+            --brand: #0f766e;
+            --brand-soft: #d7f7f2;
+            --demand: #1d4ed8;
             --demand-soft: #dbeafe;
-            --border: #e5e7eb;
+            --danger: #b42318;
+            --danger-soft: #ffe4e6;
+            --border: rgba(24, 50, 74, 0.1);
+            --shadow: 0 18px 45px rgba(15, 118, 110, 0.08);
         }
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); }
-        header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 26%),
+                radial-gradient(circle at top right, rgba(29, 78, 216, 0.12), transparent 30%),
+                linear-gradient(180deg, #f5fbfc 0%, var(--bg) 100%);
+        }
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 12;
+            background: rgba(245, 251, 252, 0.88);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid rgba(24, 50, 74, 0.08);
+        }
         .topbar { max-width: 1200px; margin: 0 auto; padding: 1rem 5%; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-        .logo { font-size: 1.2rem; font-weight: 700; color: #2563eb; text-decoration: none; }
+        .logo { font-size: 1.22rem; font-weight: 800; color: var(--demand); text-decoration: none; }
         .actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-        .btn { border: none; border-radius: 999px; padding: 0.5rem 1rem; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; }
-        .btn-outline { color: #1f2937; background: #f3f4f6; }
-        .btn-brand { color: #fff; background: var(--brand); }
+        .btn {
+            border: none;
+            border-radius: 999px;
+            padding: 0.72rem 1.05rem;
+            cursor: pointer;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn-outline { color: var(--text); background: rgba(255, 255, 255, 0.72); border: 1px solid rgba(24, 50, 74, 0.12); }
+        .btn-brand { color: #fff; background: linear-gradient(135deg, var(--brand) 0%, #14b8a6 100%); box-shadow: 0 12px 24px rgba(15, 118, 110, 0.2); }
 
         .container { max-width: 1200px; margin: 0 auto; padding: 1.3rem 5% 2rem; display: grid; gap: 1rem; }
+        .hero, .identity, .card, .panel, .order-list {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+        }
+        .hero {
+            padding: 1.2rem;
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.9fr);
+            gap: 1rem;
+        }
+        .hero h1 { margin: 0; font-size: clamp(1.7rem, 3vw, 2.4rem); line-height: 1.1; }
+        .hero p { margin: 0.85rem 0 0; color: var(--muted); line-height: 1.7; }
+        .hero-pills { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+        .hero-pills span { background: var(--brand-soft); color: var(--brand); border-radius: 999px; padding: 0.45rem 0.8rem; font-size: 0.9rem; font-weight: 700; }
+        .identity { padding: 1rem 1.1rem; display: flex; justify-content: space-between; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .identity.admin { background: linear-gradient(135deg, rgba(219, 234, 254, 0.96) 0%, rgba(236, 253, 245, 0.96) 100%); }
+        .identity h2 { margin: 0; font-size: 1rem; }
+        .identity p { margin: 0.35rem 0 0; color: var(--muted); line-height: 1.6; }
+        .identity-badge { border-radius: 999px; padding: 0.45rem 0.8rem; font-size: 0.84rem; font-weight: 800; white-space: nowrap; }
+        .identity-badge.admin { background: var(--demand-soft); color: var(--demand); }
+        .identity-badge.user { background: var(--brand-soft); color: var(--brand); }
+        .identity-badge.guest { background: #f1f5f9; color: #475569; }
         .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; }
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; }
+        .card { padding: 1rem; }
         .card h3 { margin: 0; color: var(--muted); font-size: 0.95rem; }
-        .card .num { margin-top: 0.4rem; font-size: 1.7rem; font-weight: 700; }
+        .card .num { margin-top: 0.4rem; font-size: 1.85rem; font-weight: 800; }
 
         .grid { display: grid; gap: 1rem; grid-template-columns: 1fr 1fr; }
-        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; }
+        .panel { padding: 1rem; }
         .panel h2 { margin: 0 0 0.8rem; font-size: 1.05rem; }
         .hint { margin: 0; color: var(--muted); font-size: 0.85rem; }
         .form-group { margin-bottom: 0.8rem; }
@@ -41,33 +96,61 @@
         .form-group input, .form-group textarea {
             width: 100%;
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 0.55rem 0.65rem;
+            border-radius: 12px;
+            padding: 0.65rem 0.75rem;
             font-size: 0.9rem;
             font-family: inherit;
+            background: rgba(255, 255, 255, 0.92);
         }
         .form-group textarea { min-height: 88px; resize: vertical; }
         .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
         .form-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
         .btn-business { background: var(--brand); color: #fff; }
         .btn-demand { background: var(--demand); color: #fff; }
+        .btn[disabled] { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         .list-wrap { display: grid; gap: 1rem; grid-template-columns: 1fr 1fr; }
-        .order-list { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; }
+        .order-list { padding: 1rem; }
         .order-list h3 { margin: 0 0 0.8rem; font-size: 1rem; }
-        .order-item { border: 1px solid var(--border); border-radius: 10px; padding: 0.7rem; margin-bottom: 0.7rem; }
+        .order-item { border: 1px solid var(--border); border-radius: 14px; padding: 0.8rem; margin-bottom: 0.7rem; background: rgba(255, 255, 255, 0.76); }
         .order-item:last-child { margin-bottom: 0; }
         .order-item.business { border-left: 4px solid var(--brand); background: #f0fdfa; }
         .order-item.demand { border-left: 4px solid var(--demand); background: #eff6ff; }
         .order-title { margin: 0 0 0.3rem; font-weight: 700; }
         .order-meta { margin: 0.1rem 0; color: #374151; font-size: 0.86rem; }
         .order-muted { color: var(--muted); font-size: 0.8rem; }
-        .order-actions { margin-top: 0.4rem; }
-        .order-btn { border: none; background: #ef4444; color: #fff; border-radius: 8px; padding: 0.35rem 0.6rem; cursor: pointer; font-size: 0.8rem; }
+        .order-actions { margin-top: 0.6rem; display: flex; gap: 0.45rem; flex-wrap: wrap; }
+        .order-btn { border: none; border-radius: 10px; padding: 0.48rem 0.7rem; cursor: pointer; font-size: 0.82rem; font-weight: 700; }
+        .order-btn.complete { background: var(--demand-soft); color: var(--demand); }
+        .order-btn.cancel { background: var(--danger-soft); color: var(--danger); }
+        .order-btn.accept { background: var(--brand-soft); color: var(--brand); }
+        .admin-note {
+            margin-top: 0.8rem;
+            border-radius: 14px;
+            padding: 0.8rem;
+            background: rgba(219, 234, 254, 0.78);
+            color: #365271;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
         .empty { color: var(--muted); font-size: 0.9rem; }
 
         @media (max-width: 980px) {
-            .grid, .list-wrap, .row { grid-template-columns: 1fr; }
+            .hero, .grid, .list-wrap, .row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 720px) {
+            .identity, .topbar {
+                align-items: stretch;
+            }
+
+            .actions, .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -77,20 +160,59 @@
             <a href="substitute.html" class="logo">代课发布管理</a>
             <div class="actions">
                 <a href="substitute.html" class="btn btn-outline">返回代课页</a>
+                <a href="admin-dashboard.html" id="adminDashboardLink" class="btn btn-outline" style="display:none;">管理员后台</a>
                 <a href="main.html" class="btn btn-brand">返回大厅</a>
             </div>
         </div>
     </header>
 
     <main class="container">
+        <section class="hero">
+            <div>
+                <h1>现在这里不再只是本地草稿，而是真实发布与真实任务管理。</h1>
+                <p>商单、普通需求、我发布的单、我接的单都统一接入后端。管理员账号会自动锁定普通发布入口，避免以超级身份误发用户任务，同时给出清晰的管理跳转。</p>
+                <div class="hero-pills">
+                    <span>真实发布</span>
+                    <span>我的发布</span>
+                    <span>我的接单</span>
+                </div>
+            </div>
+            <div class="summary">
+                <article class="card">
+                    <h3>我发布的任务</h3>
+                    <div class="num" id="publishedCount">0</div>
+                </article>
+                <article class="card">
+                    <h3>发布已完成</h3>
+                    <div class="num" id="publishedCompletedCount">0</div>
+                </article>
+                <article class="card">
+                    <h3>我接的任务</h3>
+                    <div class="num" id="acceptedCount">0</div>
+                </article>
+                <article class="card">
+                    <h3>接单已完成</h3>
+                    <div class="num" id="acceptedCompletedCount">0</div>
+                </article>
+            </div>
+        </section>
+
+        <section id="identityPanel" class="identity">
+            <div>
+                <h2 id="identityTitle">正在识别登录状态</h2>
+                <p id="identityText">请稍候，系统正在同步你的账号权限。</p>
+            </div>
+            <span id="identityBadge" class="identity-badge guest">访客模式</span>
+        </section>
+
         <section class="summary">
             <article class="card">
-                <h3>代课商单数量</h3>
-                <div class="num" id="businessCount">0</div>
+                <h3>商单快捷入口</h3>
+                <div class="num" id="businessCount">发布</div>
             </article>
             <article class="card">
-                <h3>代课需求数量</h3>
-                <div class="num" id="demandCount">0</div>
+                <h3>需求快捷入口</h3>
+                <div class="num" id="demandCount">管理</div>
             </article>
         </section>
 
@@ -102,6 +224,10 @@
                     <div class="form-group">
                         <label for="businessTitle">商单标题</label>
                         <input id="businessTitle" type="text" placeholder="例如：高数代课两节课">
+                    </div>
+                    <div class="form-group">
+                        <label for="businessCourse">课程/事项</label>
+                        <input id="businessCourse" type="text" placeholder="例如：高等数学（上）">
                     </div>
                     <div class="row">
                         <div class="form-group">
@@ -141,6 +267,10 @@
                         <label for="demandTitle">需求标题</label>
                         <input id="demandTitle" type="text" placeholder="例如：周五下午代签到">
                     </div>
+                    <div class="form-group">
+                        <label for="demandCourse">课程/事项</label>
+                        <input id="demandCourse" type="text" placeholder="例如：马克思主义基本原理">
+                    </div>
                     <div class="row">
                         <div class="form-group">
                             <label for="demandTime">时间</label>
@@ -174,159 +304,319 @@
 
         <section class="list-wrap">
             <article class="order-list">
-                <h3>我发布的代课商单</h3>
-                <div id="businessList" class="empty">暂无商单</div>
+                <h3>我发布的任务</h3>
+                <div id="publishedList" class="empty">暂无发布记录</div>
             </article>
 
             <article class="order-list">
-                <h3>我发布的代课需求</h3>
-                <div id="demandList" class="empty">暂无需求</div>
+                <h3>我接的任务</h3>
+                <div id="acceptedList" class="empty">暂无接单记录</div>
             </article>
         </section>
     </main>
 
+    <script src="../js/api-config.js"></script>
     <script src="../js/api-utils.js"></script>
+    <script src="../js/admin-auth.js"></script>
     <script>
-        const STORAGE_KEYS = {
-            business: 'substitute_business_orders',
-            demand: 'substitute_demand_orders'
+        const adminDashboardLinkEl = document.getElementById('adminDashboardLink');
+        const identityPanelEl = document.getElementById('identityPanel');
+        const identityTitleEl = document.getElementById('identityTitle');
+        const identityTextEl = document.getElementById('identityText');
+        const identityBadgeEl = document.getElementById('identityBadge');
+
+        const state = {
+            published: [],
+            accepted: [],
+            statistics: null,
         };
 
-        function readList(key) {
-            const raw = localStorage.getItem(key);
-            if (!raw) return [];
-            try {
-                const list = JSON.parse(raw);
-                return Array.isArray(list) ? list : [];
-            } catch (error) {
-                return [];
+        function isViewerAdmin() {
+            return typeof hasAdminPermission === 'function'
+                ? hasAdminPermission()
+                : (typeof isAdminLoggedIn === 'function' && isAdminLoggedIn());
+        }
+
+        function getCurrentUser() {
+            return getStorage('userInfo');
+        }
+
+        function isLoggedIn() {
+            return !!getStorage('authToken');
+        }
+
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function ensureSuccess(response, fallbackMessage) {
+            if (!response || response.success !== true) {
+                throw new Error(response?.message || fallbackMessage);
             }
+            return response.data;
         }
 
-        function writeList(key, list) {
-            localStorage.setItem(key, JSON.stringify(list));
+        function extractRows(data) {
+            if (Array.isArray(data?.records)) {
+                return data.records;
+            }
+            if (Array.isArray(data?.list)) {
+                return data.list;
+            }
+            return Array.isArray(data) ? data : [];
         }
 
-        function fmtTime(value) {
-            if (!value) return '-';
-            const date = new Date(value);
-            if (Number.isNaN(date.getTime())) return value;
+        function formatTaskTime(value) {
+            if (!value) {
+                return '-';
+            }
+            const date = new Date(String(value).replace(' ', 'T'));
+            if (Number.isNaN(date.getTime())) {
+                return value;
+            }
             return date.toLocaleString('zh-CN', { hour12: false });
         }
 
-        function renderCounts() {
-            document.getElementById('businessCount').textContent = readList(STORAGE_KEYS.business).length;
-            document.getElementById('demandCount').textContent = readList(STORAGE_KEYS.demand).length;
+        function toApiDateTime(localValue) {
+            if (!localValue) {
+                return '';
+            }
+            return `${localValue.replace('T', ' ')}:00`;
         }
 
-        function renderOneList(targetId, type, data) {
-            const el = document.getElementById(targetId);
-            if (!data.length) {
-                el.className = 'empty';
-                el.textContent = type === 'business' ? '暂无商单' : '暂无需求';
+        function lockForms(disabled) {
+            document.querySelectorAll('#businessForm input, #businessForm textarea, #businessForm button, #demandForm input, #demandForm textarea, #demandForm button')
+                .forEach((element) => {
+                    element.disabled = disabled;
+                });
+        }
+
+        function renderIdentity() {
+            const user = getCurrentUser();
+            if (isViewerAdmin()) {
+                identityPanelEl.classList.add('admin');
+                identityTitleEl.textContent = '管理员模式';
+                identityTextEl.textContent = '管理员账号不参与普通任务发布与接单，当前页面已自动锁定发布表单。你可以前往任务大厅进行全量任务管理，或进入管理员后台处理其他模块。';
+                identityBadgeEl.textContent = '管理员账号';
+                identityBadgeEl.className = 'identity-badge admin';
+                adminDashboardLinkEl.style.display = 'inline-flex';
+                lockForms(true);
                 return;
             }
 
-            el.className = '';
-            el.innerHTML = data.map((item) => `
-                <article class="order-item ${type}">
-                    <p class="order-title">${item.title}</p>
-                    <p class="order-meta">时间：${fmtTime(item.time)} | 地点：${item.location || '-'}</p>
-                    <p class="order-meta">${type === 'business' ? '预算' : '感谢方式'}：${item.reward || '-'}</p>
-                    <p class="order-meta">联系：${item.contact || '-'}</p>
-                    <p class="order-meta">${item.desc || '-'}</p>
-                    <p class="order-muted">发布于：${item.createdAt}</p>
-                    <div class="order-actions">
-                        <button class="order-btn" data-type="${type}" data-id="${item.id}">删除</button>
-                    </div>
-                </article>
-            `).join('');
+            identityPanelEl.classList.remove('admin');
+            adminDashboardLinkEl.style.display = 'none';
+
+            if (isLoggedIn()) {
+                identityTitleEl.textContent = `普通用户：${escapeHtml(user?.username || '同学')}`;
+                identityTextEl.textContent = '你现在可以发布新的代课任务，并在下方直接管理自己发布或接下的任务。';
+                identityBadgeEl.textContent = '已登录';
+                identityBadgeEl.className = 'identity-badge user';
+                lockForms(false);
+            } else {
+                identityTitleEl.textContent = '访客模式';
+                identityTextEl.textContent = '未登录时无法发布和查看“我的任务”。如果要继续，请先回到首页登录。';
+                identityBadgeEl.textContent = '未登录';
+                identityBadgeEl.className = 'identity-badge guest';
+                lockForms(true);
+            }
         }
 
-        function renderLists() {
-            const business = readList(STORAGE_KEYS.business);
-            const demand = readList(STORAGE_KEYS.demand);
-            renderOneList('businessList', 'business', business);
-            renderOneList('demandList', 'demand', demand);
-            renderCounts();
+        function renderStatistics() {
+            const stats = state.statistics || {};
+            document.getElementById('publishedCount').textContent = Number(stats.publishedCount || 0);
+            document.getElementById('publishedCompletedCount').textContent = Number(stats.publishedCompletedCount || 0);
+            document.getElementById('acceptedCount').textContent = Number(stats.acceptedCount || 0);
+            document.getElementById('acceptedCompletedCount').textContent = Number(stats.acceptedCompletedCount || 0);
         }
 
-        function createOrder(formValues) {
-            return {
-                id: Date.now() + Math.floor(Math.random() * 1000),
-                ...formValues,
-                createdAt: new Date().toLocaleString('zh-CN', { hour12: false })
-            };
-        }
-
-        function submitBusiness(event) {
-            event.preventDefault();
-            const title = document.getElementById('businessTitle').value.trim();
-            const time = document.getElementById('businessTime').value;
-            const reward = document.getElementById('businessBudget').value.trim();
-            const location = document.getElementById('businessLocation').value.trim();
-            const contact = document.getElementById('businessContact').value.trim();
-            const desc = document.getElementById('businessDesc').value.trim();
-
-            if (!title || !time || !reward) {
-                showMessage('请至少填写商单标题、时间和预算', 'warning');
+        function renderTaskList(targetId, rows, type) {
+            const element = document.getElementById(targetId);
+            if (!rows.length) {
+                element.className = 'empty';
+                element.textContent = type === 'published' ? '暂无发布记录' : '暂无接单记录';
                 return;
             }
 
-            const list = readList(STORAGE_KEYS.business);
-            list.unshift(createOrder({ title, time, reward, location, contact, desc }));
-            writeList(STORAGE_KEYS.business, list);
-            event.target.reset();
-            renderLists();
-            showMessage('代课商单发布成功', 'success');
-        }
+            element.className = '';
+            element.innerHTML = rows.map((task) => {
+                const cardType = type === 'published' ? 'business' : 'demand';
+                const actions = [];
 
-        function submitDemand(event) {
-            event.preventDefault();
-            const title = document.getElementById('demandTitle').value.trim();
-            const time = document.getElementById('demandTime').value;
-            const reward = document.getElementById('demandReward').value.trim();
-            const location = document.getElementById('demandLocation').value.trim();
-            const contact = document.getElementById('demandContact').value.trim();
-            const desc = document.getElementById('demandDesc').value.trim();
-
-            if (!title || !time) {
-                showMessage('请至少填写需求标题和时间', 'warning');
-                return;
-            }
-
-            const list = readList(STORAGE_KEYS.demand);
-            list.unshift(createOrder({ title, time, reward, location, contact, desc }));
-            writeList(STORAGE_KEYS.demand, list);
-            event.target.reset();
-            renderLists();
-            showMessage('代课需求发布成功', 'success');
-        }
-
-        function deleteOrder(type, id) {
-            const key = type === 'business' ? STORAGE_KEYS.business : STORAGE_KEYS.demand;
-            const next = readList(key).filter((item) => Number(item.id) !== Number(id));
-            writeList(key, next);
-            renderLists();
-            showMessage('已删除该条发布', 'info');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            renderLists();
-            document.getElementById('businessForm').addEventListener('submit', submitBusiness);
-            document.getElementById('demandForm').addEventListener('submit', submitDemand);
-            document.getElementById('businessList').addEventListener('click', (event) => {
-                const target = event.target;
-                if (target.tagName === 'BUTTON' && target.dataset.id) {
-                    deleteOrder(target.dataset.type, target.dataset.id);
+                if (type === 'published' && task.status === 'accepted') {
+                    actions.push(`<button class="order-btn complete" type="button" data-action="complete" data-id="${task.id}">确认完成</button>`);
                 }
-            });
-            document.getElementById('demandList').addEventListener('click', (event) => {
-                const target = event.target;
-                if (target.tagName === 'BUTTON' && target.dataset.id) {
-                    deleteOrder(target.dataset.type, target.dataset.id);
+
+                if (type === 'published' && (task.status === 'pending' || task.status === 'accepted')) {
+                    actions.push(`<button class="order-btn cancel" type="button" data-action="cancel" data-id="${task.id}">取消任务</button>`);
                 }
+
+                if (type === 'accepted' && task.status === 'accepted') {
+                    actions.push(`<button class="order-btn accept" type="button" data-action="cancel-accept" data-id="${task.id}">取消接单</button>`);
+                }
+
+                if (!actions.length) {
+                    actions.push('<span class="order-btn accept">当前无需操作</span>');
+                }
+
+                return `
+                    <article class="order-item ${cardType}">
+                        <p class="order-title">${escapeHtml(task.title || '未命名任务')}</p>
+                        <p class="order-meta">课程/事项：${escapeHtml(task.course || '-')}</p>
+                        <p class="order-meta">时间：${escapeHtml(formatTaskTime(task.time))}</p>
+                        <p class="order-meta">地点：${escapeHtml(task.location || '-')}</p>
+                        <p class="order-meta">酬金/感谢方式：${escapeHtml(task.reward || '-')}</p>
+                        <p class="order-meta">状态：${escapeHtml(task.status || '-')}</p>
+                        <p class="order-meta">发布者：${escapeHtml(task.publisherName || '-')} | 接单者：${escapeHtml(task.accepterName || '暂无')}</p>
+                        <p class="order-meta">${escapeHtml(task.description || '暂无补充说明').replace(/\n/g, '<br>')}</p>
+                        <p class="order-muted">创建时间：${escapeHtml(formatTaskTime(task.createdAt))}</p>
+                        <div class="order-actions">${actions.join('')}</div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        async function loadMyData() {
+            if (!isLoggedIn() || isViewerAdmin()) {
+                state.statistics = null;
+                state.published = [];
+                state.accepted = [];
+                renderStatistics();
+                renderTaskList('publishedList', [], 'published');
+                renderTaskList('acceptedList', [], 'accepted');
+                return;
+            }
+
+            try {
+                const [statsData, publishedData, acceptedData] = await Promise.all([
+                    get(API_ENDPOINTS.substitute.statistics),
+                    get(API_ENDPOINTS.substitute.myPublished, { page: 1, pageSize: 20 }),
+                    get(API_ENDPOINTS.substitute.myAccepted, { page: 1, pageSize: 20 }),
+                ]);
+
+                state.statistics = ensureSuccess(statsData, '加载统计失败');
+                state.published = extractRows(ensureSuccess(publishedData, '加载发布任务失败'));
+                state.accepted = extractRows(ensureSuccess(acceptedData, '加载接单任务失败'));
+
+                renderStatistics();
+                renderTaskList('publishedList', state.published, 'published');
+                renderTaskList('acceptedList', state.accepted, 'accepted');
+            } catch (error) {
+                handleError(error, '加载我的任务失败');
+            }
+        }
+
+        function ensurePublishable() {
+            if (isViewerAdmin()) {
+                showMessage('管理员账号不能发布普通代课任务，请前往大厅执行管理操作', 'warning');
+                return false;
+            }
+            if (!isLoggedIn()) {
+                showMessage('请先登录后再发布任务', 'warning');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 900);
+                return false;
+            }
+            return true;
+        }
+
+        async function submitTask(event, type) {
+            event.preventDefault();
+            if (!ensurePublishable()) {
+                return;
+            }
+
+            const titleId = type === 'business' ? 'businessTitle' : 'demandTitle';
+            const courseId = type === 'business' ? 'businessCourse' : 'demandCourse';
+            const timeId = type === 'business' ? 'businessTime' : 'demandTime';
+            const rewardId = type === 'business' ? 'businessBudget' : 'demandReward';
+            const locationId = type === 'business' ? 'businessLocation' : 'demandLocation';
+            const contactId = type === 'business' ? 'businessContact' : 'demandContact';
+            const descId = type === 'business' ? 'businessDesc' : 'demandDesc';
+
+            const title = document.getElementById(titleId).value.trim();
+            const course = document.getElementById(courseId).value.trim();
+            const time = document.getElementById(timeId).value;
+            const reward = document.getElementById(rewardId).value.trim();
+            const location = document.getElementById(locationId).value.trim();
+            const contact = document.getElementById(contactId).value.trim();
+            const desc = document.getElementById(descId).value.trim();
+
+            if (!title || !course || !time) {
+                showMessage('请至少填写标题、课程/事项和时间', 'warning');
+                return;
+            }
+
+            if (type === 'business' && !reward) {
+                showMessage('商单请填写预算或酬金', 'warning');
+                return;
+            }
+
+            const description = [
+                `任务类型：${type === 'business' ? '商单' : '普通需求'}`,
+                contact ? `联系方式：${contact}` : '',
+                desc ? `详细说明：${desc}` : '',
+            ].filter(Boolean).join('\n');
+
+            try {
+                showLoading('正在发布任务...');
+                ensureSuccess(await post(API_ENDPOINTS.substitute.publish, {
+                    title,
+                    course,
+                    time: toApiDateTime(time),
+                    location,
+                    reward,
+                    description,
+                }), '发布任务失败');
+                hideLoading();
+                event.target.reset();
+                showMessage(type === 'business' ? '代课商单发布成功' : '代课需求发布成功', 'success');
+                await loadMyData();
+            } catch (error) {
+                hideLoading();
+                handleError(error, '发布任务失败');
+            }
+        }
+
+        async function submitTaskAction(action, taskId) {
+            try {
+                showLoading('正在处理任务...');
+                const actionUrl = `${API_ENDPOINTS.substitute.taskBase}/${taskId}/${action}`;
+                ensureSuccess(await post(actionUrl), '任务处理失败');
+                hideLoading();
+                showMessage('任务状态已更新', 'success');
+                await loadMyData();
+            } catch (error) {
+                hideLoading();
+                handleError(error, '任务处理失败');
+            }
+        }
+
+        function bindEvents() {
+            document.getElementById('businessForm').addEventListener('submit', (event) => submitTask(event, 'business'));
+            document.getElementById('demandForm').addEventListener('submit', (event) => submitTask(event, 'demand'));
+
+            ['publishedList', 'acceptedList'].forEach((id) => {
+                document.getElementById(id).addEventListener('click', (event) => {
+                    const target = event.target.closest('[data-action]');
+                    if (target) {
+                        submitTaskAction(target.dataset.action, target.dataset.id);
+                    }
+                });
             });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            renderIdentity();
+            renderStatistics();
+            bindEvents();
+            await loadMyData();
         });
     </script>
 </body>

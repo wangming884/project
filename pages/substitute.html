@@ -5,40 +5,460 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>互助代课平台 - 校园综合服务平台</title>
     <style>
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f4f7f6; color: #333; min-height: 100vh; }
-        header { background: #ffffff; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        .logo { font-size: 1.5rem; font-weight: bold; color: #3182ce; letter-spacing: 0.5px; text-decoration: none; }
-        .header-actions { display: flex; gap: 15px; }
-        .btn { padding: 0.5rem 1.2rem; border-radius: 20px; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease; text-decoration: none; border: none; }
-        .btn-primary { background: #38b2ac; color: white; }
-        .btn-primary:hover { background: #319795; transform: translateY(-2px); }
-        .btn-outline { background: transparent; color: #4a5568; border: 1px solid #cbd5e0; }
-        .btn-outline:hover { background: #edf2f7; color: #2d3748; }
+        :root {
+            --bg: #eef6f7;
+            --surface: rgba(255, 255, 255, 0.94);
+            --surface-strong: #ffffff;
+            --text: #17324d;
+            --muted: #5f7185;
+            --brand: #0f766e;
+            --brand-soft: #d7f7f2;
+            --accent: #1d4ed8;
+            --accent-soft: #dbeafe;
+            --warning: #c2410c;
+            --warning-soft: #ffedd5;
+            --danger: #b42318;
+            --danger-soft: #ffe4e6;
+            --border: rgba(23, 50, 77, 0.1);
+            --shadow: 0 18px 45px rgba(15, 118, 110, 0.08);
+        }
 
-        .announcement { max-width: 1000px; margin: 1rem auto 0; padding: 0 5%; }
-        .announcement-card { display: none; background: #ecfeff; border: 1px solid #99f6e4; color: #115e59; border-radius: 10px; padding: 0.75rem 0.9rem; font-size: 0.92rem; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 24%),
+                radial-gradient(circle at top right, rgba(29, 78, 216, 0.12), transparent 28%),
+                linear-gradient(180deg, #f5fbfc 0%, var(--bg) 100%);
+        }
 
-        .container { max-width: 1000px; margin: 0 auto; padding: 1.2rem 5% 2rem; }
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(18px);
+            background: rgba(245, 251, 252, 0.86);
+            border-bottom: 1px solid rgba(23, 50, 77, 0.08);
+        }
 
-        .page-title { margin-bottom: 1rem; color: #2d3748; border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
-        .task-list { display: flex; flex-direction: column; gap: 1.5rem; }
-        .task-card { background: white; border-radius: 12px; padding: 1.5rem 2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s, box-shadow 0.2s; border-left: 5px solid #38b2ac; }
-        .task-card:hover { transform: translateX(5px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
-        .task-info h3 { margin: 0 0 0.8rem 0; color: #2d3748; font-size: 1.3rem; }
-        .task-details { color: #718096; font-size: 0.95rem; display: flex; gap: 1.5rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
-        .task-details span { display: flex; align-items: center; gap: 5px; }
-        .task-reward { font-weight: bold; color: #e53e3e; font-size: 1.15rem; }
-        .accept-btn { padding: 0.7rem 1.8rem; background: #e6fffa; color: #319795; border: 1px solid transparent; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: all 0.2s; }
-        .accept-btn:hover { background: #319795; color: white; }
+        .topbar, .announcement, .container {
+            width: min(1180px, calc(100% - 32px));
+            margin: 0 auto;
+        }
 
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+
+        .brand-block { display: grid; gap: 0.25rem; }
+        .logo {
+            color: var(--accent);
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            text-decoration: none;
+        }
+        .brand-subtitle { color: var(--muted); font-size: 0.9rem; }
+
+        .header-actions {
+            display: flex;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .btn, .action-btn, .mini-btn, .filter-btn {
+            border: none;
+            cursor: pointer;
+            font: inherit;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
+        }
+
+        .btn {
+            border-radius: 999px;
+            padding: 0.7rem 1.15rem;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--brand) 0%, #14b8a6 100%);
+            color: #fff;
+            box-shadow: 0 12px 24px rgba(15, 118, 110, 0.2);
+        }
+
+        .btn-outline {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.65);
+            border: 1px solid rgba(23, 50, 77, 0.12);
+        }
+
+        .btn:hover, .action-btn:hover, .mini-btn:hover, .filter-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .announcement {
+            padding-top: 1rem;
+        }
+
+        .announcement-card,
+        .identity-panel,
+        .hero-card,
+        .controls,
+        .task-card,
+        .empty-state {
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+
+        .announcement-card {
+            display: none;
+            padding: 0.9rem 1rem;
+            color: #115e59;
+            background: rgba(236, 253, 245, 0.92);
+            border-color: rgba(20, 184, 166, 0.22);
+        }
+
+        .container {
+            padding: 1.2rem 0 2.4rem;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .hero-card {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.9fr);
+            gap: 1rem;
+            padding: 1.2rem;
+        }
+
+        .hero-copy h1 {
+            margin: 0;
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            line-height: 1.08;
+        }
+
+        .hero-copy p {
+            margin: 0.8rem 0 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .hero-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 1rem;
+        }
+
+        .hero-tag {
+            padding: 0.45rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: var(--brand-soft);
+            color: var(--brand);
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .stat-card {
+            border-radius: 18px;
+            background: var(--surface-strong);
+            border: 1px solid var(--border);
+            padding: 1rem;
+        }
+
+        .stat-label { color: var(--muted); font-size: 0.9rem; }
+        .stat-value { margin-top: 0.45rem; font-size: 1.9rem; font-weight: 800; }
+
+        .identity-panel {
+            padding: 1rem 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .identity-title { margin: 0; font-size: 1rem; font-weight: 800; }
+        .identity-text { margin: 0.25rem 0 0; color: var(--muted); line-height: 1.6; }
+        .identity-panel.admin {
+            background: linear-gradient(135deg, rgba(219, 234, 254, 0.96) 0%, rgba(236, 253, 245, 0.96) 100%);
+            border-color: rgba(29, 78, 216, 0.18);
+        }
+
+        .badge {
+            border-radius: 999px;
+            padding: 0.45rem 0.75rem;
+            font-size: 0.85rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .badge-admin { background: var(--accent-soft); color: var(--accent); }
+        .badge-user { background: var(--brand-soft); color: var(--brand); }
+        .badge-guest { background: #f3f4f6; color: #475569; }
+
+        .controls {
+            padding: 1rem;
+            display: grid;
+            gap: 0.9rem;
+        }
+
+        .controls-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .controls-title { margin: 0; font-size: 1.05rem; }
+        .controls-subtitle { color: var(--muted); font-size: 0.9rem; }
+
+        .filters {
+            display: grid;
+            grid-template-columns: minmax(220px, 1.5fr) repeat(3, minmax(140px, 0.7fr));
+            gap: 0.75rem;
+        }
+
+        .field {
+            display: grid;
+            gap: 0.35rem;
+        }
+
+        .field label {
+            color: var(--muted);
+            font-size: 0.84rem;
+            font-weight: 700;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            padding: 0.78rem 0.9rem;
+            border-radius: 14px;
+            border: 1px solid rgba(23, 50, 77, 0.14);
+            background: rgba(255, 255, 255, 0.92);
+            font: inherit;
+            color: var(--text);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .filter-btn {
+            border-radius: 14px;
+            padding: 0.78rem 1rem;
+            font-weight: 700;
+        }
+
+        .filter-btn.primary { background: var(--brand); color: #fff; }
+        .filter-btn.secondary { background: #e2e8f0; color: var(--text); }
+
+        .task-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .task-card {
+            padding: 1.15rem;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .task-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .task-title-wrap h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .task-course {
+            margin-top: 0.4rem;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .status-pill {
+            border-radius: 999px;
+            padding: 0.5rem 0.8rem;
+            font-size: 0.86rem;
+            font-weight: 800;
+        }
+
+        .status-pending { background: var(--brand-soft); color: var(--brand); }
+        .status-accepted { background: var(--accent-soft); color: var(--accent); }
+        .status-completed { background: #ecfccb; color: #3f6212; }
+        .status-cancelled { background: var(--danger-soft); color: var(--danger); }
+
+        .task-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.8rem;
+        }
+
+        .meta-item {
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(23, 50, 77, 0.07);
+            padding: 0.8rem 0.85rem;
+        }
+
+        .meta-label { color: var(--muted); font-size: 0.8rem; font-weight: 700; }
+        .meta-value { margin-top: 0.3rem; line-height: 1.6; word-break: break-word; }
+
+        .task-desc {
+            margin: 0;
+            color: #344256;
+            line-height: 1.75;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .task-actions,
+        .admin-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+        }
+
+        .action-btn,
+        .mini-btn {
+            border-radius: 14px;
+            padding: 0.72rem 1rem;
+            font-weight: 700;
+        }
+
+        .action-btn.primary { background: var(--brand); color: #fff; }
+        .action-btn.info { background: var(--accent-soft); color: var(--accent); }
+        .action-btn.warning { background: var(--warning-soft); color: var(--warning); }
+        .action-btn.danger { background: var(--danger-soft); color: var(--danger); }
+        .action-btn.muted { background: #f1f5f9; color: #475569; }
+
+        .mini-btn {
+            padding: 0.58rem 0.9rem;
+            background: #f8fafc;
+            color: #334155;
+            border: 1px solid rgba(23, 50, 77, 0.08);
+        }
+
+        .mini-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .mini-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.45;
+            transform: none;
+        }
+
+        .admin-box {
+            border-radius: 18px;
+            border: 1px solid rgba(29, 78, 216, 0.14);
+            background: rgba(239, 246, 255, 0.88);
+            padding: 0.9rem;
+        }
+
+        .admin-box h4 {
+            margin: 0 0 0.4rem;
+            color: var(--accent);
+            font-size: 0.95rem;
+        }
+
+        .admin-box p {
+            margin: 0 0 0.8rem;
+            color: #45607f;
+            font-size: 0.88rem;
+        }
+
+        .empty-state {
+            padding: 2rem 1.2rem;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .empty-state strong {
+            display: block;
+            color: var(--text);
+            font-size: 1.05rem;
+            margin-bottom: 0.4rem;
+        }
+
+        @media (max-width: 900px) {
+            .hero-card,
+            .filters,
+            .task-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .topbar,
+            .identity-panel,
+            .controls-top,
+            .task-head {
+                align-items: stretch;
+            }
+
+            .header-actions,
+            .filter-actions {
+                justify-content: stretch;
+            }
+
+            .btn,
+            .filter-btn,
+            .action-btn {
+                width: 100%;
+            }
+
+            .hero-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
     </style>
 </head>
 <body>
     <header>
-        <a href="main.html" class="logo">MyBrand校园 - 代课平台</a>
-        <div class="header-actions">
-            <button class="btn btn-primary" onclick="window.location.href='substitute-manage.html'">发布需求</button>
-            <a href="main.html" class="btn btn-outline">返回大厅</a>
+        <div class="topbar">
+            <div class="brand-block">
+                <a href="main.html" class="logo">MyBrand校园 · 互助代课</a>
+                <div class="brand-subtitle">真实任务大厅 + 管理员全量调度视图</div>
+            </div>
+            <div class="header-actions">
+                <a href="substitute-manage.html" class="btn btn-primary">发布与我的任务</a>
+                <a href="admin-dashboard.html" id="adminDashboardLink" class="btn btn-outline" style="display:none;">管理员后台</a>
+                <a href="main.html" class="btn btn-outline">返回大厅</a>
+            </div>
         </div>
     </header>
 
@@ -47,49 +467,332 @@
     </div>
 
     <main class="container">
-        <div class="page-title">
-            <h2>互助大厅任务列表</h2>
-            <span style="color: #718096; font-size: 0.9rem;">共 2 个急单待接</span>
-        </div>
-
-        <div class="task-list">
-            <div class="task-card">
-                <div class="task-info">
-                    <h3>大学物理（下） 代课/笔记</h3>
-                    <div class="task-details">
-                        <span>📅 明天 08:00 - 09:40</span>
-                        <span>📍 教1-204</span>
-                        <span>👤 张同学（大二）</span>
-                    </div>
-                    <div class="task-reward">💰 酬金: 30元 + 奶茶一杯</div>
+        <section class="hero-card">
+            <div class="hero-copy">
+                <h1>把代课大厅从静态示例，升级成真正可调度的任务池。</h1>
+                <p>普通用户可以查看、接单、取消、确认完成；管理员登录后，会自动切换成全量任务视角，拥有强制状态流转能力，方便处理异常单、违规单和滞留单。</p>
+                <div class="hero-tags">
+                    <span class="hero-tag">公开浏览</span>
+                    <span class="hero-tag">真实接口</span>
+                    <span class="hero-tag">管理员强制改状态</span>
                 </div>
-                <button class="accept-btn" onclick="alert('已向发布者发送接单请求！请注意留意系统通知。')">立即接单</button>
             </div>
+            <div class="hero-stats">
+                <article class="stat-card">
+                    <div class="stat-label">当前列表总数</div>
+                    <div class="stat-value" id="totalCount">0</div>
+                </article>
+                <article class="stat-card">
+                    <div class="stat-label">待接单</div>
+                    <div class="stat-value" id="pendingCount">0</div>
+                </article>
+                <article class="stat-card">
+                    <div class="stat-label">已接单</div>
+                    <div class="stat-value" id="acceptedCount">0</div>
+                </article>
+                <article class="stat-card">
+                    <div class="stat-label">已完成/已取消</div>
+                    <div class="stat-value" id="closedCount">0</div>
+                </article>
+            </div>
+        </section>
 
-            <div class="task-card" style="border-left-color: #3182ce;">
-                <div class="task-info">
-                    <h3>马克思主义基本原理 代签到</h3>
-                    <div class="task-details">
-                        <span>📅 周五 14:00 - 15:40</span>
-                        <span>📍 阶梯教室3</span>
-                        <span>👤 王同学（大三）</span>
-                    </div>
-                    <div class="task-reward">💰 酬金: 20元</div>
-                </div>
-                <button class="accept-btn" onclick="alert('已向发布者发送接单请求！请注意留意系统通知。')">立即接单</button>
+        <section id="identityPanel" class="identity-panel">
+            <div>
+                <p class="identity-title" id="identityTitle">正在识别当前身份</p>
+                <p class="identity-text" id="identityText">请稍候，系统正在同步登录态与管理员权限。</p>
             </div>
-        </div>
+            <span id="identityBadge" class="badge badge-guest">访客模式</span>
+        </section>
+
+        <section class="controls">
+            <div class="controls-top">
+                <div>
+                    <h2 class="controls-title">任务筛选</h2>
+                    <div class="controls-subtitle" id="resultText">加载中...</div>
+                </div>
+                <div class="filter-actions">
+                    <button id="refreshBtn" class="filter-btn secondary" type="button">刷新列表</button>
+                    <button id="searchBtn" class="filter-btn primary" type="button">查询任务</button>
+                </div>
+            </div>
+            <div class="filters">
+                <div class="field">
+                    <label for="keywordInput">关键词</label>
+                    <input id="keywordInput" type="text" placeholder="搜索标题、课程或说明">
+                </div>
+                <div class="field">
+                    <label for="statusSelect">任务状态</label>
+                    <select id="statusSelect">
+                        <option value="pending">待接单</option>
+                        <option value="accepted">已接单</option>
+                        <option value="completed">已完成</option>
+                        <option value="cancelled">已取消</option>
+                        <option value="all">全部状态</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="sortSelect">排序方式</label>
+                    <select id="sortSelect">
+                        <option value="latest">最新发布</option>
+                        <option value="time_asc">最早上课</option>
+                        <option value="time_desc">最晚上课</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="pageSizeSelect">单次加载</label>
+                    <select id="pageSizeSelect">
+                        <option value="20">20 条</option>
+                        <option value="50" selected>50 条</option>
+                        <option value="100">100 条</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section id="taskList" class="task-list"></section>
     </main>
 
     <script src="../js/api-config.js"></script>
     <script src="../js/api-utils.js"></script>
+    <script src="../js/admin-auth.js"></script>
     <script>
         const announcementEl = document.getElementById('substituteAnnouncement');
+        const taskListEl = document.getElementById('taskList');
+        const identityPanelEl = document.getElementById('identityPanel');
+        const identityTitleEl = document.getElementById('identityTitle');
+        const identityTextEl = document.getElementById('identityText');
+        const identityBadgeEl = document.getElementById('identityBadge');
+        const adminDashboardLinkEl = document.getElementById('adminDashboardLink');
+        const resultTextEl = document.getElementById('resultText');
+        const statusSelectEl = document.getElementById('statusSelect');
+        const keywordInputEl = document.getElementById('keywordInput');
+        const sortSelectEl = document.getElementById('sortSelect');
+        const pageSizeSelectEl = document.getElementById('pageSizeSelect');
+
+        const STATUS_META = {
+            pending: { label: '待接单', className: 'status-pending' },
+            accepted: { label: '已接单', className: 'status-accepted' },
+            completed: { label: '已完成', className: 'status-completed' },
+            cancelled: { label: '已取消', className: 'status-cancelled' },
+        };
+
+        const state = {
+            tasks: [],
+            total: 0,
+        };
+
+        function isViewerAdmin() {
+            return typeof hasAdminPermission === 'function'
+                ? hasAdminPermission()
+                : (typeof isAdminLoggedIn === 'function' && isAdminLoggedIn());
+        }
+
+        function getCurrentUser() {
+            return getStorage('userInfo');
+        }
+
+        function getCurrentUserId() {
+            const user = getCurrentUser();
+            return user && user.userId !== undefined ? Number(user.userId) : null;
+        }
+
+        function isLoggedIn() {
+            return !!getStorage('authToken');
+        }
+
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function formatTaskTime(value) {
+            if (!value) {
+                return '-';
+            }
+            const date = new Date(value.replace(' ', 'T'));
+            if (Number.isNaN(date.getTime())) {
+                return value;
+            }
+            return date.toLocaleString('zh-CN', { hour12: false });
+        }
+
+        function extractRows(data) {
+            if (Array.isArray(data?.records)) {
+                return data.records;
+            }
+            if (Array.isArray(data?.list)) {
+                return data.list;
+            }
+            return Array.isArray(data) ? data : [];
+        }
+
+        function ensureSuccess(response, fallbackMessage) {
+            if (!response || response.success !== true) {
+                throw new Error(response?.message || fallbackMessage);
+            }
+            return response.data;
+        }
+
+        function initIdentityPanel() {
+            const user = getCurrentUser();
+            if (isViewerAdmin()) {
+                identityPanelEl.classList.add('admin');
+                identityTitleEl.textContent = '管理员超级视图已开启';
+                identityTextEl.textContent = `当前管理员：${escapeHtml(user?.username || 'admin')}。你现在看到的是全量任务，并可直接强制把任务改为待接单、已接单、已完成或已取消。`;
+                identityBadgeEl.textContent = '管理员模式';
+                identityBadgeEl.className = 'badge badge-admin';
+                adminDashboardLinkEl.style.display = 'inline-flex';
+                statusSelectEl.value = 'all';
+                return;
+            }
+
+            identityPanelEl.classList.remove('admin');
+            if (isLoggedIn()) {
+                identityTitleEl.textContent = '普通用户视图';
+                identityTextEl.textContent = `当前登录用户：${escapeHtml(user?.username || '同学')}。你可以接单、取消接单、确认完成或取消自己发布的任务。`;
+                identityBadgeEl.textContent = '已登录用户';
+                identityBadgeEl.className = 'badge badge-user';
+            } else {
+                identityTitleEl.textContent = '访客浏览模式';
+                identityTextEl.textContent = '未登录时可公开浏览任务；需要接单或处理任务时，请先从首页登录。';
+                identityBadgeEl.textContent = '访客模式';
+                identityBadgeEl.className = 'badge badge-guest';
+            }
+        }
+
+        function buildActionButtons(task) {
+            if (isViewerAdmin()) {
+                return '';
+            }
+
+            const currentUserId = getCurrentUserId();
+            const actions = [];
+
+            if (!isLoggedIn()) {
+                if (task.status === 'pending') {
+                    actions.push('<a class="action-btn muted" href="index.html">登录后接单</a>');
+                }
+                return actions.join('');
+            }
+
+            if (task.status === 'pending' && currentUserId !== Number(task.publisherId)) {
+                actions.push(`<button class="action-btn primary" type="button" data-action="accept" data-id="${task.id}">立即接单</button>`);
+            }
+
+            if (task.status === 'accepted' && currentUserId === Number(task.accepterId)) {
+                actions.push(`<button class="action-btn warning" type="button" data-action="cancel-accept" data-id="${task.id}">取消接单</button>`);
+            }
+
+            if (currentUserId === Number(task.publisherId) && task.status === 'accepted') {
+                actions.push(`<button class="action-btn info" type="button" data-action="complete" data-id="${task.id}">确认完成</button>`);
+            }
+
+            if (currentUserId === Number(task.publisherId) && (task.status === 'pending' || task.status === 'accepted')) {
+                actions.push(`<button class="action-btn danger" type="button" data-action="cancel" data-id="${task.id}">取消任务</button>`);
+            }
+
+            if (!actions.length) {
+                actions.push('<span class="action-btn muted">当前无需操作</span>');
+            }
+
+            return actions.join('');
+        }
+
+        function buildAdminActions(task) {
+            if (!isViewerAdmin()) {
+                return '';
+            }
+
+            const buttons = ['pending', 'accepted', 'completed', 'cancelled']
+                .map((status) => {
+                    const meta = STATUS_META[status];
+                    const disabled = status === 'accepted' && !task.accepterId ? 'disabled' : '';
+                    const activeClass = task.status === status ? 'active' : '';
+                    return `<button class="mini-btn ${activeClass}" type="button" data-admin-status="${status}" data-id="${task.id}" ${disabled}>改为${meta.label}</button>`;
+                })
+                .join('');
+
+            return `
+                <div class="admin-box">
+                    <h4>管理员强制处理</h4>
+                    <p>适用于异常单、恶意占单、无人处理的历史任务。若任务没有接单人，系统会禁止直接改为“已接单”。</p>
+                    <div class="admin-actions">${buttons}</div>
+                </div>
+            `;
+        }
+
+        function renderStats() {
+            const pending = state.tasks.filter((item) => item.status === 'pending').length;
+            const accepted = state.tasks.filter((item) => item.status === 'accepted').length;
+            const closed = state.tasks.filter((item) => item.status === 'completed' || item.status === 'cancelled').length;
+
+            document.getElementById('totalCount').textContent = state.total;
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('acceptedCount').textContent = accepted;
+            document.getElementById('closedCount').textContent = closed;
+        }
+
+        function renderTasks() {
+            renderStats();
+
+            if (!state.tasks.length) {
+                taskListEl.innerHTML = `
+                    <section class="empty-state">
+                        <strong>暂时没有匹配到任务</strong>
+                        <div>可以尝试切换状态、调整关键词，或者前往“发布与我的任务”发布新的需求。</div>
+                    </section>
+                `;
+                return;
+            }
+
+            taskListEl.innerHTML = state.tasks.map((task) => {
+                const meta = STATUS_META[task.status] || STATUS_META.pending;
+                return `
+                    <article class="task-card">
+                        <div class="task-head">
+                            <div class="task-title-wrap">
+                                <h3>${escapeHtml(task.title || '未命名任务')}</h3>
+                                <div class="task-course">课程/事项：${escapeHtml(task.course || '未填写')}</div>
+                            </div>
+                            <span class="status-pill ${meta.className}">${meta.label}</span>
+                        </div>
+
+                        <div class="task-meta">
+                            <div class="meta-item">
+                                <div class="meta-label">上课时间</div>
+                                <div class="meta-value">${escapeHtml(formatTaskTime(task.time))}</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">上课地点</div>
+                                <div class="meta-value">${escapeHtml(task.location || '-')}</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">酬金/感谢方式</div>
+                                <div class="meta-value">${escapeHtml(task.reward || '-')}</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">发布与接单</div>
+                                <div class="meta-value">发布者：${escapeHtml(task.publisherName || '-')}<br>接单者：${escapeHtml(task.accepterName || '暂无')}</div>
+                            </div>
+                        </div>
+
+                        <p class="task-desc">${escapeHtml(task.description || '暂无额外说明')}</p>
+                        <div class="task-actions">${buildActionButtons(task)}</div>
+                        ${buildAdminActions(task)}
+                    </article>
+                `;
+            }).join('');
+        }
 
         async function loadAnnouncement() {
             try {
                 const response = await get(API_ENDPOINTS.announcement.latest, { scope: 'substitute' });
-                if (!response.success || !response.data || !response.data.announcement) {
+                if (!response.success || !response.data?.announcement) {
                     announcementEl.style.display = 'none';
                     return;
                 }
@@ -101,8 +804,121 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAnnouncement();
+        async function loadTasks() {
+            const isAdmin = isViewerAdmin();
+            const params = {
+                keyword: keywordInputEl.value.trim(),
+                sortBy: sortSelectEl.value,
+                page: 1,
+                pageSize: Number(pageSizeSelectEl.value || 50),
+            };
+
+            if (statusSelectEl.value !== 'all') {
+                params.status = statusSelectEl.value;
+            }
+
+            resultTextEl.textContent = isAdmin ? '管理员全量查询中...' : '正在加载任务大厅...';
+
+            try {
+                const endpoint = isAdmin ? API_ENDPOINTS.admin.substituteAdminTasks : API_ENDPOINTS.substitute.list;
+                const data = ensureSuccess(await get(endpoint, params), '获取任务列表失败');
+                state.tasks = extractRows(data);
+                state.total = Number(data?.total ?? state.tasks.length ?? 0);
+                resultTextEl.textContent = isAdmin
+                    ? `管理员已加载 ${state.tasks.length} 条任务，覆盖总数 ${state.total}。`
+                    : `当前展示 ${state.tasks.length} 条任务，匹配总数 ${state.total}。`;
+                renderTasks();
+            } catch (error) {
+                state.tasks = [];
+                state.total = 0;
+                renderTasks();
+                handleError(error, '获取任务列表失败');
+                resultTextEl.textContent = '任务列表加载失败，请稍后重试。';
+            }
+        }
+
+        async function submitTaskAction(action, taskId) {
+            if (!isLoggedIn()) {
+                showMessage('请先登录后再执行该操作', 'warning');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 900);
+                return;
+            }
+
+            const taskUrlBase = `${API_ENDPOINTS.substitute.taskBase}/${taskId}`;
+            const actionMap = {
+                accept: { url: `${taskUrlBase}/accept`, message: '接单成功' },
+                'cancel-accept': { url: `${taskUrlBase}/cancel-accept`, message: '已取消接单' },
+                complete: { url: `${taskUrlBase}/complete`, message: '任务已完成' },
+                cancel: { url: `${taskUrlBase}/cancel`, message: '任务已取消' },
+            };
+
+            const config = actionMap[action];
+            if (!config) {
+                return;
+            }
+
+            try {
+                showLoading('正在提交任务操作...');
+                ensureSuccess(await post(config.url), '任务操作失败');
+                hideLoading();
+                showMessage(config.message, 'success');
+                await loadTasks();
+            } catch (error) {
+                hideLoading();
+                handleError(error, '任务操作失败');
+            }
+        }
+
+        async function submitAdminStatus(taskId, status) {
+            try {
+                showLoading('管理员正在更新任务状态...');
+                ensureSuccess(
+                    await post(`${API_ENDPOINTS.admin.substituteAdminStatusBase}/${taskId}/status`, { status }),
+                    '管理员更新任务状态失败'
+                );
+                hideLoading();
+                showMessage('管理员状态修改成功', 'success');
+                await loadTasks();
+            } catch (error) {
+                hideLoading();
+                handleError(error, '管理员更新任务状态失败');
+            }
+        }
+
+        function bindEvents() {
+            document.getElementById('searchBtn').addEventListener('click', loadTasks);
+            document.getElementById('refreshBtn').addEventListener('click', loadTasks);
+            keywordInputEl.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    loadTasks();
+                }
+            });
+
+            [statusSelectEl, sortSelectEl, pageSizeSelectEl].forEach((element) => {
+                element.addEventListener('change', loadTasks);
+            });
+
+            taskListEl.addEventListener('click', (event) => {
+                const actionTarget = event.target.closest('[data-action]');
+                if (actionTarget) {
+                    submitTaskAction(actionTarget.dataset.action, actionTarget.dataset.id);
+                    return;
+                }
+
+                const adminTarget = event.target.closest('[data-admin-status]');
+                if (adminTarget) {
+                    submitAdminStatus(adminTarget.dataset.id, adminTarget.dataset.adminStatus);
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initIdentityPanel();
+            bindEvents();
+            await loadAnnouncement();
+            await loadTasks();
         });
     </script>
 </body>

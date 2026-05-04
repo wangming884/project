@@ -69,6 +69,8 @@ public class SecurityConfig {
                     "/secondhand/list",
                     "/secondhand/search",
                     "/substitute/list",
+                    "/substitute/tasks",
+                    "/substitute/tasks/*",
                     "/recommend/list",
                     "/recommend/detail",
                     "/recommend/coupon",
