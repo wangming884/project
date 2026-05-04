@@ -242,7 +242,7 @@ curl http://127.0.0.1:8080/api/auth/check
 2. 根目录指向：`/www/wwwroot/campus-web`
 3. PHP 版本选“纯静态”
 
-确认首页文件（如 `index.html`）在该目录中。
+确认页面目录存在：`/www/wwwroot/campus-web/pages/index.html`。
 
 ---
 
@@ -260,8 +260,12 @@ location /api/ {
     proxy_set_header X-Forwarded-Proto $scheme;
 }
 
+location = / {
+    return 302 /pages/index.html;
+}
+
 location / {
-    try_files $uri $uri/ /index.html;
+    try_files $uri $uri/ =404;
 }
 
 location ~* \.(css|js|jpg|jpeg|png|gif|svg|ico|woff|woff2)$ {

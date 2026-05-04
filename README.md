@@ -75,7 +75,7 @@ const pointsUrl = API_ENDPOINTS.points.getBalance;
 
 ### 3. 页面功能优化
 
-#### index.html（首页）
+#### pages/index.html（首页）
 - ✅ 集成登录 API 调用
 - ✅ 集成注册 API 调用
 - ✅ 添加表单验证
@@ -83,20 +83,20 @@ const pointsUrl = API_ENDPOINTS.points.getBalance;
 - ✅ 登录成功自动跳转
 - ✅ 注册成功自动填充登录表单
 
-#### main.html（服务大厅）
+#### pages/main.html（服务大厅）
 - ✅ 集成积分查询 API
 - ✅ 集成每日签到 API
 - ✅ 支持后端未连接时的降级方案（使用本地存储）
 - ✅ 优化签到体验
 
-#### checkin.html（晚寝签到）
+#### pages/checkin.html（晚寝签到）
 - ✅ 集成签到提交 API
 - ✅ 集成积分兑换 API
 - ✅ 添加地理位置获取功能
 - ✅ 优化表单验证
 - ✅ 支持降级方案
 
-#### secondhand.html（二手交易）
+#### pages/secondhand.html（二手交易）
 - ✅ 集成商品列表 API
 - ✅ 集成商品搜索 API
 - ✅ 集成联系卖家 API
@@ -106,7 +106,7 @@ const pointsUrl = API_ENDPOINTS.points.getBalance;
 
 ### 4. 完整的 API 接口文档
 
-**文件**: `API-DOCUMENTATION.md`
+**文件**: `docs/API-DOCUMENTATION.md`
 
 - 📋 详细的接口说明
 - 📝 请求参数示例
@@ -244,7 +244,7 @@ CORS(app, supports_credentials=True)
 
 ### 3. 实现接口
 
-参考 `API-DOCUMENTATION.md` 文档实现各个接口。
+参考 `docs/API-DOCUMENTATION.md` 文档实现各个接口。
 
 示例（Node.js + Express）：
 
@@ -346,22 +346,24 @@ CREATE TABLE secondhand_products (
 
 ```
 .
-├── index.html              # 首页（登录/注册）
-├── main.html               # 服务大厅
-├── checkin.html            # 晚寝签到
-├── secondhand.html         # 二手交易
-├── substitute.html         # 代课平台
-├── recommend.html          # 站长好物
-├── resources.html          # 学习资源
-├── learning_materials.html # 学习资料
-├── learning_software.html  # 学习软件
-├── publish.html            # 发布商品
-├── contact.html            # 联系作者
-├── view.jpg                # 展示图片
+├── pages/
+│   ├── index.html              # 首页（登录/注册）
+│   ├── main.html               # 服务大厅
+│   ├── checkin.html            # 晚寝签到
+│   ├── secondhand.html         # 二手交易
+│   ├── substitute.html         # 代课平台
+│   ├── recommend.html          # 站长好物
+│   ├── resources.html          # 学习资源
+│   ├── learning_materials.html # 学习资料
+│   ├── learning_software.html  # 学习软件
+│   ├── publish.html            # 发布商品
+│   ├── contact.html            # 联系作者
+│   └── view.jpg                # 展示图片
 ├── js/
 │   ├── api-config.js       # API 配置文件
 │   └── api-utils.js        # 工具函数库
-├── API-DOCUMENTATION.md    # API 接口文档
+├── docs/
+│   └── API-DOCUMENTATION.md    # API 接口文档
 └── README.md               # 项目说明
 ```
 
@@ -419,7 +421,7 @@ CREATE TABLE secondhand_products (
 
 如有问题，请联系：
 - 📧 邮箱: admin@mybrand.com
-- 📖 文档: 查看 API-DOCUMENTATION.md
+- 📖 文档: 查看 docs/API-DOCUMENTATION.md
 
 ## 📝 更新日志
 
