@@ -29,27 +29,47 @@ public class CheckinRecord implements Serializable {
     private Long userId;
     
     /**
-     * 学号/账号
+     * 用户名
      */
-    private String account;
+    private String username;
     
     /**
-     * 寝室地址
+     * 签到位置
      */
-    private String dorm;
+    private String location;
     
     /**
-     * 纬度
+     * 签到时间
+     */
+    private LocalDateTime checkinTime;
+    
+    /**
+     * 状态（pending-待审核，approved-已通过，rejected-已拒绝）
+     */
+    private String status;
+    
+    /**
+     * 备注
+     */
+    private String remark;
+    
+    /**
+     * 审核备注
+     */
+    private String reviewRemark;
+    
+    /**
+     * 纬度（可选）
      */
     private BigDecimal latitude;
     
     /**
-     * 经度
+     * 经度（可选）
      */
     private BigDecimal longitude;
     
     /**
-     * 签到时间
+     * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;

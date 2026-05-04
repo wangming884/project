@@ -135,6 +135,26 @@ public class PointsService {
     }
     
     /**
+     * 增加积分（内部方法）
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void addPoints(Long userId, int amount, String description) {
+        User user = userMapper.selectById(userId);
+        
+        user.setPoints(user.getPoints() + amount);
+        userMapper.updateById(user);
+        
+        // 记录积分历史
+        PointsHistory history = new PointsHistory();
+        history.setUserId(userId);
+        history.setType("reward");
+        history.setAmount(amount);
+        history.setBalance(user.getPoints());
+        history.setDescription(description);
+        pointsHistoryMapper.insert(history);
+    }
+    
+    /**
      * 扣除积分（内部方法）
      */
     @Transactional(rollbackFor = Exception.class)

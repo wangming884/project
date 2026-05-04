@@ -43,12 +43,18 @@ CREATE TABLE IF NOT EXISTS points_history (
 CREATE TABLE IF NOT EXISTS checkin_records (
     id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '签到ID',
     user_id BIGINT NOT NULL COMMENT '用户ID',
-    account VARCHAR(50) NOT NULL COMMENT '学号/账号',
-    dorm VARCHAR(100) NOT NULL COMMENT '寝室地址',
-    latitude DECIMAL(10, 8) COMMENT '纬度',
-    longitude DECIMAL(11, 8) COMMENT '经度',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '签到时间',
+    username VARCHAR(50) NOT NULL COMMENT '用户名',
+    location VARCHAR(200) NOT NULL COMMENT '签到位置',
+    checkin_time DATETIME NOT NULL COMMENT '签到时间',
+    status VARCHAR(20) DEFAULT 'pending' COMMENT '状态（pending-待审核，approved-已通过，rejected-已拒绝）',
+    remark VARCHAR(500) COMMENT '备注',
+    review_remark VARCHAR(500) COMMENT '审核备注',
+    latitude DECIMAL(10, 8) COMMENT '纬度（可选）',
+    longitude DECIMAL(11, 8) COMMENT '经度（可选）',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     INDEX idx_user_id (user_id),
+    INDEX idx_status (status),
+    INDEX idx_checkin_time (checkin_time),
     INDEX idx_created_at (created_at),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='晚寝签到记录表';
@@ -65,7 +71,7 @@ CREATE TABLE IF NOT EXISTS secondhand_products (
     seller_name VARCHAR(50) COMMENT '卖家姓名',
     contact VARCHAR(100) COMMENT '联系方式',
     status VARCHAR(20) DEFAULT 'available' COMMENT '状态（available-可售，sold-已售，removed-已下架）',
-    views INT DEFAULT 0 COMMENT '浏览次数',
+    view_count INT DEFAULT 0 COMMENT '浏览次数',
     deleted TINYINT DEFAULT 0 COMMENT '逻辑删除',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -106,7 +112,7 @@ INSERT INTO users (username, email, password, points, status) VALUES
 ('demo', 'demo@example.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EH', 100, 1);
 
 -- 插入示例二手商品
-INSERT INTO secondhand_products (title, price, category, description, images, seller_id, seller_name, contact, status, views) VALUES
+INSERT INTO secondhand_products (title, price, category, description, images, seller_id, seller_name, contact, status, view_count) VALUES
 ('高等数学（第七版）上下册 几乎全新', 25.00, 'books', '几乎全新，无笔记', 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=400', 1, '李同学', '微信: demo123', 'available', 120),
 ('九成新 索尼降噪耳机 毕业出清', 450.00, 'electronics', '九成新，音质完美', 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400', 1, '王学长', '微信: demo123', 'available', 85),
 ('校园代步自行车 送车锁打气筒', 120.00, 'transport', '八成新，骑行流畅', 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&q=80&w=400', 1, '赵同学', '微信: demo123', 'available', 56),
