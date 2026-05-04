@@ -60,6 +60,15 @@ admin:
   username: admin
   password: Admin@123456
 
+# Google Drive 接入预留配置
+google-drive:
+  enabled: false
+  client-id: ""
+  client-secret: ""
+  refresh-token: ""
+  materials-folder-id: ""
+  software-folder-id: ""
+
 # 日志配置
 logging:
   level:

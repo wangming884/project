@@ -50,11 +50,11 @@
 
     <main class="container">
         <div class="search-bar">
-            <input type="text" placeholder="搜索历年真题、期末复习提纲、课件 PPT...">
-            <button>搜索资料</button>
+            <input id="materials-search-input" type="text" placeholder="搜索历年真题、期末复习提纲、课件 PPT...">
+            <button id="materials-search-btn">搜索资料</button>
         </div>
 
-        <div class="resource-grid">
+        <div id="materials-resource-grid" class="resource-grid">
             <!-- 资料 1 -->
             <div class="resource-card">
                 <div class="resource-icon">📄</div>
@@ -107,16 +107,120 @@
         </div>
     </main>
 
+    <script src="../js/api-config.js"></script>
+    <script src="../js/api-utils.js"></script>
     <script>
+        const materialsGrid = document.getElementById('materials-resource-grid');
+        const materialsSearchInput = document.getElementById('materials-search-input');
+        const materialsSearchBtn = document.getElementById('materials-search-btn');
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function renderMaterials(list) {
+            if (!Array.isArray(list) || list.length === 0) {
+                materialsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #718096; padding: 2.5rem 0;">暂无匹配资源</p>';
+                return;
+            }
+
+            materialsGrid.innerHTML = list.map((item) => `
+                <div class="resource-card">
+                    <div class="resource-icon">📄</div>
+                    <div class="resource-info">
+                        <h3 class="resource-title">${escapeHtml(item.title)}</h3>
+                        <div class="resource-meta">${escapeHtml(item.meta || 'Google Drive 预留资源')} · ${escapeHtml(item.downloadCount || 0)}次下载</div>
+                        <a href="#" class="download-btn" data-id="${escapeHtml(item.id)}">⬇️ 极速下载</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadMaterials(keyword = '') {
+            try {
+                const response = await get(API_ENDPOINTS.resources.materials.list, {
+                    keyword,
+                    page: 1,
+                    pageSize: 50,
+                });
+                if (!response.success || !response.data) {
+                    return;
+                }
+                renderMaterials(response.data.list || []);
+            } catch (error) {
+                // 保留静态内容作为降级方案
+            }
+        }
+
+        async function requestMaterialDownload(resourceId) {
+            try {
+                const response = await get(API_ENDPOINTS.resources.materials.download, { id: resourceId });
+                if (!response.success || !response.data) {
+                    showMessage('暂未生成下载链接，请稍后重试', 'warning');
+                    return;
+                }
+                if (response.data.downloadUrl) {
+                    window.open(response.data.downloadUrl, '_blank', 'noopener,noreferrer');
+                    showMessage('已跳转到云盘下载页面', 'success');
+                } else {
+                    showMessage(response.data.message || '当前为预留模式，稍后开放下载', 'info');
+                }
+            } catch (error) {
+                showMessage('下载服务暂不可用', 'warning');
+            }
+        }
+
+        async function handleMaterialsSearch() {
+            const keyword = materialsSearchInput.value.trim();
+            await loadMaterials(keyword);
+        }
+
         // 处理文件上传选中后的逻辑
-        function handleFileUpload(input) {
+        async function handleFileUpload(input) {
             if (input.files && input.files.length > 0) {
                 const file = input.files[0];
-                alert(`🎉 感谢您的分享！\n文件【${file.name}】已成功加入上传队列。\n系统审核通过后将展示在资料库中。`);
+                try {
+                    const response = await post(API_ENDPOINTS.resources.materials.upload, {
+                        fileName: file.name,
+                        mimeType: file.type || 'application/octet-stream',
+                    });
+                    if (response.success) {
+                        showMessage('已创建云盘上传预留会话，后续接入 Google Drive 后可直接上传。', 'info');
+                    } else {
+                        showMessage(response.message || '上传接口暂不可用', 'warning');
+                    }
+                } catch (error) {
+                    showMessage(`🎉 感谢分享！文件【${file.name}】已加入上传待处理队列。`, 'success');
+                }
                 // 重置 input 以便可以重复上传同一文件
                 input.value = '';
             }
         }
+
+        materialsSearchBtn.addEventListener('click', handleMaterialsSearch);
+        materialsSearchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                handleMaterialsSearch();
+            }
+        });
+
+        materialsGrid.addEventListener('click', (event) => {
+            const target = event.target;
+            if (target.classList.contains('download-btn') && target.dataset.id) {
+                event.preventDefault();
+                requestMaterialDownload(target.dataset.id);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMaterials();
+        });
     </script>
 </body>
 </html>

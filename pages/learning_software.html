@@ -41,11 +41,11 @@
 
     <main class="container">
         <div class="search-bar">
-            <input type="text" placeholder="搜索 AutoCAD、MATLAB、Office...">
-            <button>搜索软件</button>
+            <input id="software-search-input" type="text" placeholder="搜索 AutoCAD、MATLAB、Office...">
+            <button id="software-search-btn">搜索软件</button>
         </div>
 
-        <div class="resource-grid">
+        <div id="software-resource-grid" class="resource-grid">
             <!-- 软件 1 -->
             <div class="resource-card">
                 <div class="resource-icon">🧮</div>
@@ -97,5 +97,99 @@
             </div>
         </div>
     </main>
+
+    <script src="../js/api-config.js"></script>
+    <script src="../js/api-utils.js"></script>
+    <script>
+        const softwareGrid = document.getElementById('software-resource-grid');
+        const softwareSearchInput = document.getElementById('software-search-input');
+        const softwareSearchBtn = document.getElementById('software-search-btn');
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function renderSoftware(list) {
+            if (!Array.isArray(list) || list.length === 0) {
+                softwareGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #718096; padding: 2.5rem 0;">暂无匹配软件</p>';
+                return;
+            }
+
+            softwareGrid.innerHTML = list.map((item) => `
+                <div class="resource-card">
+                    <div class="resource-icon">💻</div>
+                    <div class="resource-info">
+                        <h3 class="resource-title">${escapeHtml(item.title)}</h3>
+                        <div class="resource-meta">${escapeHtml(item.meta || 'Google Drive 预留资源')} · ${escapeHtml(item.downloadCount || 0)}次下载</div>
+                        <a href="#" class="download-btn" data-id="${escapeHtml(item.id)}">⬇️ 获取安装包</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadSoftware(keyword = '') {
+            try {
+                const response = await get(API_ENDPOINTS.resources.software.list, {
+                    keyword,
+                    page: 1,
+                    pageSize: 50,
+                });
+                if (!response.success || !response.data) {
+                    return;
+                }
+                renderSoftware(response.data.list || []);
+            } catch (error) {
+                // 保留静态内容作为降级方案
+            }
+        }
+
+        async function requestSoftwareDownload(resourceId) {
+            try {
+                const response = await get(API_ENDPOINTS.resources.software.download, { id: resourceId });
+                if (!response.success || !response.data) {
+                    showMessage('暂未生成下载链接，请稍后重试', 'warning');
+                    return;
+                }
+                if (response.data.downloadUrl) {
+                    window.open(response.data.downloadUrl, '_blank', 'noopener,noreferrer');
+                    showMessage('已跳转到云盘下载页面', 'success');
+                } else {
+                    showMessage(response.data.message || '当前为预留模式，稍后开放下载', 'info');
+                }
+            } catch (error) {
+                showMessage('下载服务暂不可用', 'warning');
+            }
+        }
+
+        async function handleSoftwareSearch() {
+            const keyword = softwareSearchInput.value.trim();
+            await loadSoftware(keyword);
+        }
+
+        softwareSearchBtn.addEventListener('click', handleSoftwareSearch);
+        softwareSearchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                handleSoftwareSearch();
+            }
+        });
+
+        softwareGrid.addEventListener('click', (event) => {
+            const target = event.target;
+            if (target.classList.contains('download-btn') && target.dataset.id) {
+                event.preventDefault();
+                requestSoftwareDownload(target.dataset.id);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSoftware();
+        });
+    </script>
 </body>
 </html>

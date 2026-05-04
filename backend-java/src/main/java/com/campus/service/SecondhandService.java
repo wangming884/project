@@ -54,7 +54,7 @@ public class SecondhandService {
         product.setCategory(category);
         product.setImages(images);
         product.setStatus("available");
-        product.setViewCount(0);
+        product.setViews(0);
         
         productMapper.insert(product);
         
@@ -96,7 +96,7 @@ public class SecondhandService {
         } else if ("price_desc".equals(sortBy)) {
             query.orderByDesc(SecondhandProduct::getPrice);
         } else if ("views".equals(sortBy)) {
-            query.orderByDesc(SecondhandProduct::getViewCount);
+            query.orderByDesc(SecondhandProduct::getViews);
         } else {
             query.orderByDesc(SecondhandProduct::getCreatedAt);
         }
@@ -115,7 +115,7 @@ public class SecondhandService {
         }
         
         // 增加浏览次数
-        product.setViewCount(product.getViewCount() + 1);
+        product.setViews((product.getViews() == null ? 0 : product.getViews()) + 1);
         productMapper.updateById(product);
         
         Map<String, Object> result = new HashMap<>();
