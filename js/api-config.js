@@ -100,6 +100,8 @@ const API_ENDPOINTS = {
         pointsUserStatusBase: `${API_BASE_URL}/points/admin/users`, // POST - 管理员启用/禁用用户
         pointsResetSigninBase: `${API_BASE_URL}/points/admin/users`, // POST - 管理员重置签到信息
         pointsHistory: `${API_BASE_URL}/points/admin/history`,  // GET - 管理员查看积分流水
+        resourceUploadMaterial: `${API_BASE_URL}/resources/admin/materials/upload`, // POST - 管理员上传学习资料
+        resourceUploadSoftware: `${API_BASE_URL}/resources/admin/software/upload`, // POST - 管理员上传学习软件
     },
 };
 

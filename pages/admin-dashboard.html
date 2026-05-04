@@ -55,9 +55,12 @@
         .form-group { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.7rem; }
         .form-group label { font-size: 0.82rem; color: var(--muted); }
         .form-group input { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; }
+        .form-group select { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; background: #fff; }
         .form-group input:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
+        .form-group select:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
         .adjust-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
         .empty { color: var(--muted); font-size: 0.9rem; padding: 0.5rem 0; }
+        .upload-result { margin-top: 0.7rem; padding: 0.7rem; background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; font-size: 0.84rem; color: #334155; }
         @media (max-width: 980px) {
             .grid { grid-template-columns: 1fr; }
             .point-tool-grid { grid-template-columns: 1fr; }
@@ -138,6 +141,7 @@
                     <div class="perm-item">重置用户签到连续记录</div>
                     <div class="perm-item">查看全站积分流水</div>
                     <div class="perm-item">管理员强制状态修改</div>
+                    <div class="perm-item">上传学习资料/学习软件</div>
                 </div>
                 <p class="empty" style="margin-top:0.8rem;">提示：管理员登录后签发专属 token，并具备超级权限（后端 `userId=0`）。</p>
             </aside>
@@ -219,6 +223,38 @@
                     </tbody>
                 </table>
             </div>
+        </section>
+
+        <section class="panel">
+            <h2>学习资源上传（管理员）</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="resourceTypeSelect">资源类型</label>
+                    <select id="resourceTypeSelect">
+                        <option value="materials">学习资料</option>
+                        <option value="software">学习软件</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="resourceMimeInput">MIME 类型（可自动识别）</label>
+                    <input id="resourceMimeInput" type="text" placeholder="例如：application/pdf">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="resourceNameInput">资源名称（可自动填充）</label>
+                    <input id="resourceNameInput" type="text" placeholder="请选择本地文件或手动输入文件名">
+                </div>
+                <div class="form-group" style="justify-content:flex-end;">
+                    <label>&nbsp;</label>
+                    <div class="adjust-actions">
+                        <input id="resourceFileInput" type="file" style="display:none;">
+                        <button class="btn btn-muted" type="button" id="pickResourceFileBtn">选择文件</button>
+                        <button class="btn btn-primary" type="button" id="submitResourceUploadBtn">发起上传</button>
+                    </div>
+                </div>
+            </div>
+            <div id="resourceUploadResult" class="upload-result">提示：当前为 Google Drive 预留接入模式，上传成功后会返回预留会话信息。</div>
         </section>
     </main>
 
@@ -520,6 +556,66 @@
             }
         }
 
+        function setResourceUploadResult(text) {
+            const el = document.getElementById('resourceUploadResult');
+            if (el) {
+                el.textContent = text;
+            }
+        }
+
+        function pickResourceFile() {
+            const fileInput = document.getElementById('resourceFileInput');
+            if (fileInput) {
+                fileInput.click();
+            }
+        }
+
+        function handleResourceFilePicked(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) {
+                return;
+            }
+            document.getElementById('resourceNameInput').value = file.name || '';
+            if (file.type) {
+                document.getElementById('resourceMimeInput').value = file.type;
+            }
+        }
+
+        async function submitResourceUpload() {
+            const type = document.getElementById('resourceTypeSelect').value;
+            const fileName = document.getElementById('resourceNameInput').value.trim();
+            const mimeType = document.getElementById('resourceMimeInput').value.trim() || 'application/octet-stream';
+
+            if (!fileName) {
+                showMessage('请先选择文件或填写资源名称', 'warning');
+                return;
+            }
+
+            const endpoint = type === 'software'
+                ? API_ENDPOINTS.admin.resourceUploadSoftware
+                : API_ENDPOINTS.admin.resourceUploadMaterial;
+
+            try {
+                showLoading('正在发起上传会话...');
+                const response = await post(endpoint, { fileName, mimeType });
+                hideLoading();
+                if (!response.success) {
+                    showMessage(response.message || '上传会话创建失败', 'error');
+                    return;
+                }
+
+                const data = response.data || {};
+                const message = data.message || '上传会话创建成功';
+                setResourceUploadResult(
+                    `状态：${message} | 类型：${data.resourceType || type} | 文件：${data.fileName || fileName} | 提供方：${data.provider || 'google-drive'}`
+                );
+                showMessage('管理员上传会话创建成功', 'success');
+            } catch (error) {
+                hideLoading();
+                handleError(error, '上传会话创建失败');
+            }
+        }
+
         function initAdminIdentity() {
             const session = getAdminSession();
             const modeText = session?.mode === 'offline' ? '离线模式' : '服务端模式';
@@ -551,6 +647,9 @@
             document.getElementById('enableUserBtn').addEventListener('click', () => updateUserStatus(1));
             document.getElementById('disableUserBtn').addEventListener('click', () => updateUserStatus(0));
             document.getElementById('resetSigninBtn').addEventListener('click', resetSelectedUserSignin);
+            document.getElementById('pickResourceFileBtn').addEventListener('click', pickResourceFile);
+            document.getElementById('submitResourceUploadBtn').addEventListener('click', submitResourceUpload);
+            document.getElementById('resourceFileInput').addEventListener('change', handleResourceFilePicked);
             document.getElementById('pendingTableBody').addEventListener('click', (event) => {
                 const target = event.target;
                 const recordId = target.dataset.id;

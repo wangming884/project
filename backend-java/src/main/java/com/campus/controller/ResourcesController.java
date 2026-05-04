@@ -3,6 +3,7 @@ package com.campus.controller;
 import com.campus.common.Result;
 import com.campus.service.LearningResourceService;
 import lombok.Data;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -18,6 +19,21 @@ public class ResourcesController {
 
     public ResourcesController(LearningResourceService learningResourceService) {
         this.learningResourceService = learningResourceService;
+    }
+
+    private Long currentUserId(Authentication authentication) {
+        if (authentication == null) {
+            return null;
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof Long) {
+            return (Long) principal;
+        }
+        try {
+            return Long.parseLong(authentication.getName());
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
     /**
@@ -51,6 +67,23 @@ public class ResourcesController {
     }
 
     /**
+     * 管理员上传学习资料（Google Drive 预留）
+     */
+    @PostMapping("/admin/materials/upload")
+    public Result<Map<String, Object>> adminUploadMaterial(
+            @RequestBody UploadRequest request,
+            Authentication authentication) {
+        Long userId = currentUserId(authentication);
+        if (userId == null || userId != 0L) {
+            return Result.error(403, "无管理员权限");
+        }
+        return Result.success(learningResourceService.createMaterialUploadSession(
+            request.getFileName(),
+            request.getMimeType()
+        ));
+    }
+
+    /**
      * 学习软件列表（预留 Google Drive）
      */
     @GetMapping("/software/list")
@@ -69,10 +102,26 @@ public class ResourcesController {
         return Result.success(learningResourceService.getSoftwareDownload(id));
     }
 
+    /**
+     * 管理员上传学习软件（Google Drive 预留）
+     */
+    @PostMapping("/admin/software/upload")
+    public Result<Map<String, Object>> adminUploadSoftware(
+            @RequestBody UploadRequest request,
+            Authentication authentication) {
+        Long userId = currentUserId(authentication);
+        if (userId == null || userId != 0L) {
+            return Result.error(403, "无管理员权限");
+        }
+        return Result.success(learningResourceService.createSoftwareUploadSession(
+            request.getFileName(),
+            request.getMimeType()
+        ));
+    }
+
     @Data
     static class UploadRequest {
         private String fileName;
         private String mimeType;
     }
 }
-

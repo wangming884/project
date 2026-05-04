@@ -39,6 +39,10 @@ public class LearningResourceService {
         return cloudResourceGateway.buildUploadSession("materials", fileName, mimeType);
     }
 
+    public Map<String, Object> createSoftwareUploadSession(String fileName, String mimeType) {
+        return cloudResourceGateway.buildUploadSession("software", fileName, mimeType);
+    }
+
     private Map<String, Object> buildListResponse(String type, String keyword, int page, int pageSize) {
         List<Map<String, Object>> list = cloudResourceGateway.listResources(type, keyword, page, pageSize);
 
@@ -53,4 +57,3 @@ public class LearningResourceService {
         return data;
     }
 }
-
