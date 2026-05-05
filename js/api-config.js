@@ -99,13 +99,15 @@ const API_ENDPOINTS = {
 
     // 二手物品交易相关
     secondhand: {
-        list: `${API_BASE_URL}/secondhand/list`,               // GET - 获取商品列表
-        detail: `${API_BASE_URL}/secondhand/detail`,           // GET - 获取商品详情
+        list: `${API_BASE_URL}/secondhand/list`,               // GET - 兼容旧版商品列表
+        detail: `${API_BASE_URL}/secondhand/detail`,           // GET - 兼容旧版商品详情
         publish: `${API_BASE_URL}/secondhand/publish`,         // POST - 发布商品
-        update: `${API_BASE_URL}/secondhand/update`,           // PUT - 更新商品
-        delete: `${API_BASE_URL}/secondhand/delete`,           // DELETE - 删除商品
-        search: `${API_BASE_URL}/secondhand/search`,           // GET - 搜索商品
-        contact: `${API_BASE_URL}/secondhand/contact`,         // POST - 联系卖家
+        search: `${API_BASE_URL}/secondhand/search`,           // GET - 兼容旧版搜索商品
+        contact: `${API_BASE_URL}/secondhand/contact`,         // POST - 兼容旧版联系卖家
+        products: `${API_BASE_URL}/secondhand/products`,       // GET - 商品列表（真实接口）
+        productBase: `${API_BASE_URL}/secondhand/products`,    // GET/PUT/PATCH/DELETE - 商品基础路径
+        myProducts: `${API_BASE_URL}/secondhand/my-products`,  // GET - 我的发布
+        statistics: `${API_BASE_URL}/secondhand/statistics`,   // GET - 我的统计
     },
 
     // 代课平台相关

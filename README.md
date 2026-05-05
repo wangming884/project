@@ -12,10 +12,11 @@
 2. 每日签到与积分记录
 3. 晚寝签到（含审核流程）
 4. 二手商品发布与浏览
-5. 代课任务发布与接单
-6. 学习资料/学习软件下载入口
-7. 联系作者
-8. 代课“我的发布 / 我的接单”管理页：`pages/substitute-manage.html`
+5. 二手“我的发布”管理页：`pages/secondhand-manage.html`
+6. 代课任务发布与接单
+7. 学习资料/学习软件下载入口
+8. 联系作者
+9. 代课“我的发布 / 我的接单”管理页：`pages/substitute-manage.html`
 
 ### 管理员侧
 
@@ -126,6 +127,18 @@ mvn spring-boot:run
 7. 任务统计：`GET /api/substitute/statistics`
 8. 管理员全量任务：`GET /api/substitute/admin/tasks`
 9. 管理员强制改状态：`POST /api/substitute/admin/tasks/{taskId}/status`
+
+## 6.5 二手模块当前状态
+
+当前二手模块已接入 Java 后端，前台与管理页都可使用真实数据：
+
+1. 大厅页：`pages/secondhand.html`
+2. 我的发布管理页：`pages/secondhand-manage.html`
+3. 发布商品接口：`POST /api/secondhand/publish`
+4. 我的发布：`GET /api/secondhand/my-products`
+5. 商品统计：`GET /api/secondhand/statistics`
+6. 更新状态：`PATCH /api/secondhand/products/{productId}/status`
+7. 删除商品：`DELETE /api/secondhand/products/{productId}`
 
 ## 7. 学习资源与上传说明
 

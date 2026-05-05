@@ -37,8 +37,8 @@ public class SecondhandService {
      * 发布商品
      */
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> publishProduct(Long userId, String title, String description, 
-                                             BigDecimal price, String category, String images) {
+    public Map<String, Object> publishProduct(Long userId, String title, String description,
+                                             BigDecimal price, String category, String images, String contact) {
         User user = userMapper.selectById(userId);
         if (user == null) {
             throw new RuntimeException("用户不存在");
@@ -53,6 +53,7 @@ public class SecondhandService {
         product.setPrice(price);
         product.setCategory(category);
         product.setImages(images);
+        product.setContact(contact);
         product.setStatus("available");
         product.setViews(0);
         
@@ -141,8 +142,8 @@ public class SecondhandService {
      * 更新商品信息
      */
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> updateProduct(Long productId, Long userId, String title, 
-                                            String description, BigDecimal price, String category) {
+    public Map<String, Object> updateProduct(Long productId, Long userId, String title,
+                                            String description, BigDecimal price, String category, String contact) {
         SecondhandProduct product = productMapper.selectById(productId);
         if (product == null) {
             throw new RuntimeException("商品不存在");
@@ -156,6 +157,7 @@ public class SecondhandService {
         if (description != null) product.setDescription(description);
         if (price != null) product.setPrice(price);
         if (category != null) product.setCategory(category);
+        if (contact != null) product.setContact(contact);
         
         productMapper.updateById(product);
         

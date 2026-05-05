@@ -60,15 +60,16 @@ public class SecondhandController {
     public Result<Map<String, Object>> publishProduct(
             @RequestBody Map<String, Object> request,
             Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         String title = (String) request.get("title");
         String description = (String) request.get("description");
         BigDecimal price = new BigDecimal(request.get("price").toString());
         String category = (String) request.get("category");
         String images = (String) request.getOrDefault("images", "");
-        
+        String contact = (String) request.getOrDefault("contact", "");
+
         Map<String, Object> result = secondhandService.publishProduct(
-            userId, title, description, price, category, images);
+            userId, title, description, price, category, images, contact);
         return Result.success(result);
     }
     
@@ -104,7 +105,7 @@ public class SecondhandController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize,
             Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         Page<SecondhandProduct> products = secondhandService.getMyProducts(userId, page, pageSize);
         return Result.success(products);
     }
@@ -117,15 +118,16 @@ public class SecondhandController {
             @PathVariable Long productId,
             @RequestBody Map<String, Object> request,
             Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         String title = (String) request.get("title");
         String description = (String) request.get("description");
         BigDecimal price = request.get("price") != null 
             ? new BigDecimal(request.get("price").toString()) : null;
         String category = (String) request.get("category");
+        String contact = (String) request.get("contact");
         
         Map<String, Object> result = secondhandService.updateProduct(
-            productId, userId, title, description, price, category);
+            productId, userId, title, description, price, category, contact);
         return Result.success(result);
     }
     
@@ -137,7 +139,7 @@ public class SecondhandController {
             @PathVariable Long productId,
             @RequestBody Map<String, String> request,
             Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         String status = request.get("status");
         
         Map<String, Object> result = secondhandService.updateStatus(productId, userId, status);
@@ -151,7 +153,7 @@ public class SecondhandController {
     public Result<Map<String, Object>> deleteProduct(
             @PathVariable Long productId,
             Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         Map<String, Object> result = secondhandService.deleteProduct(productId, userId);
         return Result.success(result);
     }
@@ -161,7 +163,7 @@ public class SecondhandController {
      */
     @GetMapping("/statistics")
     public Result<Map<String, Object>> getStatistics(Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         Map<String, Object> statistics = secondhandService.getStatistics(userId);
         return Result.success(statistics);
     }

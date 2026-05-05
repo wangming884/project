@@ -10,6 +10,15 @@ const AUTH_STORAGE_KEYS = {
 
 // ==================== HTTP 请求封装 ====================
 
+function escapeHtmlContent(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function isPlainObject(value) {
     return Object.prototype.toString.call(value) === '[object Object]';
 }
@@ -96,8 +105,26 @@ async function request(url, options = {}) {
  * GET 请求
  */
 async function get(url, params = {}) {
+    const searchParams = new URLSearchParams();
+    Object.entries(params || {}).forEach(([key, value]) => {
+        if (value === undefined || value === null) {
+            return;
+        }
+
+        if (Array.isArray(value)) {
+            value.forEach((item) => {
+                if (item !== undefined && item !== null) {
+                    searchParams.append(key, String(item));
+                }
+            });
+            return;
+        }
+
+        searchParams.append(key, String(value));
+    });
+
     // 构建查询参数
-    const queryString = new URLSearchParams(params).toString();
+    const queryString = searchParams.toString();
     const fullUrl = queryString ? `${url}?${queryString}` : url;
     
     return request(fullUrl, { method: 'GET' });
@@ -174,7 +201,7 @@ function showLoading(message = '加载中...') {
                     animation: spin 1s linear infinite;
                     margin: 0 auto 1rem;
                 "></div>
-                <div style="color: #333; font-size: 1rem;">${message}</div>
+                <div style="color: #333; font-size: 1rem;">${escapeHtmlContent(message)}</div>
             </div>
         </div>
         <style>
@@ -240,7 +267,7 @@ function showMessage(message, type = 'info', duration = 3000) {
     `;
     messageDiv.innerHTML = `
         <span style="font-size: 1.2rem; font-weight: bold;">${icons[type] || icons.info}</span>
-        <span>${message}</span>
+        <span>${escapeHtmlContent(message)}</span>
     `;
 
     // 添加动画样式
@@ -276,6 +303,12 @@ function handleError(error, defaultMessage = '操作失败，请稍后重试') {
     console.error('Error:', error);
     
     let message = defaultMessage;
+    const status = Number(
+        error?.status
+        ?? error?.response?.code
+        ?? error?.response?.status
+        ?? 0
+    );
     
     // 解析错误信息
     if (error.message) {
@@ -283,7 +316,7 @@ function handleError(error, defaultMessage = '操作失败，请稍后重试') {
     }
     
     // 特殊错误处理
-    if (message.includes('401') || message.includes('Unauthorized')) {
+    if (status === 401 || message.includes('401') || message.includes('Unauthorized')) {
         message = '登录已过期，请重新登录';
         // 清除登录信息
         clearAuthSession();
@@ -291,11 +324,11 @@ function handleError(error, defaultMessage = '操作失败，请稍后重试') {
         setTimeout(() => {
             window.location.href = 'index.html';
         }, 1500);
-    } else if (message.includes('403') || message.includes('Forbidden')) {
+    } else if (status === 403 || message.includes('403') || message.includes('Forbidden')) {
         message = '没有权限执行此操作';
-    } else if (message.includes('404') || message.includes('Not Found')) {
+    } else if (status === 404 || message.includes('404') || message.includes('Not Found')) {
         message = '请求的资源不存在';
-    } else if (message.includes('500') || message.includes('Server Error')) {
+    } else if (status >= 500 || message.includes('500') || message.includes('Server Error')) {
         message = '服务器错误，请稍后重试';
     } else if (message.includes('Network') || message.includes('Failed to fetch')) {
         message = '网络连接失败，请检查网络';
@@ -395,6 +428,9 @@ function validatePassword(password) {
  */
 function formatDate(date, format = 'YYYY-MM-DD HH:mm:ss') {
     const d = new Date(date);
+    if (Number.isNaN(d.getTime())) {
+        return '-';
+    }
     
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -418,6 +454,9 @@ function formatDate(date, format = 'YYYY-MM-DD HH:mm:ss') {
 function getRelativeTime(date) {
     const now = new Date();
     const past = new Date(date);
+    if (Number.isNaN(past.getTime())) {
+        return '-';
+    }
     const diff = now - past;
     
     const seconds = Math.floor(diff / 1000);

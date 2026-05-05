@@ -6,111 +6,623 @@
     <title>二手发布管理 - 校园综合服务平台</title>
     <style>
         :root {
-            --bg: #f4f7f6;
-            --surface: #ffffff;
-            --text: #1f2937;
-            --muted: #6b7280;
-            --brand: #2563eb;
+            --bg: #f4f8fb;
+            --surface: rgba(255, 255, 255, 0.95);
+            --surface-strong: #ffffff;
+            --text: #183153;
+            --muted: #64748b;
+            --brand: #1d4ed8;
             --brand-soft: #dbeafe;
-            --need: #f97316;
+            --need: #ea580c;
             --need-soft: #ffedd5;
-            --border: #e5e7eb;
+            --success: #0f766e;
+            --success-soft: #d7f7f2;
+            --danger: #b42318;
+            --danger-soft: #ffe4e6;
+            --slate-soft: #eef2ff;
+            --border: rgba(24, 49, 83, 0.1);
+            --shadow: 0 18px 42px rgba(29, 78, 216, 0.08);
         }
+
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); }
-        header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
-        .topbar { max-width: 1200px; margin: 0 auto; padding: 1rem 5%; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-        .logo { font-size: 1.2rem; font-weight: 700; color: #2563eb; text-decoration: none; }
-        .actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-        .btn { border: none; border-radius: 999px; padding: 0.5rem 1rem; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; }
-        .btn-outline { color: #1f2937; background: #f3f4f6; }
-        .btn-brand { color: #fff; background: var(--brand); }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 1.3rem 5% 2rem; display: grid; gap: 1rem; }
-        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; }
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; }
-        .card h3 { margin: 0; color: var(--muted); font-size: 0.95rem; }
-        .card .num { margin-top: 0.4rem; font-size: 1.7rem; font-weight: 700; }
-
-        .grid { display: grid; gap: 1rem; grid-template-columns: 1fr 1fr; }
-        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; }
-        .panel h2 { margin: 0 0 0.8rem; font-size: 1.05rem; }
-        .hint { margin: 0; color: var(--muted); font-size: 0.85rem; }
-        .form-group { margin-bottom: 0.8rem; }
-        .form-group label { display: block; margin-bottom: 0.3rem; font-size: 0.85rem; color: var(--muted); }
-        .form-group input, .form-group textarea {
-            width: 100%;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 0.55rem 0.65rem;
-            font-size: 0.9rem;
-            font-family: inherit;
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(29, 78, 216, 0.12), transparent 28%),
+                radial-gradient(circle at top right, rgba(234, 88, 12, 0.12), transparent 30%),
+                linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
         }
-        .form-group textarea { min-height: 88px; resize: vertical; }
-        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
-        .form-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-        .btn-sell { background: var(--brand); color: #fff; }
-        .btn-need { background: var(--need); color: #fff; }
 
-        .list-wrap { display: grid; gap: 1rem; grid-template-columns: 1fr 1fr; }
-        .order-list { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; }
-        .order-list h3 { margin: 0 0 0.8rem; font-size: 1rem; }
-        .order-item { border: 1px solid var(--border); border-radius: 10px; padding: 0.7rem; margin-bottom: 0.7rem; }
-        .order-item:last-child { margin-bottom: 0; }
-        .order-item.sell { border-left: 4px solid var(--brand); background: #eff6ff; }
-        .order-item.need { border-left: 4px solid var(--need); background: #fff7ed; }
-        .order-title { margin: 0 0 0.3rem; font-weight: 700; }
-        .order-meta { margin: 0.1rem 0; color: #374151; font-size: 0.86rem; }
-        .order-muted { color: var(--muted); font-size: 0.8rem; }
-        .order-actions { margin-top: 0.4rem; }
-        .order-btn { border: none; background: #ef4444; color: #fff; border-radius: 8px; padding: 0.35rem 0.6rem; cursor: pointer; font-size: 0.8rem; }
-        .empty { color: var(--muted); font-size: 0.9rem; }
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(16px);
+            background: rgba(248, 251, 255, 0.88);
+            border-bottom: 1px solid rgba(24, 49, 83, 0.08);
+        }
+
+        .topbar, .container {
+            width: min(1200px, calc(100% - 32px));
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+
+        .brand-block {
+            display: grid;
+            gap: 0.25rem;
+        }
+
+        .logo {
+            color: var(--brand);
+            font-size: 1.28rem;
+            font-weight: 800;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+        }
+
+        .brand-subtitle {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.65rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .btn,
+        .panel-btn,
+        .item-btn {
+            border: none;
+            cursor: pointer;
+            font: inherit;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        .btn {
+            border-radius: 999px;
+            padding: 0.72rem 1.05rem;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:hover,
+        .panel-btn:hover,
+        .item-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--brand) 0%, #3b82f6 100%);
+            color: #fff;
+            box-shadow: 0 12px 24px rgba(29, 78, 216, 0.22);
+        }
+
+        .btn-outline {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(24, 49, 83, 0.12);
+        }
+
+        .container {
+            padding: 1.2rem 0 2.5rem;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .hero,
+        .identity,
+        .summary-card,
+        .panel,
+        .list-panel,
+        .empty-state {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .hero {
+            padding: 1.2rem;
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.9fr);
+            gap: 1rem;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            line-height: 1.08;
+        }
+
+        .hero p {
+            margin: 0.85rem 0 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .hero-tags {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .hero-tags span {
+            border-radius: 999px;
+            padding: 0.45rem 0.78rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .tag-sell { background: var(--brand-soft); color: var(--brand); }
+        .tag-need { background: var(--need-soft); color: var(--need); }
+        .tag-live { background: var(--success-soft); color: var(--success); }
+
+        .hero-side {
+            display: grid;
+            gap: 0.75rem;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .summary-card {
+            padding: 1rem;
+            background: var(--surface-strong);
+        }
+
+        .summary-card .label {
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .summary-card .value {
+            margin-top: 0.4rem;
+            font-size: 1.9rem;
+            font-weight: 800;
+        }
+
+        .identity {
+            padding: 1rem 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .identity.admin {
+            background: linear-gradient(135deg, rgba(219, 234, 254, 0.96) 0%, rgba(255, 237, 213, 0.96) 100%);
+            border-color: rgba(29, 78, 216, 0.18);
+        }
+
+        .identity h2 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .identity p {
+            margin: 0.3rem 0 0;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        .identity-badge {
+            border-radius: 999px;
+            padding: 0.45rem 0.8rem;
+            font-size: 0.84rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .identity-badge.admin { background: var(--brand-soft); color: var(--brand); }
+        .identity-badge.user { background: var(--success-soft); color: var(--success); }
+        .identity-badge.guest { background: #f1f5f9; color: #475569; }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .controls-text h3 {
+            margin: 0;
+            font-size: 1.05rem;
+        }
+
+        .controls-text p {
+            margin: 0.35rem 0 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .panel-grid,
+        .list-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .panel,
+        .list-panel {
+            padding: 1rem;
+        }
+
+        .panel h2,
+        .list-panel h2 {
+            margin: 0;
+            font-size: 1.05rem;
+        }
+
+        .hint {
+            margin: 0.45rem 0 0.9rem;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 0.32rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.7rem;
+        }
+
+        label {
+            color: var(--muted);
+            font-size: 0.84rem;
+            font-weight: 700;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border-radius: 14px;
+            border: 1px solid rgba(24, 49, 83, 0.14);
+            background: rgba(255, 255, 255, 0.96);
+            padding: 0.78rem 0.9rem;
+            font: inherit;
+            color: var(--text);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 0.65rem;
+            flex-wrap: wrap;
+        }
+
+        .panel-btn {
+            border-radius: 14px;
+            padding: 0.78rem 1rem;
+            font-weight: 700;
+        }
+
+        .panel-btn.sell {
+            background: var(--brand);
+            color: #fff;
+        }
+
+        .panel-btn.need {
+            background: var(--need);
+            color: #fff;
+        }
+
+        .panel-btn.secondary {
+            background: #e2e8f0;
+            color: var(--text);
+        }
+
+        .panel button[disabled],
+        .panel input[disabled],
+        .panel textarea[disabled],
+        .panel select[disabled],
+        .item-btn[disabled] {
+            cursor: not-allowed;
+            opacity: 0.55;
+            transform: none;
+        }
+
+        .panel-note {
+            border-radius: 16px;
+            padding: 0.85rem 0.95rem;
+            background: rgba(239, 246, 255, 0.8);
+            color: #43617f;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        .list-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+        }
+
+        .list-subtitle {
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .item-list {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .item-card {
+            border-radius: 18px;
+            border: 1px solid rgba(24, 49, 83, 0.08);
+            background: rgba(255, 255, 255, 0.82);
+            padding: 0.95rem;
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .item-card.sell {
+            border-left: 4px solid var(--brand);
+            background: rgba(239, 246, 255, 0.9);
+        }
+
+        .item-card.need {
+            border-left: 4px solid var(--need);
+            background: rgba(255, 247, 237, 0.9);
+        }
+
+        .item-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.75rem;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .item-title {
+            margin: 0;
+            font-size: 1.02rem;
+        }
+
+        .item-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.45rem;
+        }
+
+        .type-badge,
+        .status-badge {
+            border-radius: 999px;
+            padding: 0.42rem 0.72rem;
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+
+        .type-sell { background: var(--brand-soft); color: var(--brand); }
+        .type-need { background: var(--need-soft); color: var(--need); }
+        .status-available { background: var(--success-soft); color: var(--success); }
+        .status-sold { background: var(--slate-soft); color: #4338ca; }
+        .status-removed { background: var(--danger-soft); color: var(--danger); }
+
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.7rem;
+        }
+
+        .meta-box {
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(24, 49, 83, 0.06);
+            padding: 0.72rem 0.8rem;
+        }
+
+        .meta-box .meta-label {
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .meta-box .meta-value {
+            margin-top: 0.3rem;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .item-desc {
+            margin: 0;
+            line-height: 1.72;
+            color: #31445f;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .item-footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .item-time {
+            color: var(--muted);
+            font-size: 0.84rem;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.55rem;
+            flex-wrap: wrap;
+        }
+
+        .item-btn {
+            border-radius: 12px;
+            padding: 0.58rem 0.9rem;
+            font-weight: 700;
+        }
+
+        .item-btn.success { background: var(--success-soft); color: var(--success); }
+        .item-btn.info { background: var(--brand-soft); color: var(--brand); }
+        .item-btn.warning { background: var(--need-soft); color: var(--need); }
+        .item-btn.danger { background: var(--danger-soft); color: var(--danger); }
+
+        .empty-state {
+            padding: 1.6rem 1rem;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .empty-state strong {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-size: 1rem;
+            color: var(--text);
+        }
 
         @media (max-width: 980px) {
-            .grid, .list-wrap, .row { grid-template-columns: 1fr; }
+            .hero,
+            .panel-grid,
+            .list-grid,
+            .row,
+            .item-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .topbar,
+            .identity,
+            .item-top,
+            .item-footer {
+                align-items: stretch;
+            }
+
+            .actions,
+            .form-actions,
+            .item-actions {
+                flex-direction: column;
+            }
+
+            .btn,
+            .panel-btn,
+            .item-btn {
+                width: 100%;
+            }
+
+            .hero-side {
+                grid-template-columns: 1fr 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <header>
         <div class="topbar">
-            <a href="secondhand.html" class="logo">二手发布管理</a>
+            <div class="brand-block">
+                <a href="secondhand.html" class="logo">MyBrand校园 · 二手发布管理</a>
+                <div class="brand-subtitle">从本地草稿升级为真实发布、真实状态、真实联系人</div>
+            </div>
             <div class="actions">
-                <a href="secondhand.html" class="btn btn-outline">返回二手页</a>
-                <a href="main.html" class="btn btn-brand">返回大厅</a>
+                <button id="refreshBtn" class="btn btn-outline" type="button">刷新数据</button>
+                <a href="secondhand.html" class="btn btn-primary">查看二手大厅</a>
+                <a href="admin-dashboard.html" id="adminDashboardLink" class="btn btn-outline" style="display:none;">管理员后台</a>
+                <a href="main.html" class="btn btn-outline">返回大厅</a>
             </div>
         </div>
     </header>
 
     <main class="container">
-        <section class="summary">
-            <article class="card">
-                <h3>二手物品商单数量</h3>
-                <div class="num" id="sellCount">0</div>
-            </article>
-            <article class="card">
-                <h3>二手需求商单数量</h3>
-                <div class="num" id="needCount">0</div>
-            </article>
+        <section class="hero">
+            <div>
+                <h1>把二手发布从浏览页的配角，升级成真正可运营的个人货架。</h1>
+                <p>现在这里直接接入 Java 后端。普通用户可以发布出售或求购信息、管理状态、删除历史记录；管理员登录后会自动锁定普通发布入口，避免用超级身份混入用户数据。</p>
+                <div class="hero-tags">
+                    <span class="tag-sell">出售发布</span>
+                    <span class="tag-need">求购发布</span>
+                    <span class="tag-live">真实后端</span>
+                </div>
+            </div>
+            <div class="hero-side">
+                <article class="summary-card">
+                    <div class="label">我的发布总数</div>
+                    <div class="value" id="totalCount">0</div>
+                </article>
+                <article class="summary-card">
+                    <div class="label">可售/进行中</div>
+                    <div class="value" id="availableCount">0</div>
+                </article>
+                <article class="summary-card">
+                    <div class="label">已成交</div>
+                    <div class="value" id="soldCount">0</div>
+                </article>
+                <article class="summary-card">
+                    <div class="label">已下架</div>
+                    <div class="value" id="removedCount">0</div>
+                </article>
+            </div>
         </section>
 
-        <section class="grid">
+        <section id="identityPanel" class="identity">
+            <div>
+                <h2 id="identityTitle">正在识别登录状态</h2>
+                <p id="identityText">请稍候，系统正在同步你的账号权限。</p>
+            </div>
+            <span id="identityBadge" class="identity-badge guest">访客模式</span>
+        </section>
+
+        <section class="controls">
+            <div class="controls-text">
+                <h3>发布与管理</h3>
+                <p id="resultText">正在准备二手管理数据...</p>
+            </div>
+        </section>
+
+        <section class="panel-grid">
             <article class="panel">
-                <h2>发布二手物品商单</h2>
-                <p class="hint">用于发布“我有闲置要出售”的二手物品商单。</p>
+                <h2>发布出售商品</h2>
+                <p class="hint">适合“我有闲置想卖”的场景。价格请填写纯数字，图片地址可选但建议补上，这样二手大厅展示更完整。</p>
                 <form id="sellForm">
                     <div class="form-group">
-                        <label for="sellTitle">商单标题</label>
-                        <input id="sellTitle" type="text" placeholder="例如：九成新 iPad 闲置出售">
+                        <label for="sellTitle">商品标题</label>
+                        <input id="sellTitle" type="text" placeholder="例如：九成新 iPad mini 闲置出售">
                     </div>
                     <div class="row">
                         <div class="form-group">
-                            <label for="sellPrice">售价/预算</label>
-                            <input id="sellPrice" type="text" placeholder="例如：1500元">
+                            <label for="sellPrice">售价（元）</label>
+                            <input id="sellPrice" type="number" min="0.01" step="0.01" placeholder="例如：1499">
                         </div>
                         <div class="form-group">
-                            <label for="sellCategory">物品分类</label>
-                            <input id="sellCategory" type="text" placeholder="例如：数码电子">
+                            <label for="sellCategory">商品分类</label>
+                            <select id="sellCategory"></select>
                         </div>
                     </div>
                     <div class="row">
@@ -120,22 +632,27 @@
                         </div>
                         <div class="form-group">
                             <label for="sellContact">联系方式</label>
-                            <input id="sellContact" type="text" placeholder="例如：vx:xxx">
+                            <input id="sellContact" type="text" placeholder="例如：vx:campus-demo">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="sellDesc">物品描述</label>
-                        <textarea id="sellDesc" placeholder="成色、配件、购买时间、交易说明等"></textarea>
+                        <label for="sellImage">封面图片地址（可选）</label>
+                        <input id="sellImage" type="url" placeholder="例如：https://example.com/item.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label for="sellDesc">补充说明</label>
+                        <textarea id="sellDesc" placeholder="例如：成色、购买时间、配件、是否可小刀等"></textarea>
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-sell">发布二手商单</button>
+                        <button class="panel-btn sell" type="submit">发布出售商品</button>
+                        <button class="panel-btn secondary" type="reset">清空表单</button>
                     </div>
                 </form>
             </article>
 
             <article class="panel">
-                <h2>发布二手需求商单</h2>
-                <p class="hint">用于发布“我想求购某物品”的需求商单。</p>
+                <h2>发布求购需求</h2>
+                <p class="hint">适合“我想收某样东西”的场景。虽然后端当前没有单独的求购表结构，但页面会自动做结构化兼容，并保持你的管理体验不变。</p>
                 <form id="needForm">
                     <div class="form-group">
                         <label for="needTitle">需求标题</label>
@@ -143,12 +660,12 @@
                     </div>
                     <div class="row">
                         <div class="form-group">
-                            <label for="needBudget">预期预算</label>
-                            <input id="needBudget" type="text" placeholder="例如：50元以内">
+                            <label for="needBudget">预算上限（元）</label>
+                            <input id="needBudget" type="number" min="0.01" step="0.01" placeholder="例如：50">
                         </div>
                         <div class="form-group">
                             <label for="needCategory">需求分类</label>
-                            <input id="needCategory" type="text" placeholder="例如：教材书籍">
+                            <select id="needCategory"></select>
                         </div>
                     </div>
                     <div class="row">
@@ -158,168 +675,504 @@
                         </div>
                         <div class="form-group">
                             <label for="needContact">联系方式</label>
-                            <input id="needContact" type="text" placeholder="例如：QQ:xxx">
+                            <input id="needContact" type="text" placeholder="例如：QQ:123456">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="needDesc">需求说明</label>
-                        <textarea id="needDesc" placeholder="对成色、版本、交付时间等要求"></textarea>
+                        <textarea id="needDesc" placeholder="例如：版本要求、成色要求、希望交易时间"></textarea>
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-need">发布需求商单</button>
+                        <button class="panel-btn need" type="submit">发布求购需求</button>
+                        <button class="panel-btn secondary" type="reset">清空表单</button>
                     </div>
                 </form>
+                <div class="panel-note">
+                    求购与出售会统一进入你的真实“我的发布”列表。页面会根据结构化标记区分卡片样式、价格文案和状态操作，不会和旧的本地草稿模式混在一起。
+                </div>
             </article>
         </section>
 
-        <section class="list-wrap">
-            <article class="order-list">
-                <h3>我发布的二手物品商单</h3>
-                <div id="sellList" class="empty">暂无二手商单</div>
+        <section class="list-grid">
+            <article class="list-panel">
+                <div class="list-head">
+                    <div>
+                        <h2>我发布的出售商品</h2>
+                        <div class="list-subtitle" id="sellListSubtitle">正在同步出售记录...</div>
+                    </div>
+                </div>
+                <div id="sellList" class="empty-state">
+                    <strong>暂无出售发布</strong>
+                    <div>发布成功后，这里会显示你的真实商品记录。</div>
+                </div>
             </article>
-            <article class="order-list">
-                <h3>我发布的二手需求商单</h3>
-                <div id="needList" class="empty">暂无需求商单</div>
+
+            <article class="list-panel">
+                <div class="list-head">
+                    <div>
+                        <h2>我发布的求购需求</h2>
+                        <div class="list-subtitle" id="needListSubtitle">正在同步求购记录...</div>
+                    </div>
+                </div>
+                <div id="needList" class="empty-state">
+                    <strong>暂无求购发布</strong>
+                    <div>发布成功后，这里会显示你的真实求购记录。</div>
+                </div>
             </article>
         </section>
     </main>
 
+    <script src="../js/api-config.js"></script>
     <script src="../js/api-utils.js"></script>
+    <script src="../js/admin-auth.js"></script>
     <script>
-        const STORAGE_KEYS = {
-            sell: 'secondhand_sell_orders',
-            need: 'secondhand_need_orders'
+        const CATEGORY_OPTIONS = [
+            { value: 'books', label: '教材书籍' },
+            { value: 'electronics', label: '数码电子' },
+            { value: 'daily', label: '生活用品' },
+            { value: 'transport', label: '交通出行' },
+            { value: 'other', label: '其他闲置' },
+        ];
+
+        const CATEGORY_LABELS = CATEGORY_OPTIONS.reduce((map, item) => {
+            map[item.value] = item.label;
+            return map;
+        }, {});
+
+        const TYPE_META = {
+            sell: { label: '出售', className: 'type-sell', priceLabel: '售价' },
+            need: { label: '求购', className: 'type-need', priceLabel: '预算' },
         };
 
-        function readList(key) {
-            const raw = localStorage.getItem(key);
-            if (!raw) return [];
-            try {
-                const list = JSON.parse(raw);
-                return Array.isArray(list) ? list : [];
-            } catch (error) {
-                return [];
+        const STATUS_META = {
+            available: { label: '进行中', className: 'status-available' },
+            sold: { label: '已成交', className: 'status-sold' },
+            removed: { label: '已下架', className: 'status-removed' },
+        };
+
+        const state = {
+            products: [],
+            statistics: null,
+        };
+
+        const adminDashboardLinkEl = document.getElementById('adminDashboardLink');
+        const identityPanelEl = document.getElementById('identityPanel');
+        const identityTitleEl = document.getElementById('identityTitle');
+        const identityTextEl = document.getElementById('identityText');
+        const identityBadgeEl = document.getElementById('identityBadge');
+        const resultTextEl = document.getElementById('resultText');
+        const sellListSubtitleEl = document.getElementById('sellListSubtitle');
+        const needListSubtitleEl = document.getElementById('needListSubtitle');
+
+        function isViewerAdmin() {
+            return typeof hasAdminPermission === 'function'
+                ? hasAdminPermission()
+                : (typeof isAdminLoggedIn === 'function' && isAdminLoggedIn());
+        }
+
+        function getCurrentUser() {
+            return getStorage('userInfo');
+        }
+
+        function userLoggedIn() {
+            return typeof getAuthToken === 'function' ? !!getAuthToken() : !!getStorage('authToken');
+        }
+
+        function ensureSuccess(response, fallbackMessage) {
+            if (!response || response.success !== true) {
+                throw new Error(response?.message || fallbackMessage);
             }
+            return response.data;
         }
 
-        function writeList(key, list) {
-            localStorage.setItem(key, JSON.stringify(list));
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
-        function renderCounts() {
-            document.getElementById('sellCount').textContent = readList(STORAGE_KEYS.sell).length;
-            document.getElementById('needCount').textContent = readList(STORAGE_KEYS.need).length;
+        function extractRows(data) {
+            if (Array.isArray(data?.records)) {
+                return data.records;
+            }
+            if (Array.isArray(data?.list)) {
+                return data.list;
+            }
+            return Array.isArray(data) ? data : [];
         }
 
-        function renderOneList(targetId, type, data) {
-            const el = document.getElementById(targetId);
-            if (!data.length) {
-                el.className = 'empty';
-                el.textContent = type === 'sell' ? '暂无二手商单' : '暂无需求商单';
+        function fillCategorySelect(selectId) {
+            const select = document.getElementById(selectId);
+            select.innerHTML = CATEGORY_OPTIONS
+                .map((item) => `<option value="${item.value}">${item.label}</option>`)
+                .join('');
+        }
+
+        function initSelects() {
+            fillCategorySelect('sellCategory');
+            fillCategorySelect('needCategory');
+        }
+
+        function lockForms(disabled) {
+            document.querySelectorAll('#sellForm input, #sellForm textarea, #sellForm select, #sellForm button, #needForm input, #needForm textarea, #needForm select, #needForm button')
+                .forEach((element) => {
+                    element.disabled = disabled;
+                });
+        }
+
+        function renderIdentity() {
+            const user = getCurrentUser();
+
+            if (isViewerAdmin()) {
+                identityPanelEl.classList.add('admin');
+                identityTitleEl.textContent = '管理员模式';
+                identityTextEl.textContent = '管理员账号不参与普通二手发布，当前页面已自动锁定发布表单。你可以前往管理员后台处理全量商品，或返回二手大厅查看用户侧展示。';
+                identityBadgeEl.textContent = '管理员账号';
+                identityBadgeEl.className = 'identity-badge admin';
+                adminDashboardLinkEl.style.display = 'inline-flex';
+                lockForms(true);
                 return;
             }
 
-            el.className = '';
-            el.innerHTML = data.map((item) => `
-                <article class="order-item ${type}">
-                    <p class="order-title">${item.title}</p>
-                    <p class="order-meta">${type === 'sell' ? '售价' : '预算'}：${item.price || '-'}</p>
-                    <p class="order-meta">分类：${item.category || '-'}</p>
-                    <p class="order-meta">地点：${item.location || '-'}</p>
-                    <p class="order-meta">联系：${item.contact || '-'}</p>
-                    <p class="order-meta">${item.desc || '-'}</p>
-                    <p class="order-muted">发布于：${item.createdAt}</p>
-                    <div class="order-actions">
-                        <button class="order-btn" data-type="${type}" data-id="${item.id}">删除</button>
-                    </div>
-                </article>
-            `).join('');
+            identityPanelEl.classList.remove('admin');
+            adminDashboardLinkEl.style.display = 'none';
+
+            if (userLoggedIn()) {
+                identityTitleEl.textContent = `普通用户：${escapeHtml(user?.username || '同学')}`;
+                identityTextEl.textContent = '你现在可以直接发布出售或求购信息，并在下方对自己的二手记录执行成交、下架、重新上架或删除操作。';
+                identityBadgeEl.textContent = '已登录';
+                identityBadgeEl.className = 'identity-badge user';
+                lockForms(false);
+            } else {
+                identityTitleEl.textContent = '访客模式';
+                identityTextEl.textContent = '未登录时不能发布和管理自己的二手信息。如果要继续，请先回到首页登录。';
+                identityBadgeEl.textContent = '未登录';
+                identityBadgeEl.className = 'identity-badge guest';
+                lockForms(true);
+            }
+        }
+
+        function parseTradeType(product) {
+            const description = String(product?.description || '');
+            const matched = description.match(/【交易类型】(出售|求购)/);
+            if (matched) {
+                return matched[1] === '求购' ? 'need' : 'sell';
+            }
+            return 'sell';
+        }
+
+        function parseLocation(product) {
+            const description = String(product?.description || '');
+            const matched = description.match(/【交易地点】([^\n\r]+)/);
+            return matched ? matched[1].trim() : '-';
+        }
+
+        function parseDescriptionText(product) {
+            const description = String(product?.description || '');
+            const cleaned = description
+                .replace(/【交易类型】(出售|求购)\s*/g, '')
+                .replace(/【交易地点】([^\n\r]+)\s*/g, '')
+                .replace(/【详细说明】\s*/g, '')
+                .trim();
+            return cleaned || '暂无补充说明';
+        }
+
+        function buildDescription(type, location, detail) {
+            const typeLabel = type === 'need' ? '求购' : '出售';
+            const rows = [
+                `【交易类型】${typeLabel}`,
+                location ? `【交易地点】${location}` : '',
+                detail ? `【详细说明】${detail}` : '',
+            ];
+            return rows.filter(Boolean).join('\n');
+        }
+
+        function formatCategory(category) {
+            return CATEGORY_LABELS[category] || category || '未分类';
+        }
+
+        function formatDateTime(value) {
+            if (!value) {
+                return '-';
+            }
+            const date = new Date(String(value).replace(' ', 'T'));
+            if (Number.isNaN(date.getTime())) {
+                return value;
+            }
+            return date.toLocaleString('zh-CN', { hour12: false });
+        }
+
+        function normalizePrice(value) {
+            const num = Number(value);
+            return Number.isFinite(num) ? num.toFixed(2) : '0.00';
+        }
+
+        function parsePriceInput(rawValue) {
+            const value = Number(rawValue);
+            if (!Number.isFinite(value) || value <= 0) {
+                return null;
+            }
+            return value.toFixed(2);
+        }
+
+        function getStatusMeta(status) {
+            return STATUS_META[status] || STATUS_META.available;
+        }
+
+        function renderStatistics() {
+            const stats = state.statistics || {};
+            const removedCount = state.products.filter((product) => product.status === 'removed').length;
+            document.getElementById('totalCount').textContent = Number(stats.totalCount || state.products.length || 0);
+            document.getElementById('availableCount').textContent = Number(stats.availableCount || 0);
+            document.getElementById('soldCount').textContent = Number(stats.soldCount || 0);
+            document.getElementById('removedCount').textContent = removedCount;
+        }
+
+        function buildActionButtons(product) {
+            const actions = [];
+            const productUrl = `${API_ENDPOINTS.secondhand.productBase}/${product.id}`;
+
+            if (product.status === 'available') {
+                actions.push(`<button class="item-btn success" type="button" data-method="patch" data-url="${productUrl}/status" data-status="sold">标记已成交</button>`);
+                actions.push(`<button class="item-btn warning" type="button" data-method="patch" data-url="${productUrl}/status" data-status="removed">下架商品</button>`);
+            }
+
+            if (product.status === 'sold' || product.status === 'removed') {
+                actions.push(`<button class="item-btn info" type="button" data-method="patch" data-url="${productUrl}/status" data-status="available">重新上架</button>`);
+            }
+
+            actions.push(`<button class="item-btn danger" type="button" data-method="delete" data-url="${productUrl}" data-id="${product.id}">删除记录</button>`);
+            return actions.join('');
+        }
+
+        function renderOneList(targetId, subtitleEl, rows, type) {
+            subtitleEl.textContent = `当前共 ${rows.length} 条${type === 'sell' ? '出售' : '求购'}记录`;
+            const container = document.getElementById(targetId);
+
+            if (!rows.length) {
+                container.className = 'empty-state';
+                container.innerHTML = `
+                    <strong>${type === 'sell' ? '暂无出售发布' : '暂无求购发布'}</strong>
+                    <div>${type === 'sell' ? '发布出售商品后，这里会出现你的个人货架。' : '发布求购需求后，这里会出现你的真实求购记录。'}</div>
+                `;
+                return;
+            }
+
+            container.className = 'item-list';
+            container.innerHTML = rows.map((product) => {
+                const tradeType = parseTradeType(product);
+                const typeMeta = TYPE_META[tradeType];
+                const statusMeta = getStatusMeta(product.status);
+                return `
+                    <article class="item-card ${tradeType}">
+                        <div class="item-top">
+                            <div>
+                                <h3 class="item-title">${escapeHtml(product.title || '未命名商品')}</h3>
+                                <div class="item-tags">
+                                    <span class="type-badge ${typeMeta.className}">${typeMeta.label}</span>
+                                    <span class="status-badge ${statusMeta.className}">${statusMeta.label}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="item-grid">
+                            <div class="meta-box">
+                                <div class="meta-label">${typeMeta.priceLabel}</div>
+                                <div class="meta-value">￥ ${escapeHtml(normalizePrice(product.price))}</div>
+                            </div>
+                            <div class="meta-box">
+                                <div class="meta-label">分类</div>
+                                <div class="meta-value">${escapeHtml(formatCategory(product.category))}</div>
+                            </div>
+                            <div class="meta-box">
+                                <div class="meta-label">交易地点</div>
+                                <div class="meta-value">${escapeHtml(parseLocation(product))}</div>
+                            </div>
+                            <div class="meta-box">
+                                <div class="meta-label">联系方式</div>
+                                <div class="meta-value">${escapeHtml(product.contact || '未填写')}</div>
+                            </div>
+                        </div>
+
+                        <p class="item-desc">${escapeHtml(parseDescriptionText(product))}</p>
+
+                        <div class="item-footer">
+                            <div class="item-time">发布时间：${escapeHtml(formatDateTime(product.createdAt))}</div>
+                            <div class="item-actions">${buildActionButtons(product)}</div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
         }
 
         function renderLists() {
-            const sell = readList(STORAGE_KEYS.sell);
-            const need = readList(STORAGE_KEYS.need);
-            renderOneList('sellList', 'sell', sell);
-            renderOneList('needList', 'need', need);
-            renderCounts();
+            const sellRows = state.products.filter((product) => parseTradeType(product) === 'sell');
+            const needRows = state.products.filter((product) => parseTradeType(product) === 'need');
+
+            renderOneList('sellList', sellListSubtitleEl, sellRows, 'sell');
+            renderOneList('needList', needListSubtitleEl, needRows, 'need');
+            renderStatistics();
         }
 
-        function createOrder(formValues) {
-            return {
-                id: Date.now() + Math.floor(Math.random() * 1000),
-                ...formValues,
-                createdAt: new Date().toLocaleString('zh-CN', { hour12: false })
-            };
-        }
-
-        function submitSell(event) {
-            event.preventDefault();
-            const title = document.getElementById('sellTitle').value.trim();
-            const price = document.getElementById('sellPrice').value.trim();
-            const category = document.getElementById('sellCategory').value.trim();
-            const location = document.getElementById('sellLocation').value.trim();
-            const contact = document.getElementById('sellContact').value.trim();
-            const desc = document.getElementById('sellDesc').value.trim();
-
-            if (!title || !price) {
-                showMessage('请至少填写商单标题和售价', 'warning');
+        async function loadMyData(withLoading = true) {
+            if (!userLoggedIn() || isViewerAdmin()) {
+                state.statistics = null;
+                state.products = [];
+                resultTextEl.textContent = isViewerAdmin()
+                    ? '管理员模式下已锁定普通发布与个人货架。'
+                    : '登录后可查看并管理自己的二手发布。';
+                renderLists();
                 return;
             }
 
-            const list = readList(STORAGE_KEYS.sell);
-            list.unshift(createOrder({ title, price, category, location, contact, desc }));
-            writeList(STORAGE_KEYS.sell, list);
-            event.target.reset();
-            renderLists();
-            showMessage('二手物品商单发布成功', 'success');
+            try {
+                if (withLoading) {
+                    showLoading('正在同步我的二手发布...');
+                }
+
+                const [statisticsResponse, productsResponse] = await Promise.all([
+                    get(API_ENDPOINTS.secondhand.statistics),
+                    get(API_ENDPOINTS.secondhand.myProducts, { page: 1, pageSize: 50 }),
+                ]);
+
+                state.statistics = ensureSuccess(statisticsResponse, '加载统计失败');
+                state.products = extractRows(ensureSuccess(productsResponse, '加载我的发布失败'));
+                resultTextEl.textContent = `已同步 ${state.products.length} 条真实发布记录，你可以直接管理状态和删除历史数据。`;
+                renderLists();
+            } catch (error) {
+                state.statistics = null;
+                state.products = [];
+                renderLists();
+                resultTextEl.textContent = '我的二手数据加载失败，请稍后重试。';
+                handleError(error, '加载我的发布失败');
+            } finally {
+                hideLoading();
+            }
         }
 
-        function submitNeed(event) {
-            event.preventDefault();
-            const title = document.getElementById('needTitle').value.trim();
-            const price = document.getElementById('needBudget').value.trim();
-            const category = document.getElementById('needCategory').value.trim();
-            const location = document.getElementById('needLocation').value.trim();
-            const contact = document.getElementById('needContact').value.trim();
-            const desc = document.getElementById('needDesc').value.trim();
+        function ensurePublishable() {
+            if (isViewerAdmin()) {
+                showMessage('管理员账号不能发布普通二手信息，请前往后台处理全量商品', 'warning');
+                return false;
+            }
+            if (!userLoggedIn()) {
+                showMessage('请先登录后再发布二手信息', 'warning');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 900);
+                return false;
+            }
+            return true;
+        }
 
-            if (!title || !price) {
-                showMessage('请至少填写需求标题和预算', 'warning');
+        async function publishProduct(type, event) {
+            event.preventDefault();
+            if (!ensurePublishable()) {
                 return;
             }
 
-            const list = readList(STORAGE_KEYS.need);
-            list.unshift(createOrder({ title, price, category, location, contact, desc }));
-            writeList(STORAGE_KEYS.need, list);
-            event.target.reset();
-            renderLists();
-            showMessage('二手需求商单发布成功', 'success');
+            const isSell = type === 'sell';
+            const title = document.getElementById(isSell ? 'sellTitle' : 'needTitle').value.trim();
+            const priceInput = document.getElementById(isSell ? 'sellPrice' : 'needBudget').value.trim();
+            const category = document.getElementById(isSell ? 'sellCategory' : 'needCategory').value;
+            const location = document.getElementById(isSell ? 'sellLocation' : 'needLocation').value.trim();
+            const contact = document.getElementById(isSell ? 'sellContact' : 'needContact').value.trim();
+            const detail = document.getElementById(isSell ? 'sellDesc' : 'needDesc').value.trim();
+            const images = isSell ? document.getElementById('sellImage').value.trim() : '';
+            const price = parsePriceInput(priceInput);
+
+            if (!title || !price || !category || !contact) {
+                showMessage('请填写完整的标题、价格、分类和联系方式，价格需为纯数字', 'warning');
+                return;
+            }
+
+            try {
+                showLoading(isSell ? '正在发布出售商品...' : '正在发布求购需求...');
+                ensureSuccess(await post(API_ENDPOINTS.secondhand.publish, {
+                    title,
+                    price,
+                    category,
+                    contact,
+                    images,
+                    description: buildDescription(type, location, detail),
+                }), '发布失败');
+                hideLoading();
+                event.target.reset();
+                showMessage(isSell ? '出售商品发布成功' : '求购需求发布成功', 'success');
+                await loadMyData(false);
+            } catch (error) {
+                hideLoading();
+                handleError(error, '发布失败');
+            }
         }
 
-        function deleteOrder(type, id) {
-            const key = type === 'sell' ? STORAGE_KEYS.sell : STORAGE_KEYS.need;
-            const next = readList(key).filter((item) => Number(item.id) !== Number(id));
-            writeList(key, next);
-            renderLists();
-            showMessage('已删除该条发布', 'info');
+        async function updateProductStatus(url, status) {
+            try {
+                showLoading('正在更新商品状态...');
+                ensureSuccess(await request(url, {
+                    method: 'PATCH',
+                    body: { status },
+                }), '状态更新失败');
+                hideLoading();
+                showMessage('商品状态已更新', 'success');
+                await loadMyData(false);
+            } catch (error) {
+                hideLoading();
+                handleError(error, '状态更新失败');
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        async function deleteProduct(url) {
+            try {
+                showLoading('正在删除商品记录...');
+                ensureSuccess(await request(url, {
+                    method: 'DELETE',
+                }), '删除失败');
+                hideLoading();
+                showMessage('商品记录已删除', 'success');
+                await loadMyData(false);
+            } catch (error) {
+                hideLoading();
+                handleError(error, '删除失败');
+            }
+        }
+
+        function bindEvents() {
+            document.getElementById('refreshBtn').addEventListener('click', () => loadMyData());
+            document.getElementById('sellForm').addEventListener('submit', (event) => publishProduct('sell', event));
+            document.getElementById('needForm').addEventListener('submit', (event) => publishProduct('need', event));
+
+            ['sellList', 'needList'].forEach((id) => {
+                document.getElementById(id).addEventListener('click', (event) => {
+                    const target = event.target.closest('[data-method]');
+                    if (!target) {
+                        return;
+                    }
+
+                    if (target.dataset.method === 'patch') {
+                        updateProductStatus(target.dataset.url, target.dataset.status);
+                        return;
+                    }
+
+                    if (target.dataset.method === 'delete') {
+                        const confirmed = window.confirm('删除后不可恢复，确定继续吗？');
+                        if (confirmed) {
+                            deleteProduct(target.dataset.url);
+                        }
+                    }
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSelects();
+            renderIdentity();
             renderLists();
-            document.getElementById('sellForm').addEventListener('submit', submitSell);
-            document.getElementById('needForm').addEventListener('submit', submitNeed);
-            document.getElementById('sellList').addEventListener('click', (event) => {
-                const target = event.target;
-                if (target.tagName === 'BUTTON' && target.dataset.id) {
-                    deleteOrder(target.dataset.type, target.dataset.id);
-                }
-            });
-            document.getElementById('needList').addEventListener('click', (event) => {
-                const target = event.target;
-                if (target.tagName === 'BUTTON' && target.dataset.id) {
-                    deleteOrder(target.dataset.type, target.dataset.id);
-                }
-            });
+            bindEvents();
+            await loadMyData();
         });
     </script>
 </body>
