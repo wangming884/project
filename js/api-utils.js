@@ -34,6 +34,22 @@ function shouldSerializeJsonBody(body) {
     return isPlainObject(body) || Array.isArray(body);
 }
 
+function isStandardApiEnvelope(body) {
+    return isPlainObject(body)
+        && typeof body.success === 'boolean'
+        && ('message' in body || 'code' in body || 'data' in body);
+}
+
+function createApiError(message, { status = 0, code, response } = {}) {
+    const error = new Error(message || '请求失败');
+    error.status = Number.isFinite(Number(status)) ? Number(status) : 0;
+    if (code !== undefined && code !== null && code !== '') {
+        error.code = Number.isFinite(Number(code)) ? Number(code) : code;
+    }
+    error.response = response;
+    return error;
+}
+
 async function parseResponseBody(response) {
     if (response.status === 204) {
         return null;
@@ -87,10 +103,24 @@ async function request(url, options = {}) {
             const message = responseBody && responseBody.message
                 ? responseBody.message
                 : `HTTP Error: ${response.status}`;
-            const error = new Error(message);
-            error.status = response.status;
-            error.response = responseBody;
-            throw error;
+            throw createApiError(message, {
+                status: response.status,
+                code: responseBody && responseBody.code,
+                response: responseBody,
+            });
+        }
+
+        // 处理后端标准业务失败响应（例如 200 + success:false）
+        if (isStandardApiEnvelope(responseBody) && responseBody.success === false) {
+            const businessCode = Number(responseBody.code);
+            const derivedStatus = Number.isFinite(businessCode) && businessCode > 0
+                ? businessCode
+                : (response.status >= 400 ? response.status : 400);
+            throw createApiError(responseBody.message || '业务处理失败', {
+                status: derivedStatus,
+                code: responseBody.code,
+                response: responseBody,
+            });
         }
 
         // 解析响应数据

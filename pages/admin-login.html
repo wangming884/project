@@ -105,7 +105,11 @@
                 }, 600);
             } catch (error) {
                 hideLoading();
-                if (username === LOCAL_ADMIN.username && password === LOCAL_ADMIN.password) {
+                if (
+                    isOfflineFallbackError(error)
+                    && username === LOCAL_ADMIN.username
+                    && password === LOCAL_ADMIN.password
+                ) {
                     clearAuthSession();
                     setStorage('userInfo', {
                         userId: 0,
