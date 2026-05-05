@@ -3,7 +3,41 @@
  * 提供统一的HTTP请求封装、错误处理、加载状态管理等功能
  */
 
+const AUTH_STORAGE_KEYS = {
+    token: 'authToken',
+    user: 'userInfo',
+};
+
 // ==================== HTTP 请求封装 ====================
+
+function isPlainObject(value) {
+    return Object.prototype.toString.call(value) === '[object Object]';
+}
+
+function createRequestHeaders(headers = {}) {
+    if (headers instanceof Headers) {
+        return headers;
+    }
+    return new Headers(headers);
+}
+
+function shouldSerializeJsonBody(body) {
+    return isPlainObject(body) || Array.isArray(body);
+}
+
+async function parseResponseBody(response) {
+    if (response.status === 204) {
+        return null;
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+        return response.json();
+    }
+
+    const text = await response.text();
+    return text ? { message: text } : null;
+}
 
 /**
  * 统一的 HTTP 请求函数
@@ -14,38 +48,44 @@
 async function request(url, options = {}) {
     const defaultOptions = {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
         credentials: 'include', // 携带 cookie
     };
 
     // 合并配置
     const config = { ...defaultOptions, ...options };
-    
-    // 如果有 body 且是对象，转换为 JSON
-    if (config.body && typeof config.body === 'object') {
+
+    config.headers = createRequestHeaders(options.headers);
+
+    // 如果有 body 且是普通对象，转换为 JSON；FormData 则保持原样
+    if (config.body && shouldSerializeJsonBody(config.body)) {
+        if (!config.headers.has('Content-Type')) {
+            config.headers.set('Content-Type', 'application/json');
+        }
         config.body = JSON.stringify(config.body);
     }
 
-    // 从 localStorage 获取 token（如果存在）
-    const token = localStorage.getItem('authToken');
+    const token = getAuthToken();
     if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`;
+        config.headers.set('Authorization', `Bearer ${token}`);
     }
 
     try {
         const response = await fetch(url, config);
-        
+        const responseBody = await parseResponseBody(response);
+
         // 处理 HTTP 错误状态
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || `HTTP Error: ${response.status}`);
+            const message = responseBody && responseBody.message
+                ? responseBody.message
+                : `HTTP Error: ${response.status}`;
+            const error = new Error(message);
+            error.status = response.status;
+            error.response = responseBody;
+            throw error;
         }
 
         // 解析响应数据
-        const data = await response.json();
-        return data;
+        return responseBody;
     } catch (error) {
         console.error('API Request Error:', error);
         throw error;
@@ -246,8 +286,7 @@ function handleError(error, defaultMessage = '操作失败，请稍后重试') {
     if (message.includes('401') || message.includes('Unauthorized')) {
         message = '登录已过期，请重新登录';
         // 清除登录信息
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userInfo');
+        clearAuthSession();
         // 跳转到登录页
         setTimeout(() => {
             window.location.href = 'index.html';
@@ -394,15 +433,58 @@ function getRelativeTime(date) {
     return formatDate(date, 'YYYY-MM-DD');
 }
 
+// ==================== 登录态工具 ====================
+
+function getAuthToken() {
+    return getStorage(AUTH_STORAGE_KEYS.token, '');
+}
+
+function getUserInfo() {
+    return getStorage(AUTH_STORAGE_KEYS.user);
+}
+
+function setAuthSession(token, user) {
+    if (token) {
+        setStorage(AUTH_STORAGE_KEYS.token, token);
+    }
+    if (user) {
+        setStorage(AUTH_STORAGE_KEYS.user, user);
+    }
+}
+
+function clearAuthSession() {
+    removeStorage(AUTH_STORAGE_KEYS.token);
+    removeStorage(AUTH_STORAGE_KEYS.user);
+}
+
+function isLoggedIn() {
+    return !!getAuthToken();
+}
+
+function isOfflineFallbackError(error) {
+    if (error && Number.isFinite(Number(error.status)) && Number(error.status) > 0) {
+        return false;
+    }
+
+    const message = String(error && error.message ? error.message : '');
+    return !message
+        || message.includes('Network')
+        || message.includes('Failed to fetch')
+        || message.includes('Load failed');
+}
+
 // ==================== 导出所有工具函数 ====================
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
+        AUTH_STORAGE_KEYS,
         request, get, post, put, del,
         showLoading, hideLoading,
         showMessage, handleError,
         setStorage, getStorage, removeStorage, clearStorage,
         validateEmail, validatePhone, validatePassword,
         formatDate, getRelativeTime,
+        getAuthToken, getUserInfo, setAuthSession, clearAuthSession, isLoggedIn,
+        isOfflineFallbackError,
     };
 }

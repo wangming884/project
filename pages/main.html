@@ -300,12 +300,9 @@
     <!-- 引入 API 配置和工具函数 -->
     <script src="../js/api-config.js"></script>
     <script src="../js/api-utils.js"></script>
+    <script src="../js/campus-state.js"></script>
     
     <script>
-        const STORAGE_KEYS = {
-            points: 'userPoints',
-            signInDate: 'lastSignInDate',
-        };
         const SERVICE_START_DATE = new Date(2026, 4, 3, 0, 0, 0);
         const userPointsEl = document.getElementById('userPoints');
         const signInBtn = document.getElementById('signInBtn');
@@ -325,27 +322,9 @@
             runTimeEl.textContent = `${days}天 ${hours}时 ${minutes}分 ${seconds}秒`;
         }
 
-        function formatDateKey(date = new Date()) {
-            const year = date.getFullYear();
-            const month = `${date.getMonth() + 1}`.padStart(2, '0');
-            const day = `${date.getDate()}`.padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        function isTodaySigned(dateValue) {
-            if (!dateValue) {
-                return false;
-            }
-            const parsedDate = new Date(dateValue);
-            if (Number.isNaN(parsedDate.getTime())) {
-                return dateValue === formatDateKey();
-            }
-            return formatDateKey(parsedDate) === formatDateKey();
-        }
-
         function updateSignInView() {
             userPointsEl.textContent = `💰 积分: ${userPoints}`;
-            const signed = isTodaySigned(lastSignInDate);
+            const signed = hasSignedInToday(lastSignInDate);
             signInBtn.textContent = signed ? '今日已签到' : '签到领积分';
             signInBtn.disabled = signed;
         }
@@ -362,23 +341,32 @@
             try {
                 // 从后端获取积分余额
                 const response = await get(API_ENDPOINTS.points.getBalance);
-                if (response.success) {
-                    userPoints = response.data.balance || 0;
-                    lastSignInDate = response.data.lastSignInDate;
+                if (response.success && response.data) {
+                    userPoints = setCampusPoints(response.data.balance || 0);
+                    lastSignInDate = response.data.lastSignInDate
+                        ? setDailySignInDate(response.data.lastSignInDate)
+                        : clearDailySignInDate();
                     updateSignInView();
+                    return;
                 }
             } catch (error) {
+                if (!isOfflineFallbackError(error)) {
+                    handleError(error, '加载积分失败');
+                    return;
+                }
+
                 // 如果后端未连接，使用本地存储作为降级方案
                 console.warn('后端未连接，使用本地存储');
-                userPoints = parseInt(localStorage.getItem(STORAGE_KEYS.points), 10) || 0;
-                lastSignInDate = localStorage.getItem(STORAGE_KEYS.signInDate);
-                updateSignInView();
             }
+
+            userPoints = getCampusPoints();
+            lastSignInDate = getDailySignInDate();
+            updateSignInView();
         }
 
         // 签到按钮点击事件
         async function handleSignIn() {
-            if (isTodaySigned(lastSignInDate)) {
+            if (hasSignedInToday(lastSignInDate)) {
                 showMessage('今天已经签到过啦，明天再来领取积分。', 'info');
                 updateSignInView();
                 return;
@@ -393,26 +381,26 @@
                 hideLoading();
                 
                 if (response.success) {
-                    userPoints = response.data.balance;
+                    userPoints = setCampusPoints(response.data.balance);
                     const earnedPoints = response.data.earnedPoints || 1;
-                    lastSignInDate = formatDateKey();
-                    
-                    localStorage.setItem(STORAGE_KEYS.points, userPoints);
-                    localStorage.setItem(STORAGE_KEYS.signInDate, lastSignInDate);
+                    lastSignInDate = setDailySignInDate(getDateKey());
                     updateSignInView();
                     showMessage(`签到成功！获得 ${earnedPoints} 积分 🎉`, 'success');
                 } else {
                     showMessage(response.message || '签到失败', 'error');
                 }
             } catch (error) {
+                if (!isOfflineFallbackError(error)) {
+                    handleError(error, '签到失败');
+                    return;
+                }
+
                 // 降级到本地处理
                 hideLoading();
                 console.warn('后端未连接，使用本地签到');
                 
-                userPoints += 1;
-                lastSignInDate = formatDateKey();
-                localStorage.setItem(STORAGE_KEYS.points, userPoints);
-                localStorage.setItem(STORAGE_KEYS.signInDate, lastSignInDate);
+                userPoints = setCampusPoints(userPoints + 1);
+                lastSignInDate = setDailySignInDate(getDateKey());
                 updateSignInView();
                 showMessage('签到成功！获得 1 积分 🎉', 'success');
             }

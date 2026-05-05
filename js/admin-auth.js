@@ -55,7 +55,6 @@ function requireAdminAuth() {
 
 function adminLogout() {
     removeStorage(ADMIN_SESSION_KEY);
-    removeStorage('authToken');
-    removeStorage('userInfo');
+    clearAuthSession();
     window.location.href = 'admin-login.html';
 }

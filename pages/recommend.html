@@ -98,11 +98,12 @@
 
     <script src="../js/api-config.js"></script>
     <script src="../js/api-utils.js"></script>
+    <script src="../js/campus-state.js"></script>
     <script>
         const recommendGrid = document.getElementById('recommendGrid');
         const announcementEl = document.getElementById('recommendAnnouncement');
         const POINTS_PURCHASE_URL = 'https://example.com/points-purchase';
-        let shopPoints = parseInt(localStorage.getItem('shopPoints')) || 0;
+        let shopPoints = getCampusPoints();
 
         function escapeHtml(value) {
             return String(value ?? '')
@@ -114,6 +115,7 @@
         }
 
         function initShopPoints() {
+            shopPoints = getCampusPoints();
             document.getElementById('currentShopPoints').innerText = shopPoints;
         }
 
@@ -132,7 +134,7 @@
         }
 
         async function syncPointsBalance() {
-            const token = getStorage('authToken');
+            const token = getAuthToken();
             if (!token) {
                 initShopPoints();
                 return;
@@ -140,8 +142,7 @@
             try {
                 const response = await get(API_ENDPOINTS.points.getBalance);
                 if (response.success && response.data) {
-                    shopPoints = Number(response.data.balance ?? shopPoints);
-                    localStorage.setItem('shopPoints', shopPoints);
+                    shopPoints = setCampusPoints(response.data.balance ?? shopPoints);
                 }
             } catch (error) {
                 // ignore
@@ -151,7 +152,7 @@
 
         function handleShopRedeem() {
             const code = document.getElementById('shopRedeemCode').value.trim();
-            const token = getStorage('authToken');
+            const token = getAuthToken();
             if (!token) {
                 showMessage('请先登录后再兑换积分', 'warning');
                 return;
@@ -168,8 +169,7 @@
                 }
                 const balance = Number(response.data?.balance ?? shopPoints);
                 const added = Number(response.data?.points ?? 0);
-                shopPoints = balance;
-                localStorage.setItem('shopPoints', shopPoints);
+                shopPoints = setCampusPoints(balance);
                 initShopPoints();
                 showMessage(`兑换成功，获得 ${added} 积分`, 'success');
                 closeShopRedeemModal();

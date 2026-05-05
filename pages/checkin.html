@@ -106,6 +106,7 @@
     <!-- 引入 API 配置和工具函数 -->
     <script src="../js/api-config.js"></script>
     <script src="../js/api-utils.js"></script>
+    <script src="../js/campus-state.js"></script>
     
     <script>
         const REDEEM_CODE_SHOP_URL = 'https://example.com/redeem-codes';
@@ -123,13 +124,37 @@
         updateTime();
 
         // 积分及签到状态初始化
-        let userPoints = parseInt(localStorage.getItem('userPoints')) || 0;
-        let lastNightCheckIn = localStorage.getItem('lastNightCheckIn');
-        let today = new Date().toDateString();
+        let userPoints = getCampusPoints();
+        let lastNightCheckIn = getNightCheckInDate();
+
+        async function syncCheckinState() {
+            try {
+                const [balanceResponse, statusResponse] = await Promise.all([
+                    get(API_ENDPOINTS.points.getBalance),
+                    get(API_ENDPOINTS.checkIn.getStatus),
+                ]);
+
+                if (balanceResponse.success && balanceResponse.data) {
+                    userPoints = setCampusPoints(balanceResponse.data.balance ?? userPoints);
+                }
+
+                if (statusResponse.success && statusResponse.data) {
+                    lastNightCheckIn = statusResponse.data.hasCheckedInToday
+                        ? setNightCheckInDate(statusResponse.data.lastCheckInTime || getDateKey())
+                        : clearNightCheckInDate();
+                }
+            } catch (error) {
+                console.warn('同步晚寝签到状态失败，使用本地缓存:', error);
+            }
+
+            initStatus();
+        }
         
         function initStatus() {
+            userPoints = getCampusPoints();
+            lastNightCheckIn = getNightCheckInDate();
             document.getElementById('currentPoints').innerText = userPoints;
-            if (lastNightCheckIn === today) {
+            if (hasNightCheckedInToday(lastNightCheckIn)) {
                 const btn = document.getElementById('checkinBtn');
                 btn.innerText = "今晚已完成签到，早点休息吧！";
                 btn.disabled = true;
@@ -138,7 +163,15 @@
                 document.getElementById('account').disabled = true;
                 document.getElementById('password').disabled = true;
                 document.getElementById('dorm').disabled = true;
+                return;
             }
+
+            const btn = document.getElementById('checkinBtn');
+            btn.innerText = '立即签到 (扣除 10 积分)';
+            btn.disabled = false;
+            document.getElementById('account').disabled = false;
+            document.getElementById('password').disabled = false;
+            document.getElementById('dorm').disabled = false;
         }
 
         // 执行签到操作
@@ -191,10 +224,8 @@
                 
                 if (response.success) {
                     // 更新积分
-                    userPoints = response.data.remainingPoints || (userPoints - 10);
-                    localStorage.setItem('userPoints', userPoints);
-                    localStorage.setItem('lastNightCheckIn', today);
-                    lastNightCheckIn = today;
+                    userPoints = setCampusPoints(response.data.remainingPoints || (userPoints - 10));
+                    lastNightCheckIn = setNightCheckInDate(getDateKey());
                     
                     initStatus();
                     showMessage(`✅ 晚寝签到成功！\n打卡账号：${account}\n所在楼栋：${dorm}\n已扣除 10 积分，祝您晚安🌙`, 'success');
@@ -202,21 +233,22 @@
                     showMessage(response.message || '签到失败', 'error');
                 }
             } catch (error) {
+                if (!isOfflineFallbackError(error)) {
+                    handleError(error, '签到失败');
+                    return;
+                }
+
                 // 降级到本地处理
                 hideLoading();
                 console.warn('后端未连接，使用本地签到');
                 
-                userPoints -= 10;
-                localStorage.setItem('userPoints', userPoints);
-                localStorage.setItem('lastNightCheckIn', today);
-                lastNightCheckIn = today;
+                userPoints = setCampusPoints(userPoints - 10);
+                lastNightCheckIn = setNightCheckInDate(getDateKey());
                 
                 initStatus();
                 showMessage(`✅ 晚寝签到成功！\n打卡账号：${account}\n所在楼栋：${dorm}\n已扣除 10 积分，祝您晚安🌙`, 'success');
             }
         }
-        
-        document.addEventListener('DOMContentLoaded', initStatus);
 
         // ================= 弹窗及兑换逻辑 =================
         function openRedeemModal() {
@@ -230,6 +262,10 @@
 
         function handleRedeem() {
             const code = document.getElementById('redeemCode').value.trim();
+            if (!getAuthToken()) {
+                showMessage('请先登录后再兑换积分', 'warning');
+                return;
+            }
             if (!code) {
                 showMessage('请输入兑换码', 'warning');
                 return;
@@ -240,8 +276,7 @@
                 .then(response => {
                     if (response.success) {
                         const addedPoints = response.data.points || 50;
-                        userPoints += addedPoints;
-                        localStorage.setItem('userPoints', userPoints);
+                        userPoints = setCampusPoints(userPoints + addedPoints);
                         initStatus();
                         showMessage(`🎉 兑换成功！您已获得 ${addedPoints} 积分。`, 'success');
                         closeRedeemModal();
@@ -250,11 +285,15 @@
                     }
                 })
                 .catch(error => {
+                    if (!isOfflineFallbackError(error)) {
+                        handleError(error, '兑换失败');
+                        return;
+                    }
+
                     // 降级到本地处理
                     console.warn('后端未连接，使用本地兑换');
                     const addedPoints = 50;
-                    userPoints += addedPoints;
-                    localStorage.setItem('userPoints', userPoints);
+                    userPoints = setCampusPoints(userPoints + addedPoints);
                     initStatus();
                     showMessage(`🎉 兑换成功！您已获得 ${addedPoints} 积分。`, 'success');
                     closeRedeemModal();
@@ -267,7 +306,9 @@
             if (event.target === modal) {
                 closeRedeemModal();
             }
-        }
+        };
+
+        document.addEventListener('DOMContentLoaded', syncCheckinState);
     </script>
 </body>
 </html>

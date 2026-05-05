@@ -88,8 +88,11 @@ mvn spring-boot:run
 
 前端默认行为：
 
-1. `localhost` 下请求 `http://localhost:3000/api`（可按需调整 `js/api-config.js`）
-2. 非 `localhost` 下请求同域 `/api`
+1. `localhost` / `127.0.0.1` 下默认请求 `http://localhost:8080/api`
+2. 非本地环境默认请求同域 `/api`
+3. 如需切换到 Node 示例后端（`3000` 端口）或其他地址，可通过以下任一方式覆盖：
+   `?apiBaseUrl=http://localhost:3000/api`
+   或在浏览器控制台执行 `localStorage.setItem('apiBaseUrl', 'http://localhost:3000/api')`
 
 ## 5. 管理员账号说明
 

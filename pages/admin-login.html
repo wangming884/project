@@ -92,8 +92,7 @@
                     return;
                 }
 
-                setStorage('authToken', response.data.token);
-                setStorage('userInfo', response.data.user);
+                setAuthSession(response.data.token, response.data.user);
                 saveAdminSession({
                     username: response.data.user.username || username,
                     role: 'admin',
@@ -107,7 +106,7 @@
             } catch (error) {
                 hideLoading();
                 if (username === LOCAL_ADMIN.username && password === LOCAL_ADMIN.password) {
-                    removeStorage('authToken');
+                    clearAuthSession();
                     setStorage('userInfo', {
                         userId: 0,
                         username,

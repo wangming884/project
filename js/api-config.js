@@ -3,10 +3,63 @@
  * 统一管理所有后端接口地址
  */
 
+const API_CONFIG_STORAGE_KEY = 'apiBaseUrl';
+
+function normalizeApiBaseUrl(url) {
+    if (!url) {
+        return '/api';
+    }
+    return String(url).replace(/\/+$/, '');
+}
+
+function readApiBaseUrlOverride() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const queryValue = params.get('apiBaseUrl');
+        if (queryValue) {
+            localStorage.setItem(API_CONFIG_STORAGE_KEY, queryValue);
+            return queryValue;
+        }
+
+        if (window.__API_BASE_URL__) {
+            return window.__API_BASE_URL__;
+        }
+
+        const storedValue = localStorage.getItem(API_CONFIG_STORAGE_KEY);
+        if (storedValue) {
+            return storedValue;
+        }
+    } catch (error) {
+        console.warn('读取 API 地址覆盖配置失败:', error);
+    }
+    return '';
+}
+
+function buildDefaultApiBaseUrl() {
+    const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+    if (isLocalhost) {
+        // 当前主架构为静态前端 + Java 后端，开发环境默认对接 8080。
+        return 'http://localhost:8080/api';
+    }
+    return '/api';
+}
+
+function resolveApiBaseUrl() {
+    return normalizeApiBaseUrl(readApiBaseUrlOverride() || buildDefaultApiBaseUrl());
+}
+
+function setApiBaseUrl(url) {
+    const nextValue = normalizeApiBaseUrl(url);
+    try {
+        localStorage.setItem(API_CONFIG_STORAGE_KEY, nextValue);
+    } catch (error) {
+        console.warn('保存 API 地址配置失败:', error);
+    }
+    return nextValue;
+}
+
 // API 基础地址配置
-const API_BASE_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:3000/api'  // 本地开发环境
-    : '/api';  // 生产环境
+const API_BASE_URL = resolveApiBaseUrl();
 
 // API 接口路径配置
 const API_ENDPOINTS = {
@@ -124,5 +177,12 @@ const API_ENDPOINTS = {
 
 // 导出配置
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { API_BASE_URL, API_ENDPOINTS };
+    module.exports = {
+        API_BASE_URL,
+        API_ENDPOINTS,
+        API_CONFIG_STORAGE_KEY,
+        normalizeApiBaseUrl,
+        resolveApiBaseUrl,
+        setApiBaseUrl,
+    };
 }
