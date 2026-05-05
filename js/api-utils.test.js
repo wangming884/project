@@ -17,7 +17,12 @@ global.localStorage = {
     },
 };
 
-const { request, isOfflineFallbackError } = require('./api-utils.js');
+const {
+    request,
+    isOfflineFallbackError,
+    sanitizeUrl,
+    REQUEST_TIMEOUT_ERROR_CODE,
+} = require('./api-utils.js');
 
 async function withMutedConsoleError(run) {
     const originalConsoleError = console.error;
@@ -106,4 +111,30 @@ test('isOfflineFallbackError only matches true connectivity failures', () => {
     assert.equal(isOfflineFallbackError(new Error('Failed to fetch')), true);
     assert.equal(isOfflineFallbackError({ message: 'Network Error' }), true);
     assert.equal(isOfflineFallbackError({ message: '无管理员权限', status: 403 }), false);
+});
+
+test('request converts timeout aborts into API errors', async () => {
+    global.fetch = async (url, options) => new Promise((resolve, reject) => {
+        options.signal.addEventListener('abort', () => {
+            const abortError = new Error('aborted');
+            abortError.name = 'AbortError';
+            reject(abortError);
+        }, { once: true });
+    });
+
+    await withMutedConsoleError(() => assert.rejects(
+        () => request('https://example.com/api/slow', { timeoutMs: 5 }),
+        (error) => {
+            assert.equal(error.message, '请求超时，请稍后重试');
+            assert.equal(error.status, 408);
+            assert.equal(error.code, REQUEST_TIMEOUT_ERROR_CODE);
+            return true;
+        }
+    ));
+});
+
+test('sanitizeUrl blocks unsupported protocols and keeps safe addresses', () => {
+    assert.equal(sanitizeUrl('javascript:alert(1)'), '#');
+    assert.equal(sanitizeUrl('https://example.com/demo?q=1'), 'https://example.com/demo?q=1');
+    assert.equal(sanitizeUrl('/images/demo.png', { allowRelative: true }), '/images/demo.png');
 });

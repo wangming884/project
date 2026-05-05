@@ -8,15 +8,54 @@ const AUTH_STORAGE_KEYS = {
     user: 'userInfo',
 };
 
+const DEFAULT_REQUEST_TIMEOUT_MS = 15000;
+const REQUEST_TIMEOUT_ERROR_CODE = 'REQUEST_TIMEOUT';
+
 // ==================== HTTP 请求封装 ====================
 
-function escapeHtmlContent(value) {
+function escapeHtml(value) {
     return String(value ?? '')
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
+}
+
+function getLocationOrigin() {
+    if (typeof window !== 'undefined' && window.location && window.location.origin) {
+        return window.location.origin;
+    }
+    return 'http://localhost';
+}
+
+function sanitizeUrl(value, {
+    fallback = '#',
+    allowRelative = false,
+    allowedProtocols = ['http:', 'https:'],
+} = {}) {
+    const normalized = String(value ?? '').trim();
+    if (!normalized) {
+        return fallback;
+    }
+
+    const hasExplicitProtocol = /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(normalized);
+    const isProtocolRelative = normalized.startsWith('//');
+
+    if (!hasExplicitProtocol && !isProtocolRelative) {
+        return allowRelative ? normalized : fallback;
+    }
+
+    try {
+        const parsed = new URL(normalized, getLocationOrigin());
+        if (allowedProtocols.includes(parsed.protocol.toLowerCase())) {
+            return parsed.href;
+        }
+    } catch (error) {
+        console.warn('URL 清洗失败:', error);
+    }
+
+    return fallback;
 }
 
 function isPlainObject(value) {
@@ -50,6 +89,52 @@ function createApiError(message, { status = 0, code, response } = {}) {
     return error;
 }
 
+function createRequestSignal(timeoutMs, existingSignal) {
+    const shouldUseTimeout = Number.isFinite(Number(timeoutMs)) && Number(timeoutMs) > 0;
+
+    if (!shouldUseTimeout && !existingSignal) {
+        return {
+            signal: undefined,
+            cleanup: () => {},
+            didTimeout: () => false,
+        };
+    }
+
+    const controller = new AbortController();
+    let timeoutId = null;
+    let didTimeout = false;
+    let abortListener = null;
+
+    if (existingSignal) {
+        if (existingSignal.aborted) {
+            controller.abort(existingSignal.reason);
+        } else {
+            abortListener = () => controller.abort(existingSignal.reason);
+            existingSignal.addEventListener('abort', abortListener, { once: true });
+        }
+    }
+
+    if (shouldUseTimeout) {
+        timeoutId = setTimeout(() => {
+            didTimeout = true;
+            controller.abort();
+        }, Number(timeoutMs));
+    }
+
+    return {
+        signal: controller.signal,
+        cleanup() {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+            if (existingSignal && abortListener) {
+                existingSignal.removeEventListener('abort', abortListener);
+            }
+        },
+        didTimeout: () => didTimeout,
+    };
+}
+
 async function parseResponseBody(response) {
     if (response.status === 204) {
         return null;
@@ -78,6 +163,10 @@ async function request(url, options = {}) {
 
     // 合并配置
     const config = { ...defaultOptions, ...options };
+    const timeoutMs = config.timeoutMs === undefined
+        ? DEFAULT_REQUEST_TIMEOUT_MS
+        : Number(config.timeoutMs);
+    delete config.timeoutMs;
 
     config.headers = createRequestHeaders(options.headers);
 
@@ -92,6 +181,11 @@ async function request(url, options = {}) {
     const token = getAuthToken();
     if (token) {
         config.headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    const requestSignal = createRequestSignal(timeoutMs, config.signal);
+    if (requestSignal.signal) {
+        config.signal = requestSignal.signal;
     }
 
     try {
@@ -126,8 +220,16 @@ async function request(url, options = {}) {
         // 解析响应数据
         return responseBody;
     } catch (error) {
+        if (requestSignal.didTimeout() && error && error.name === 'AbortError') {
+            throw createApiError('请求超时，请稍后重试', {
+                status: 408,
+                code: REQUEST_TIMEOUT_ERROR_CODE,
+            });
+        }
         console.error('API Request Error:', error);
         throw error;
+    } finally {
+        requestSignal.cleanup();
     }
 }
 
@@ -231,7 +333,7 @@ function showLoading(message = '加载中...') {
                     animation: spin 1s linear infinite;
                     margin: 0 auto 1rem;
                 "></div>
-                <div style="color: #333; font-size: 1rem;">${escapeHtmlContent(message)}</div>
+                <div style="color: #333; font-size: 1rem;">${escapeHtml(message)}</div>
             </div>
         </div>
         <style>
@@ -297,7 +399,7 @@ function showMessage(message, type = 'info', duration = 3000) {
     `;
     messageDiv.innerHTML = `
         <span style="font-size: 1.2rem; font-weight: bold;">${icons[type] || icons.info}</span>
-        <span>${escapeHtmlContent(message)}</span>
+        <span>${escapeHtml(message)}</span>
     `;
 
     // 添加动画样式
@@ -358,6 +460,8 @@ function handleError(error, defaultMessage = '操作失败，请稍后重试') {
         message = '没有权限执行此操作';
     } else if (status === 404 || message.includes('404') || message.includes('Not Found')) {
         message = '请求的资源不存在';
+    } else if (status === 408 || error?.code === REQUEST_TIMEOUT_ERROR_CODE || message.includes('超时')) {
+        message = '请求超时，请稍后重试';
     } else if (status >= 500 || message.includes('500') || message.includes('Server Error')) {
         message = '服务器错误，请稍后重试';
     } else if (message.includes('Network') || message.includes('Failed to fetch')) {
@@ -547,6 +651,10 @@ function isOfflineFallbackError(error) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         AUTH_STORAGE_KEYS,
+        DEFAULT_REQUEST_TIMEOUT_MS,
+        REQUEST_TIMEOUT_ERROR_CODE,
+        escapeHtml,
+        sanitizeUrl,
         request, get, post, put, del,
         showLoading, hideLoading,
         showMessage, handleError,

@@ -785,15 +785,6 @@
             return response.data;
         }
 
-        function escapeHtml(value) {
-            return String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
         function extractRows(data) {
             if (Array.isArray(data?.records)) {
                 return data.records;
@@ -841,7 +832,7 @@
             adminDashboardLinkEl.style.display = 'none';
 
             if (userLoggedIn()) {
-                identityTitleEl.textContent = `普通用户：${escapeHtml(user?.username || '同学')}`;
+                identityTitleEl.textContent = `普通用户：${String(user?.username || '同学')}`;
                 identityTextEl.textContent = '你现在可以直接发布出售或求购信息，并在下方对自己的二手记录执行成交、下架、重新上架或删除操作。';
                 identityBadgeEl.textContent = '已登录';
                 identityBadgeEl.className = 'identity-badge user';
@@ -936,15 +927,15 @@
             const productUrl = `${API_ENDPOINTS.secondhand.productBase}/${product.id}`;
 
             if (product.status === 'available') {
-                actions.push(`<button class="item-btn success" type="button" data-method="patch" data-url="${productUrl}/status" data-status="sold">标记已成交</button>`);
-                actions.push(`<button class="item-btn warning" type="button" data-method="patch" data-url="${productUrl}/status" data-status="removed">下架商品</button>`);
+                actions.push(`<button class="item-btn success" type="button" data-method="patch" data-url="${escapeHtml(`${productUrl}/status`)}" data-status="sold">标记已成交</button>`);
+                actions.push(`<button class="item-btn warning" type="button" data-method="patch" data-url="${escapeHtml(`${productUrl}/status`)}" data-status="removed">下架商品</button>`);
             }
 
             if (product.status === 'sold' || product.status === 'removed') {
-                actions.push(`<button class="item-btn info" type="button" data-method="patch" data-url="${productUrl}/status" data-status="available">重新上架</button>`);
+                actions.push(`<button class="item-btn info" type="button" data-method="patch" data-url="${escapeHtml(`${productUrl}/status`)}" data-status="available">重新上架</button>`);
             }
 
-            actions.push(`<button class="item-btn danger" type="button" data-method="delete" data-url="${productUrl}" data-id="${product.id}">删除记录</button>`);
+            actions.push(`<button class="item-btn danger" type="button" data-method="delete" data-url="${escapeHtml(productUrl)}" data-id="${escapeHtml(product.id)}">删除记录</button>`);
             return actions.join('');
         }
 

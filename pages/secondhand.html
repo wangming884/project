@@ -331,18 +331,16 @@
         }
 
         // 渲染商品列表
-        function escapeHtml(value) {
-            return String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
         function normalizePrice(value) {
             const num = Number(value);
             return Number.isFinite(num) ? num.toFixed(2) : '0.00';
+        }
+
+        function getSafeProductImage(url) {
+            return sanitizeUrl(url, {
+                fallback: 'https://via.placeholder.com/400x180?text=No+Image',
+                allowRelative: true,
+            });
         }
 
         function renderProducts(products) {
@@ -355,7 +353,7 @@
             
             grid.innerHTML = products.map(product => `
                 <div class="product-card">
-                    <img class="product-img" src="${escapeHtml(product.image || 'https://via.placeholder.com/400x180?text=No+Image')}" alt="${escapeHtml(product.title || '未命名商品')}">
+                    <img class="product-img" src="${escapeHtml(getSafeProductImage(product.image))}" alt="${escapeHtml(product.title || '未命名商品')}">
                     <div class="product-info">
                         <div class="product-title">${escapeHtml(product.title || '未命名商品')}</div>
                         <div class="product-price">￥ ${normalizePrice(product.price)}</div>

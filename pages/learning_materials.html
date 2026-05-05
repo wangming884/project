@@ -114,15 +114,6 @@
         const materialsSearchInput = document.getElementById('materials-search-input');
         const materialsSearchBtn = document.getElementById('materials-search-btn');
 
-        function escapeHtml(value) {
-            return String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
         function renderMaterials(list) {
             if (!Array.isArray(list) || list.length === 0) {
                 materialsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #718096; padding: 2.5rem 0;">暂无匹配资源</p>';
@@ -164,8 +155,12 @@
                     showMessage('暂未生成下载链接，请稍后重试', 'warning');
                     return;
                 }
-                if (response.data.downloadUrl) {
-                    window.open(response.data.downloadUrl, '_blank', 'noopener,noreferrer');
+                const downloadUrl = sanitizeUrl(response.data.downloadUrl, {
+                    fallback: '',
+                    allowRelative: false,
+                });
+                if (downloadUrl) {
+                    window.open(downloadUrl, '_blank', 'noopener,noreferrer');
                     showMessage('已跳转到云盘下载页面', 'success');
                 } else {
                     showMessage(response.data.message || '当前为预留模式，稍后开放下载', 'info');

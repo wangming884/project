@@ -601,15 +601,6 @@
             return !!getStorage('authToken');
         }
 
-        function escapeHtml(value) {
-            return String(value || '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
         function formatTaskTime(value) {
             if (!value) {
                 return '-';
@@ -643,7 +634,7 @@
             if (isViewerAdmin()) {
                 identityPanelEl.classList.add('admin');
                 identityTitleEl.textContent = '管理员超级视图已开启';
-                identityTextEl.textContent = `当前管理员：${escapeHtml(user?.username || 'admin')}。你现在看到的是全量任务，并可直接强制把任务改为待接单、已接单、已完成或已取消。`;
+                identityTextEl.textContent = `当前管理员：${String(user?.username || 'admin')}。你现在看到的是全量任务，并可直接强制把任务改为待接单、已接单、已完成或已取消。`;
                 identityBadgeEl.textContent = '管理员模式';
                 identityBadgeEl.className = 'badge badge-admin';
                 adminDashboardLinkEl.style.display = 'inline-flex';
@@ -654,7 +645,7 @@
             identityPanelEl.classList.remove('admin');
             if (isLoggedIn()) {
                 identityTitleEl.textContent = '普通用户视图';
-                identityTextEl.textContent = `当前登录用户：${escapeHtml(user?.username || '同学')}。你可以接单、取消接单、确认完成或取消自己发布的任务。`;
+                identityTextEl.textContent = `当前登录用户：${String(user?.username || '同学')}。你可以接单、取消接单、确认完成或取消自己发布的任务。`;
                 identityBadgeEl.textContent = '已登录用户';
                 identityBadgeEl.className = 'badge badge-user';
             } else {
@@ -681,19 +672,19 @@
             }
 
             if (task.status === 'pending' && currentUserId !== Number(task.publisherId)) {
-                actions.push(`<button class="action-btn primary" type="button" data-action="accept" data-id="${task.id}">立即接单</button>`);
+                actions.push(`<button class="action-btn primary" type="button" data-action="accept" data-id="${escapeHtml(task.id)}">立即接单</button>`);
             }
 
             if (task.status === 'accepted' && currentUserId === Number(task.accepterId)) {
-                actions.push(`<button class="action-btn warning" type="button" data-action="cancel-accept" data-id="${task.id}">取消接单</button>`);
+                actions.push(`<button class="action-btn warning" type="button" data-action="cancel-accept" data-id="${escapeHtml(task.id)}">取消接单</button>`);
             }
 
             if (currentUserId === Number(task.publisherId) && task.status === 'accepted') {
-                actions.push(`<button class="action-btn info" type="button" data-action="complete" data-id="${task.id}">确认完成</button>`);
+                actions.push(`<button class="action-btn info" type="button" data-action="complete" data-id="${escapeHtml(task.id)}">确认完成</button>`);
             }
 
             if (currentUserId === Number(task.publisherId) && (task.status === 'pending' || task.status === 'accepted')) {
-                actions.push(`<button class="action-btn danger" type="button" data-action="cancel" data-id="${task.id}">取消任务</button>`);
+                actions.push(`<button class="action-btn danger" type="button" data-action="cancel" data-id="${escapeHtml(task.id)}">取消任务</button>`);
             }
 
             if (!actions.length) {
@@ -713,7 +704,7 @@
                     const meta = STATUS_META[status];
                     const disabled = status === 'accepted' && !task.accepterId ? 'disabled' : '';
                     const activeClass = task.status === status ? 'active' : '';
-                    return `<button class="mini-btn ${activeClass}" type="button" data-admin-status="${status}" data-id="${task.id}" ${disabled}>改为${meta.label}</button>`;
+                    return `<button class="mini-btn ${activeClass}" type="button" data-admin-status="${status}" data-id="${escapeHtml(task.id)}" ${disabled}>改为${meta.label}</button>`;
                 })
                 .join('');
 

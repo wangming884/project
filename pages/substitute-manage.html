@@ -345,15 +345,6 @@
             return !!getStorage('authToken');
         }
 
-        function escapeHtml(value) {
-            return String(value || '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
         function ensureSuccess(response, fallbackMessage) {
             if (!response || response.success !== true) {
                 throw new Error(response?.message || fallbackMessage);
@@ -413,7 +404,7 @@
             adminDashboardLinkEl.style.display = 'none';
 
             if (isLoggedIn()) {
-                identityTitleEl.textContent = `普通用户：${escapeHtml(user?.username || '同学')}`;
+                identityTitleEl.textContent = `普通用户：${String(user?.username || '同学')}`;
                 identityTextEl.textContent = '你现在可以发布新的代课任务，并在下方直接管理自己发布或接下的任务。';
                 identityBadgeEl.textContent = '已登录';
                 identityBadgeEl.className = 'identity-badge user';
@@ -449,15 +440,15 @@
                 const actions = [];
 
                 if (type === 'published' && task.status === 'accepted') {
-                    actions.push(`<button class="order-btn complete" type="button" data-action="complete" data-id="${task.id}">确认完成</button>`);
+                    actions.push(`<button class="order-btn complete" type="button" data-action="complete" data-id="${escapeHtml(task.id)}">确认完成</button>`);
                 }
 
                 if (type === 'published' && (task.status === 'pending' || task.status === 'accepted')) {
-                    actions.push(`<button class="order-btn cancel" type="button" data-action="cancel" data-id="${task.id}">取消任务</button>`);
+                    actions.push(`<button class="order-btn cancel" type="button" data-action="cancel" data-id="${escapeHtml(task.id)}">取消任务</button>`);
                 }
 
                 if (type === 'accepted' && task.status === 'accepted') {
-                    actions.push(`<button class="order-btn accept" type="button" data-action="cancel-accept" data-id="${task.id}">取消接单</button>`);
+                    actions.push(`<button class="order-btn accept" type="button" data-action="cancel-accept" data-id="${escapeHtml(task.id)}">取消接单</button>`);
                 }
 
                 if (!actions.length) {

@@ -373,6 +373,13 @@
         let recommendProducts = [];
         let announcements = {};
 
+        function renderText(value, fallback = '-') {
+            if (value === undefined || value === null || value === '') {
+                return escapeHtml(fallback);
+            }
+            return escapeHtml(value);
+        }
+
         function extractRows(payload) {
             if (!payload) return [];
             if (Array.isArray(payload)) return payload;
@@ -398,14 +405,14 @@
 
             body.innerHTML = pendingRecords.map((item) => `
                 <tr>
-                    <td>${item.id ?? '-'}</td>
-                    <td>${item.username ?? '-'}</td>
-                    <td>${item.location ?? '-'}</td>
-                    <td>${item.checkinTime ?? '-'}</td>
+                    <td>${renderText(item.id)}</td>
+                    <td>${renderText(item.username)}</td>
+                    <td>${renderText(item.location)}</td>
+                    <td>${renderText(item.checkinTime)}</td>
                     <td>
                         <div class="ops">
-                            <button type="button" class="btn-ok" data-id="${item.id}" data-status="approved">通过</button>
-                            <button type="button" class="btn-no" data-id="${item.id}" data-status="rejected">驳回</button>
+                            <button type="button" class="btn-ok" data-id="${renderText(item.id, '')}" data-status="approved">通过</button>
+                            <button type="button" class="btn-no" data-id="${renderText(item.id, '')}" data-status="rejected">驳回</button>
                         </div>
                     </td>
                 </tr>
@@ -424,11 +431,11 @@
             }
             body.innerHTML = pointsHistory.map((item) => `
                 <tr>
-                    <td>${item.createdAt ?? '-'}</td>
-                    <td>${item.type ?? '-'}</td>
-                    <td>${item.amount ?? 0}</td>
-                    <td>${item.balance ?? 0}</td>
-                    <td>${item.description ?? '-'}</td>
+                    <td>${renderText(item.createdAt)}</td>
+                    <td>${renderText(item.type)}</td>
+                    <td>${renderText(item.amount, 0)}</td>
+                    <td>${renderText(item.balance, 0)}</td>
+                    <td>${renderText(item.description)}</td>
                 </tr>
             `).join('');
         }
@@ -444,18 +451,18 @@
                 const isOn = (item.status || '').toLowerCase() === 'on';
                 return `
                     <tr>
-                        <td>${item.id ?? '-'}</td>
-                        <td>${item.title ?? '-'}</td>
-                        <td>￥${item.price ?? 0}</td>
+                        <td>${renderText(item.id)}</td>
+                        <td>${renderText(item.title)}</td>
+                        <td>￥${renderText(item.price, 0)}</td>
                         <td>
                             <span class="status-pill ${isOn ? 'status-enabled' : 'status-disabled'}">
                                 ${isOn ? '上架中' : '已下架'}
                             </span>
                         </td>
-                        <td>${item.updatedAt ?? '-'}</td>
+                        <td>${renderText(item.updatedAt)}</td>
                         <td>
                             <div class="ops">
-                                <button type="button" class="${isOn ? 'btn-ban' : 'btn-enable'}" data-recommend-id="${item.id}" data-action="toggle-recommend" data-status="${isOn ? 'off' : 'on'}">
+                                <button type="button" class="${isOn ? 'btn-ban' : 'btn-enable'}" data-recommend-id="${renderText(item.id, '')}" data-action="toggle-recommend" data-status="${isOn ? 'off' : 'on'}">
                                     ${isOn ? '下架' : '上架'}
                                 </button>
                             </div>
@@ -484,10 +491,10 @@
 
             body.innerHTML = rows.map((row) => `
                 <tr>
-                    <td>${scopeLabel[row.scope] || row.scope}</td>
-                    <td>${row.item.title ?? '-'}</td>
-                    <td>${row.item.content ?? '-'}</td>
-                    <td>${row.item.publishedAt ?? '-'}</td>
+                    <td>${renderText(scopeLabel[row.scope] || row.scope)}</td>
+                    <td>${renderText(row.item.title)}</td>
+                    <td>${renderText(row.item.content)}</td>
+                    <td>${renderText(row.item.publishedAt)}</td>
                 </tr>
             `).join('');
         }
@@ -689,10 +696,10 @@
                 const enabled = Number(item.status) === 1;
                 return `
                     <tr>
-                        <td>${item.id ?? '-'}</td>
-                        <td>${item.username ?? '-'}</td>
-                        <td>${item.email ?? '-'}</td>
-                        <td>${item.points ?? 0}</td>
+                        <td>${renderText(item.id)}</td>
+                        <td>${renderText(item.username)}</td>
+                        <td>${renderText(item.email)}</td>
+                        <td>${renderText(item.points, 0)}</td>
                         <td>
                             <span class="status-pill ${enabled ? 'status-enabled' : 'status-disabled'}">
                                 ${enabled ? '正常' : '禁用'}
@@ -700,8 +707,8 @@
                         </td>
                         <td>
                             <div class="ops">
-                                <button type="button" class="btn-pick" data-user-id="${item.id}" data-action="select">选择</button>
-                                <button type="button" class="${enabled ? 'btn-ban' : 'btn-enable'}" data-user-id="${item.id}" data-action="toggle-status" data-status="${enabled ? 0 : 1}">
+                                <button type="button" class="btn-pick" data-user-id="${renderText(item.id, '')}" data-action="select">选择</button>
+                                <button type="button" class="${enabled ? 'btn-ban' : 'btn-enable'}" data-user-id="${renderText(item.id, '')}" data-action="toggle-status" data-status="${enabled ? 0 : 1}">
                                     ${enabled ? '禁用' : '启用'}
                                 </button>
                             </div>

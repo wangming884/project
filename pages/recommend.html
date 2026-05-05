@@ -105,15 +105,6 @@
         const POINTS_PURCHASE_URL = 'https://example.com/points-purchase';
         let shopPoints = getCampusPoints();
 
-        function escapeHtml(value) {
-            return String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
         function initShopPoints() {
             shopPoints = getCampusPoints();
             document.getElementById('currentShopPoints').innerText = shopPoints;
@@ -224,7 +215,10 @@
                     return;
                 }
                 const couponCode = response.data.couponCode || '';
-                const buyUrl = response.data.buyUrl || '';
+                const buyUrl = sanitizeUrl(response.data.buyUrl, {
+                    fallback: '',
+                    allowRelative: false,
+                });
 
                 if (couponCode) {
                     try {
