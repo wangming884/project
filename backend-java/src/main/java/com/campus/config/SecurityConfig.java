@@ -66,6 +66,8 @@ public class SecurityConfig {
                     "/auth/admin-login",
                     "/auth/register",
                     "/checkin/automation/**",
+                    "/course-brush/courses",
+                    "/course-brush/automation/**",
                     "/secondhand/list",
                     "/secondhand/search",
                     "/substitute/list",

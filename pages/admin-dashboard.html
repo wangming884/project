@@ -100,6 +100,10 @@
                 <div class="num" id="taskCount">0</div>
             </article>
             <article class="card">
+                <h3>刷课订单总数</h3>
+                <div class="num" id="courseBrushOrderCount">0</div>
+            </article>
+            <article class="card">
                 <h3>管理员权限</h3>
                 <div class="num" style="color:#2563eb;">ALL</div>
             </article>
@@ -144,6 +148,7 @@
                     <div class="perm-item">查看全站积分流水</div>
                     <div class="perm-item">管理员强制状态修改</div>
                     <div class="perm-item">上传学习资料/学习软件</div>
+                    <div class="perm-item">管理代刷课课程与订单</div>
                     <div class="perm-item">上架/下架站长好物</div>
                     <div class="perm-item">编辑发布前台公告</div>
                 </div>
@@ -224,6 +229,108 @@
                     </thead>
                     <tbody id="historyTableBody">
                         <tr><td colspan="5" class="empty">请选择用户后加载</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>代刷课管理（管理员）</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="courseBrushCourseId">课程ID（编辑时自动填充）</label>
+                    <input id="courseBrushCourseId" type="text" placeholder="新增课程时留空" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="courseBrushEnabledSelect">课程状态</label>
+                    <select id="courseBrushEnabledSelect">
+                        <option value="1">启用</option>
+                        <option value="0">停用</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="courseBrushNameInput">课程名称</label>
+                    <input id="courseBrushNameInput" type="text" placeholder="例如：学习通章节任务">
+                </div>
+                <div class="form-group">
+                    <label for="courseBrushCodeInput">课程编号 / 识别码</label>
+                    <input id="courseBrushCodeInput" type="text" placeholder="例如：xxt-chapter">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="courseBrushPointsInput">所需积分</label>
+                    <input id="courseBrushPointsInput" type="number" placeholder="例如：15">
+                </div>
+                <div class="form-group">
+                    <label for="courseBrushOrdersStatusFilter">订单状态筛选</label>
+                    <select id="courseBrushOrdersStatusFilter">
+                        <option value="all">全部状态</option>
+                        <option value="pending">待处理</option>
+                        <option value="processing">处理中</option>
+                        <option value="completed">已完成</option>
+                        <option value="failed">失败</option>
+                        <option value="cancelled">已取消</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="courseBrushDescInput">课程说明</label>
+                <textarea id="courseBrushDescInput" placeholder="简要说明该课程适用的平台、处理方式或注意事项"></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="courseBrushOrdersKeywordInput">订单关键词</label>
+                    <input id="courseBrushOrdersKeywordInput" type="text" placeholder="搜索用户名、课程、账号、备注、请求ID">
+                </div>
+                <div class="form-group" style="justify-content:flex-end;">
+                    <label>&nbsp;</label>
+                    <div class="adjust-actions">
+                        <button class="btn btn-primary" type="button" id="saveCourseBrushCourseBtn">保存课程</button>
+                        <button class="btn btn-muted" type="button" id="resetCourseBrushCourseBtn">重置表单</button>
+                        <button class="btn btn-muted" type="button" id="refreshCourseBrushBtn">刷新课程与订单</button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-wrap" style="margin-top:1rem;">
+                <h2 style="margin-top:0;">课程列表</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>课程名称</th>
+                            <th>编号</th>
+                            <th>积分</th>
+                            <th>状态</th>
+                            <th>说明</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="courseBrushCoursesTableBody">
+                        <tr><td colspan="7" class="empty">加载中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-wrap" style="margin-top:1rem;">
+                <h2 style="margin-top:0;">刷课订单列表</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户</th>
+                            <th>课程</th>
+                            <th>账号</th>
+                            <th>积分</th>
+                            <th>状态</th>
+                            <th>结果</th>
+                            <th>时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="courseBrushOrdersTableBody">
+                        <tr><td colspan="9" class="empty">加载中...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -372,6 +479,8 @@
         let pointsHistory = [];
         let recommendProducts = [];
         let announcements = {};
+        let courseBrushCourses = [];
+        let courseBrushOrders = [];
 
         function renderText(value, fallback = '-') {
             if (value === undefined || value === null || value === '') {
@@ -499,6 +608,94 @@
             `).join('');
         }
 
+        function renderCourseBrushCoursesTable() {
+            const body = document.getElementById('courseBrushCoursesTableBody');
+            if (!courseBrushCourses.length) {
+                body.innerHTML = '<tr><td colspan="7" class="empty">当前没有课程配置</td></tr>';
+                return;
+            }
+
+            body.innerHTML = courseBrushCourses.map((item) => {
+                const enabled = Number(item.enabled) === 1;
+                return `
+                    <tr>
+                        <td>${renderText(item.id)}</td>
+                        <td>${renderText(item.courseName)}</td>
+                        <td>${renderText(item.courseCode)}</td>
+                        <td>${renderText(item.requiredPoints, 0)}</td>
+                        <td>
+                            <span class="status-pill ${enabled ? 'status-enabled' : 'status-disabled'}">
+                                ${enabled ? '启用' : '停用'}
+                            </span>
+                        </td>
+                        <td>${renderText(item.description)}</td>
+                        <td>
+                            <div class="ops">
+                                <button type="button" class="btn-pick" data-course-id="${renderText(item.id, '')}" data-action="edit-course">编辑</button>
+                                <button type="button" class="${enabled ? 'btn-ban' : 'btn-enable'}" data-course-id="${renderText(item.id, '')}" data-action="toggle-course" data-enabled="${enabled ? 0 : 1}">
+                                    ${enabled ? '停用' : '启用'}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderCourseBrushOrdersTable() {
+            const body = document.getElementById('courseBrushOrdersTableBody');
+            if (!courseBrushOrders.length) {
+                body.innerHTML = '<tr><td colspan="9" class="empty">当前没有匹配订单</td></tr>';
+                return;
+            }
+
+            const statusLabel = {
+                pending: '待处理',
+                processing: '处理中',
+                completed: '已完成',
+                failed: '失败',
+                cancelled: '已取消',
+            };
+
+            body.innerHTML = courseBrushOrders.map((item) => `
+                <tr>
+                    <td>${renderText(item.id)}</td>
+                    <td>${renderText(item.username)}</td>
+                    <td>${renderText(item.courseName)}</td>
+                    <td>${renderText(item.studentAccount)}</td>
+                    <td>${renderText(item.requiredPoints, 0)}</td>
+                    <td>${renderText(statusLabel[item.status] || item.status)}</td>
+                    <td>${renderText(item.resultMessage)}</td>
+                    <td>${renderText(item.submittedAt || item.createdAt)}</td>
+                    <td>
+                        <div class="ops">
+                            <button type="button" class="btn-pick" data-order-id="${renderText(item.id, '')}" data-action="order-status" data-status="processing">处理中</button>
+                            <button type="button" class="btn-enable" data-order-id="${renderText(item.id, '')}" data-action="order-status" data-status="completed">完成</button>
+                            <button type="button" class="btn-ban" data-order-id="${renderText(item.id, '')}" data-action="order-status" data-status="failed">失败</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function resetCourseBrushCourseForm() {
+            document.getElementById('courseBrushCourseId').value = '';
+            document.getElementById('courseBrushNameInput').value = '';
+            document.getElementById('courseBrushCodeInput').value = '';
+            document.getElementById('courseBrushPointsInput').value = '';
+            document.getElementById('courseBrushDescInput').value = '';
+            document.getElementById('courseBrushEnabledSelect').value = '1';
+        }
+
+        function fillCourseBrushCourseForm(course) {
+            document.getElementById('courseBrushCourseId').value = course?.id ?? '';
+            document.getElementById('courseBrushNameInput').value = course?.courseName ?? '';
+            document.getElementById('courseBrushCodeInput').value = course?.courseCode ?? '';
+            document.getElementById('courseBrushPointsInput').value = course?.requiredPoints ?? '';
+            document.getElementById('courseBrushDescInput').value = course?.description ?? '';
+            document.getElementById('courseBrushEnabledSelect').value = String(course?.enabled ?? 1);
+        }
+
         async function reviewCheckin(recordId, status) {
             try {
                 showLoading('提交审核中...');
@@ -529,10 +726,11 @@
             }
 
             try {
-                const [pendingRes, productRes, taskRes] = await Promise.all([
+                const [pendingRes, productRes, taskRes, courseBrushOrderRes] = await Promise.all([
                     get(API_ENDPOINTS.admin.checkinPending, { page: 1, pageSize: 20 }),
                     get(API_ENDPOINTS.admin.secondhandAdminProducts, { page: 1, pageSize: 1 }),
                     get(API_ENDPOINTS.admin.substituteAdminTasks, { page: 1, pageSize: 1 }),
+                    get(API_ENDPOINTS.admin.courseBrushOrders, { page: 1, pageSize: 1 }),
                 ]);
 
                 pendingRecords = extractRows(pendingRes?.data);
@@ -544,9 +742,134 @@
 
                 const taskRows = extractRows(taskRes?.data);
                 document.getElementById('taskCount').textContent = extractTotal(taskRes?.data, taskRows);
+
+                const courseBrushOrderRows = extractRows(courseBrushOrderRes?.data);
+                document.getElementById('courseBrushOrderCount').textContent = extractTotal(courseBrushOrderRes?.data, courseBrushOrderRows);
             } catch (error) {
                 renderPendingTable();
                 showMessage('后台数据加载失败，请检查后端是否已启动', 'warning');
+            }
+        }
+
+        async function loadCourseBrushCourses() {
+            try {
+                const response = await get(API_ENDPOINTS.admin.courseBrushCourses, { page: 1, pageSize: 100 });
+                if (!response.success || !response.data) {
+                    courseBrushCourses = [];
+                    renderCourseBrushCoursesTable();
+                    return;
+                }
+                courseBrushCourses = extractRows(response.data);
+                renderCourseBrushCoursesTable();
+            } catch (error) {
+                courseBrushCourses = [];
+                renderCourseBrushCoursesTable();
+                showMessage('刷课课程加载失败', 'warning');
+            }
+        }
+
+        async function loadCourseBrushOrders() {
+            try {
+                const response = await get(API_ENDPOINTS.admin.courseBrushOrders, {
+                    status: document.getElementById('courseBrushOrdersStatusFilter').value,
+                    keyword: document.getElementById('courseBrushOrdersKeywordInput').value.trim(),
+                    page: 1,
+                    pageSize: 50,
+                });
+                if (!response.success || !response.data) {
+                    courseBrushOrders = [];
+                    renderCourseBrushOrdersTable();
+                    return;
+                }
+                courseBrushOrders = extractRows(response.data);
+                renderCourseBrushOrdersTable();
+            } catch (error) {
+                courseBrushOrders = [];
+                renderCourseBrushOrdersTable();
+                showMessage('刷课订单加载失败', 'warning');
+            }
+        }
+
+        async function submitCourseBrushCourse() {
+            const courseIdValue = document.getElementById('courseBrushCourseId').value.trim();
+            const courseName = document.getElementById('courseBrushNameInput').value.trim();
+            const courseCode = document.getElementById('courseBrushCodeInput').value.trim();
+            const requiredPoints = Number(document.getElementById('courseBrushPointsInput').value);
+            const description = document.getElementById('courseBrushDescInput').value.trim();
+            const enabled = Number(document.getElementById('courseBrushEnabledSelect').value);
+
+            if (!courseName) {
+                showMessage('请输入课程名称', 'warning');
+                return;
+            }
+            if (!Number.isFinite(requiredPoints) || requiredPoints <= 0) {
+                showMessage('请输入正确的所需积分', 'warning');
+                return;
+            }
+
+            try {
+                showLoading('正在保存刷课课程...');
+                const response = await post(API_ENDPOINTS.admin.courseBrushCourses, {
+                    courseId: courseIdValue ? Number(courseIdValue) : null,
+                    courseName,
+                    courseCode,
+                    requiredPoints,
+                    description,
+                    enabled,
+                });
+                hideLoading();
+                if (!response.success) {
+                    showMessage(response.message || '课程保存失败', 'error');
+                    return;
+                }
+                showMessage('刷课课程保存成功', 'success');
+                resetCourseBrushCourseForm();
+                await loadCourseBrushCourses();
+                await loadDashboardData();
+            } catch (error) {
+                hideLoading();
+                handleError(error, '课程保存失败');
+            }
+        }
+
+        async function updateCourseBrushCourseStatus(courseId, enabled) {
+            try {
+                showLoading(enabled === 1 ? '正在启用课程...' : '正在停用课程...');
+                const response = await post(`${API_ENDPOINTS.admin.courseBrushCourseStatusBase}/${courseId}/status`, { enabled });
+                hideLoading();
+                if (!response.success) {
+                    showMessage(response.message || '课程状态更新失败', 'error');
+                    return;
+                }
+                showMessage(enabled === 1 ? '课程已启用' : '课程已停用', 'success');
+                await loadCourseBrushCourses();
+            } catch (error) {
+                hideLoading();
+                handleError(error, '课程状态更新失败');
+            }
+        }
+
+        async function updateCourseBrushOrderStatus(orderId, status) {
+            const resultMessage = status === 'completed'
+                ? '管理员标记为已完成'
+                : (status === 'processing' ? '管理员已接入处理队列' : '管理员标记处理失败');
+            try {
+                showLoading('正在更新刷课订单状态...');
+                const response = await post(`${API_ENDPOINTS.admin.courseBrushOrderStatusBase}/${orderId}/status`, {
+                    status,
+                    resultMessage,
+                });
+                hideLoading();
+                if (!response.success) {
+                    showMessage(response.message || '订单状态更新失败', 'error');
+                    return;
+                }
+                showMessage('刷课订单状态已更新', 'success');
+                await loadCourseBrushOrders();
+                await loadDashboardData();
+            } catch (error) {
+                hideLoading();
+                handleError(error, '订单状态更新失败');
             }
         }
 
@@ -937,6 +1260,8 @@
             initAdminIdentity();
             loadDashboardData();
             loadUsers();
+            loadCourseBrushCourses();
+            loadCourseBrushOrders();
             loadRecommendProducts();
             loadAnnouncements();
             renderHistoryTable();
@@ -959,6 +1284,14 @@
             document.getElementById('pickResourceFileBtn').addEventListener('click', pickResourceFile);
             document.getElementById('submitResourceUploadBtn').addEventListener('click', submitResourceUpload);
             document.getElementById('resourceFileInput').addEventListener('change', handleResourceFilePicked);
+            document.getElementById('saveCourseBrushCourseBtn').addEventListener('click', submitCourseBrushCourse);
+            document.getElementById('resetCourseBrushCourseBtn').addEventListener('click', resetCourseBrushCourseForm);
+            document.getElementById('refreshCourseBrushBtn').addEventListener('click', async () => {
+                await loadCourseBrushCourses();
+                await loadCourseBrushOrders();
+                await loadDashboardData();
+            });
+            document.getElementById('courseBrushOrdersStatusFilter').addEventListener('change', loadCourseBrushOrders);
             document.getElementById('submitRecommendCreateBtn').addEventListener('click', submitRecommendCreate);
             document.getElementById('refreshRecommendBtn').addEventListener('click', loadRecommendProducts);
             document.getElementById('publishAnnouncementBtn').addEventListener('click', publishAnnouncement);
@@ -1005,6 +1338,39 @@
                     return;
                 }
                 await updateRecommendStatus(productId, status);
+            });
+            document.getElementById('courseBrushCoursesTableBody').addEventListener('click', async (event) => {
+                const target = event.target;
+                const courseId = Number(target.dataset.courseId);
+                const action = target.dataset.action;
+                if (!courseId || !action) {
+                    return;
+                }
+
+                const course = courseBrushCourses.find((item) => Number(item.id) === courseId);
+                if (!course) {
+                    return;
+                }
+
+                if (action === 'edit-course') {
+                    fillCourseBrushCourseForm(course);
+                    showMessage(`已载入课程：${course.courseName}`, 'info');
+                    return;
+                }
+
+                if (action === 'toggle-course') {
+                    await updateCourseBrushCourseStatus(courseId, Number(target.dataset.enabled));
+                }
+            });
+            document.getElementById('courseBrushOrdersTableBody').addEventListener('click', async (event) => {
+                const target = event.target;
+                const orderId = Number(target.dataset.orderId);
+                const action = target.dataset.action;
+                const status = target.dataset.status;
+                if (action !== 'order-status' || !orderId || !status) {
+                    return;
+                }
+                await updateCourseBrushOrderStatus(orderId, status);
             });
         });
     </script>

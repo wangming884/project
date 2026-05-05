@@ -1,6 +1,6 @@
 # 校园综合服务平台（Campus Platform）
 
-本项目是一个校园综合服务平台，当前采用「静态前端 + Java 后端」架构，支持用户系统、积分体系、晚寝签到、二手交易、代课任务、学习资源与管理员后台。
+本项目是一个校园综合服务平台，当前采用「静态前端 + Java 后端」架构，支持用户系统、积分体系、晚寝签到、代刷课、二手交易、代课任务、学习资源与管理员后台。
 
 最后更新：2026-05-05
 
@@ -14,9 +14,10 @@
 4. 二手商品发布与浏览
 5. 二手“我的发布”管理页：`pages/secondhand-manage.html`
 6. 代课任务发布与接单
-7. 学习资料/学习软件下载入口
-8. 联系作者
-9. 代课“我的发布 / 我的接单”管理页：`pages/substitute-manage.html`
+7. 代刷课积分下单页：`pages/course-brush.html`
+8. 学习资料/学习软件下载入口
+9. 联系作者
+10. 代课“我的发布 / 我的接单”管理页：`pages/substitute-manage.html`
 
 ### 管理员侧
 
@@ -30,6 +31,8 @@
 8. 管理员上传学习资料/学习软件（当前为 Google Drive 预留上传会话）
 9. 代课大厅全量任务查看
 10. 代课任务强制状态流转（`pending / accepted / completed / cancelled`）
+11. 代刷课课程管理（新增课程、调整积分、启停课程）
+12. 代刷课订单查看与状态流转
 
 ## 2. 技术栈
 
@@ -50,6 +53,7 @@
 │   ├── index.html
 │   ├── main.html
 │   ├── checkin.html
+│   ├── course-brush.html
 │   ├── secondhand.html
 │   ├── substitute.html
 │   ├── substitute-manage.html
@@ -150,6 +154,22 @@ mvn spring-boot:run
 
 注意：当前是预留实现（Stub），返回标准化结构，后续可无缝替换为真实 Google Drive API 调用。
 
+## 7.5 代刷课模块当前状态
+
+当前代刷课模块已接入 Java 后端，支持课程配置、积分扣费下单与脚本回写预留：
+
+1. 前台下单页：`pages/course-brush.html`
+2. 公开课程列表：`GET /api/course-brush/courses`
+3. 用户提交订单：`POST /api/course-brush/submit`
+4. 我的订单：`GET /api/course-brush/my-orders`
+5. 管理员课程列表：`GET /api/course-brush/admin/courses`
+6. 管理员保存课程：`POST /api/course-brush/admin/courses`
+7. 管理员启停课程：`POST /api/course-brush/admin/courses/{courseId}/status`
+8. 管理员订单列表：`GET /api/course-brush/admin/orders`
+9. 管理员更新订单状态：`POST /api/course-brush/admin/orders/{orderId}/status`
+10. 自动化脚本说明：`GET /api/course-brush/automation/spec`
+11. 自动化脚本回写：`POST /api/course-brush/automation/submit`
+
 ## 8. 关键接口（节选）
 
 1. 管理员登录：`POST /api/auth/admin-login`
@@ -163,6 +183,8 @@ mvn spring-boot:run
 9. 管理员积分流水：`GET /api/points/admin/history`
 10. 管理员上传资料：`POST /api/resources/admin/materials/upload`
 11. 管理员上传软件：`POST /api/resources/admin/software/upload`
+12. 代刷课下单：`POST /api/course-brush/submit`
+13. 管理员保存刷课课程：`POST /api/course-brush/admin/courses`
 
 完整接口请查看：[docs/API-DOCUMENTATION.md](/e:/project/docs/API-DOCUMENTATION.md)
 

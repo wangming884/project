@@ -74,6 +74,11 @@ automation-checkin:
   enabled: false
   script-key: ""
 
+# 自动化刷课预留配置
+automation-course-brush:
+  enabled: false
+  script-key: ""
+
 # 日志配置
 logging:
   level:

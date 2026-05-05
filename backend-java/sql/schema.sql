@@ -106,6 +106,48 @@ CREATE TABLE IF NOT EXISTS substitute_tasks (
     FOREIGN KEY (publisher_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代课任务表';
 
+-- 代刷课课程配置表
+CREATE TABLE IF NOT EXISTS course_brush_courses (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '课程ID',
+    course_name VARCHAR(100) NOT NULL COMMENT '课程名称',
+    course_code VARCHAR(100) COMMENT '课程编号/识别码',
+    required_points INT NOT NULL COMMENT '所需积分',
+    description VARCHAR(500) COMMENT '课程说明',
+    enabled TINYINT DEFAULT 1 COMMENT '是否启用（1-启用，0-停用）',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    INDEX idx_enabled (enabled),
+    INDEX idx_course_name (course_name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代刷课课程配置表';
+
+-- 代刷课订单表
+CREATE TABLE IF NOT EXISTS course_brush_orders (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '订单ID',
+    user_id BIGINT NOT NULL COMMENT '用户ID',
+    username VARCHAR(50) NOT NULL COMMENT '用户名',
+    course_id BIGINT NOT NULL COMMENT '课程ID',
+    course_name VARCHAR(100) NOT NULL COMMENT '课程名称快照',
+    required_points INT NOT NULL COMMENT '所需积分快照',
+    student_account VARCHAR(100) NOT NULL COMMENT '刷课账号/学号',
+    student_password VARCHAR(255) NOT NULL COMMENT '刷课密码',
+    remark VARCHAR(500) COMMENT '用户备注',
+    status VARCHAR(20) DEFAULT 'pending' COMMENT '状态（pending-待处理，processing-处理中，completed-已完成，failed-失败，cancelled-取消）',
+    result_message VARCHAR(500) COMMENT '处理结果说明',
+    script_name VARCHAR(100) COMMENT '处理脚本名称',
+    request_id VARCHAR(100) COMMENT '脚本请求ID',
+    source VARCHAR(30) DEFAULT 'manual' COMMENT '来源（manual-用户下单，automation-script-脚本回写）',
+    submitted_at DATETIME NOT NULL COMMENT '提交时间',
+    processed_at DATETIME COMMENT '处理时间',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    INDEX idx_user_id (user_id),
+    INDEX idx_course_id (course_id),
+    INDEX idx_status (status),
+    INDEX idx_submitted_at (submitted_at),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES course_brush_courses(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代刷课订单表';
+
 -- 插入测试数据
 -- 密码: 123456 (BCrypt加密后)
 INSERT INTO users (username, email, password, points, status) VALUES 
@@ -117,3 +159,9 @@ INSERT INTO secondhand_products (title, price, category, description, images, se
 ('九成新 索尼降噪耳机 毕业出清', 450.00, 'electronics', '九成新，音质完美', 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400', 1, '王学长', '微信: demo123', 'available', 85),
 ('校园代步自行车 送车锁打气筒', 120.00, 'transport', '八成新，骑行流畅', 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&q=80&w=400', 1, '赵同学', '微信: demo123', 'available', 56),
 ('民谣吉他 适合新手入门 音质好', 180.00, 'daily', '适合新手，音质不错', 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&q=80&w=400', 1, '陈同学', '微信: demo123', 'available', 42);
+
+-- 插入示例代刷课课程
+INSERT INTO course_brush_courses (course_name, course_code, required_points, description, enabled) VALUES
+('青年大学习', 'youth-study', 8, '适合周期性学习任务，提交后进入待处理队列。', 1),
+('学习通章节任务', 'xxt-chapter', 15, '适合日常章节阅读/视频/测验类课程任务。', 1),
+('智慧树单元任务', 'zhihuishu-unit', 20, '适合智慧树平台的单元任务与进度补刷。', 1);

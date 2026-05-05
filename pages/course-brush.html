@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代刷课服务 - 校园综合服务平台</title>
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f5f8fb; color: #1f2937; min-height: 100vh; }
+        header { background: #ffffff; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 20; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #2563eb; text-decoration: none; }
+        .btn-outline { background: transparent; color: #4b5563; border: 1px solid #d1d5db; padding: 0.5rem 1.2rem; border-radius: 20px; text-decoration: none; transition: all 0.3s; }
+        .btn-outline:hover { background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; }
+
+        .page { max-width: 1180px; margin: 0 auto; padding: 2rem 5% 3rem; display: grid; gap: 1rem; }
+        .hero, .panel, .order-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 18px; box-shadow: 0 10px 24px rgba(37, 99, 235, 0.05); }
+        .hero { padding: 1.4rem; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.9fr); gap: 1rem; }
+        .hero h1 { margin: 0; font-size: 2rem; color: #111827; }
+        .hero p { margin: 0.8rem 0 0; color: #6b7280; line-height: 1.7; }
+        .hero-tags { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+        .hero-tag { padding: 0.4rem 0.8rem; border-radius: 999px; background: #eff6ff; color: #1d4ed8; font-size: 0.88rem; font-weight: 700; }
+        .hero-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
+        .stat-card { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 16px; padding: 1rem; }
+        .stat-card strong { display: block; color: #6b7280; font-size: 0.88rem; }
+        .stat-card span { display: block; margin-top: 0.35rem; font-size: 1.5rem; font-weight: 800; color: #111827; }
+
+        .panel { padding: 1.25rem; }
+        .panel h2 { margin: 0 0 1rem; font-size: 1.1rem; }
+        .panel-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr); gap: 1rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.9rem; }
+        .form-group label { font-size: 0.88rem; color: #6b7280; font-weight: 600; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 0.75rem 0.85rem;
+            font-size: 0.95rem;
+            background: #fff;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .form-group textarea { min-height: 110px; resize: vertical; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+        }
+        .course-tip { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 16px; padding: 1rem; display: grid; gap: 0.7rem; }
+        .course-tip strong { font-size: 1rem; color: #111827; }
+        .course-tip p { margin: 0; color: #6b7280; line-height: 1.7; }
+        .points-box { padding: 1rem; border-radius: 14px; background: #fffbeb; border: 1px solid #fde68a; color: #b45309; font-weight: 700; display: grid; gap: 0.75rem; }
+        .points-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+        .btn-small, .submit-btn, .filter-btn, .status-btn {
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font: inherit;
+            transition: transform 0.18s ease, background 0.18s ease;
+        }
+        .btn-small { padding: 0.55rem 1rem; color: #fff; font-weight: 700; }
+        .btn-small.buy-btn { background: #0f766e; }
+        .btn-small { background: #d97706; }
+        .submit-btn { width: 100%; padding: 0.95rem 1.1rem; background: #2563eb; color: #fff; font-weight: 800; font-size: 1rem; }
+        .submit-btn:hover:not(:disabled), .filter-btn:hover, .status-btn:hover, .btn-small:hover { transform: translateY(-1px); }
+        .submit-btn:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+        .filter-bar { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+        .filter-bar select { min-width: 180px; }
+        .filter-btn { padding: 0.72rem 1rem; background: #e0e7ff; color: #3730a3; font-weight: 700; }
+        .orders { display: grid; gap: 0.9rem; }
+        .order-card { padding: 1rem; }
+        .order-head { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; align-items: flex-start; }
+        .order-title { margin: 0; font-size: 1.05rem; }
+        .order-meta { margin: 0.3rem 0 0; color: #6b7280; line-height: 1.6; font-size: 0.92rem; }
+        .status-pill { display: inline-block; border-radius: 999px; padding: 0.35rem 0.7rem; font-size: 0.82rem; font-weight: 800; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-processing { background: #dbeafe; color: #1d4ed8; }
+        .status-completed { background: #dcfce7; color: #166534; }
+        .status-failed { background: #fee2e2; color: #991b1b; }
+        .status-cancelled { background: #e5e7eb; color: #374151; }
+        .empty-state { text-align: center; color: #6b7280; padding: 2rem 1rem; border: 1px dashed #d1d5db; border-radius: 16px; background: #fff; }
+
+        @media (max-width: 900px) {
+            .hero, .panel-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="main.html" class="logo">MyBrand校园 - 代刷课</a>
+        <a href="main.html" class="btn-outline">返回大厅</a>
+    </header>
+
+    <main class="page">
+        <section class="hero">
+            <div>
+                <h1>按课程积分定价，下单后进入刷课处理队列。</h1>
+                <p>课程与所需积分由管理员统一维护。提交订单后会立即扣除对应积分，后续可由人工/脚本服务回写处理状态，为后续自动化刷课脚本接入预留标准接口。</p>
+                <div class="hero-tags">
+                    <span class="hero-tag">课程积分可配置</span>
+                    <span class="hero-tag">下单即扣积分</span>
+                    <span class="hero-tag">预留脚本回写接口</span>
+                </div>
+            </div>
+            <div class="hero-stats">
+                <article class="stat-card">
+                    <strong>当前可选课程</strong>
+                    <span id="courseCount">0</span>
+                </article>
+                <article class="stat-card">
+                    <strong>我的订单数</strong>
+                    <span id="orderCount">0</span>
+                </article>
+                <article class="stat-card">
+                    <strong>当前积分</strong>
+                    <span id="currentPoints">0</span>
+                </article>
+                <article class="stat-card">
+                    <strong>当前课程消耗</strong>
+                    <span id="selectedPoints">0</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>提交刷课订单</h2>
+            <div class="panel-grid">
+                <div>
+                    <div class="form-group">
+                        <label for="courseSelect">选择课程</label>
+                        <select id="courseSelect">
+                            <option value="">请先选择课程</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentAccount">刷课账号 / 学号</label>
+                        <input id="studentAccount" type="text" placeholder="请输入需要刷课的账号">
+                    </div>
+                    <div class="form-group">
+                        <label for="studentPassword">刷课密码</label>
+                        <input id="studentPassword" type="password" placeholder="请输入课程平台密码">
+                    </div>
+                    <div class="form-group">
+                        <label for="orderRemark">备注（可选）</label>
+                        <textarea id="orderRemark" placeholder="例如：优先处理本周截止的章节任务，或补充课程要求。"></textarea>
+                    </div>
+                    <button type="button" id="submitOrderBtn" class="submit-btn">请选择课程后提交</button>
+                </div>
+                <div class="course-tip">
+                    <strong id="selectedCourseName">请选择一门课程</strong>
+                    <p id="selectedCourseDesc">管理员可在后台持续新增课程、调整积分和启停课程。这里会显示当前选中课程的说明与所需积分。</p>
+                    <div class="points-box">
+                        <div>当前可用积分：<span id="currentPointsBox">0</span></div>
+                        <div>本次下单将扣除：<span id="selectedPointsBox">0</span> 积分</div>
+                        <div class="points-actions">
+                            <button type="button" class="btn-small buy-btn" onclick="openPointsPurchasePage()">购买积分</button>
+                            <button type="button" class="btn-small" onclick="openRedeemModal()">兑换积分</button>
+                        </div>
+                    </div>
+                    <p>提示：该模块当前为平台预留的标准下单入口。后端已提供自动化脚本回写接口，后续可直接接入真实刷课服务。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>我的订单</h2>
+            <div class="filter-bar">
+                <select id="statusFilter">
+                    <option value="all">全部状态</option>
+                    <option value="pending">待处理</option>
+                    <option value="processing">处理中</option>
+                    <option value="completed">已完成</option>
+                    <option value="failed">失败</option>
+                    <option value="cancelled">已取消</option>
+                </select>
+                <button type="button" id="refreshOrdersBtn" class="filter-btn">刷新订单</button>
+            </div>
+            <div id="ordersContainer" class="orders">
+                <div class="empty-state">正在加载订单...</div>
+            </div>
+        </section>
+    </main>
+
+    <div id="redeemModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);justify-content:center;align-items:center;z-index:1000;">
+        <div style="background:#fff;border-radius:14px;padding:1.5rem;width:min(92vw,360px);position:relative;">
+            <button type="button" onclick="closeRedeemModal()" style="position:absolute;right:12px;top:10px;border:none;background:none;font-size:1.4rem;cursor:pointer;">&times;</button>
+            <h2 style="margin:0 0 1rem;font-size:1.2rem;">兑换积分</h2>
+            <div class="form-group">
+                <label for="redeemCode">兑换码</label>
+                <input id="redeemCode" type="text" placeholder="请输入积分兑换码">
+            </div>
+            <button type="button" class="submit-btn" onclick="handleRedeem()" style="margin-top:0.2rem;">确认兑换</button>
+        </div>
+    </div>
+
+    <script src="../js/api-config.js"></script>
+    <script src="../js/api-utils.js"></script>
+    <script src="../js/campus-state.js"></script>
+    <script>
+        const POINTS_PURCHASE_URL = 'https://example.com/redeem-codes';
+        const STATUS_META = {
+            pending: { label: '待处理', className: 'status-pending' },
+            processing: { label: '处理中', className: 'status-processing' },
+            completed: { label: '已完成', className: 'status-completed' },
+            failed: { label: '失败', className: 'status-failed' },
+            cancelled: { label: '已取消', className: 'status-cancelled' },
+        };
+
+        const state = {
+            courses: [],
+            orders: [],
+            points: 0,
+            selectedCourse: null,
+        };
+
+        function openPointsPurchasePage() {
+            window.open(POINTS_PURCHASE_URL, '_blank', 'noopener,noreferrer');
+            showMessage('已跳转到外部网站购买积分/兑换码，本站不参与任何金钱交易。', 'info');
+        }
+
+        function openRedeemModal() {
+            document.getElementById('redeemModal').style.display = 'flex';
+        }
+
+        function closeRedeemModal() {
+            document.getElementById('redeemModal').style.display = 'none';
+            document.getElementById('redeemCode').value = '';
+        }
+
+        async function handleRedeem() {
+            const code = document.getElementById('redeemCode').value.trim();
+            if (!getAuthToken()) {
+                showMessage('请先登录后再兑换积分', 'warning');
+                return;
+            }
+            if (!code) {
+                showMessage('请输入兑换码', 'warning');
+                return;
+            }
+            try {
+                const response = await post(API_ENDPOINTS.points.redeem, { code });
+                if (!response.success) {
+                    showMessage(response.message || '兑换失败', 'error');
+                    return;
+                }
+                state.points = setCampusPoints(Number(response.data?.balance ?? state.points));
+                renderPoints();
+                showMessage(`兑换成功，获得 ${Number(response.data?.points ?? 0)} 积分`, 'success');
+                closeRedeemModal();
+            } catch (error) {
+                handleError(error, '兑换失败');
+            }
+        }
+
+        function renderPoints() {
+            document.getElementById('currentPoints').textContent = state.points;
+            document.getElementById('currentPointsBox').textContent = state.points;
+        }
+
+        function renderCourseSelect() {
+            const select = document.getElementById('courseSelect');
+            if (!state.courses.length) {
+                select.innerHTML = '<option value="">当前暂无开放课程</option>';
+                return;
+            }
+
+            select.innerHTML = ['<option value="">请选择课程</option>']
+                .concat(state.courses.map((course) => (
+                    `<option value="${escapeHtml(course.id)}">${escapeHtml(course.courseName)} (${escapeHtml(course.requiredPoints)} 积分)</option>`
+                )))
+                .join('');
+        }
+
+        function renderSelectedCourse() {
+            const course = state.selectedCourse;
+            const points = Number(course?.requiredPoints ?? 0);
+            document.getElementById('selectedPoints').textContent = points;
+            document.getElementById('selectedPointsBox').textContent = points;
+
+            const submitBtn = document.getElementById('submitOrderBtn');
+            if (!course) {
+                document.getElementById('selectedCourseName').textContent = '请选择一门课程';
+                document.getElementById('selectedCourseDesc').textContent = '管理员可在后台持续新增课程、调整积分和启停课程。这里会显示当前选中课程的说明与所需积分。';
+                submitBtn.textContent = '请选择课程后提交';
+                return;
+            }
+
+            document.getElementById('selectedCourseName').textContent = `${course.courseName} · ${points} 积分`;
+            document.getElementById('selectedCourseDesc').textContent = course.description || '该课程当前暂无额外说明，提交后会进入待处理队列。';
+            submitBtn.textContent = `立即提交订单 (扣除 ${points} 积分)`;
+        }
+
+        function renderOrders() {
+            const container = document.getElementById('ordersContainer');
+            document.getElementById('orderCount').textContent = state.orders.length;
+
+            if (!state.orders.length) {
+                container.innerHTML = '<div class="empty-state">当前没有匹配订单，提交后会在这里显示处理状态。</div>';
+                return;
+            }
+
+            container.innerHTML = state.orders.map((order) => {
+                const meta = STATUS_META[order.status] || STATUS_META.pending;
+                return `
+                    <article class="order-card">
+                        <div class="order-head">
+                            <div>
+                                <h3 class="order-title">${escapeHtml(order.courseName || '未命名课程')}</h3>
+                                <p class="order-meta">账号：${escapeHtml(order.studentAccount || '-')} · 扣除积分：${escapeHtml(order.requiredPoints ?? 0)} · 提交时间：${escapeHtml(formatDate(order.submittedAt || order.createdAt || new Date()))}</p>
+                            </div>
+                            <span class="status-pill ${meta.className}">${meta.label}</span>
+                        </div>
+                        <p class="order-meta">备注：${escapeHtml(order.remark || '无')}</p>
+                        <p class="order-meta">结果：${escapeHtml(order.resultMessage || '暂无处理结果')}</p>
+                        <p class="order-meta">脚本：${escapeHtml(order.scriptName || '未分配')} · 请求ID：${escapeHtml(order.requestId || '-')}</p>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        async function loadPoints() {
+            if (!getAuthToken()) {
+                state.points = getCampusPoints();
+                renderPoints();
+                return;
+            }
+
+            try {
+                const response = await get(API_ENDPOINTS.points.getBalance);
+                if (response.success && response.data) {
+                    state.points = setCampusPoints(Number(response.data.balance ?? 0));
+                }
+            } catch (error) {
+                state.points = getCampusPoints();
+            }
+            renderPoints();
+        }
+
+        async function loadCourses() {
+            try {
+                const response = await get(API_ENDPOINTS.courseBrush.courses, { page: 1, pageSize: 100 });
+                if (!response.success || !response.data) {
+                    state.courses = [];
+                } else {
+                    state.courses = response.data.records || response.data.list || [];
+                }
+            } catch (error) {
+                state.courses = [];
+                handleError(error, '课程列表加载失败');
+            }
+
+            document.getElementById('courseCount').textContent = state.courses.length;
+            renderCourseSelect();
+            state.selectedCourse = null;
+            renderSelectedCourse();
+        }
+
+        async function loadOrders() {
+            if (!getAuthToken()) {
+                state.orders = [];
+                renderOrders();
+                return;
+            }
+
+            try {
+                const status = document.getElementById('statusFilter').value;
+                const response = await get(API_ENDPOINTS.courseBrush.myOrders, {
+                    status,
+                    page: 1,
+                    pageSize: 20,
+                });
+                if (!response.success || !response.data) {
+                    state.orders = [];
+                } else {
+                    state.orders = response.data.records || response.data.list || [];
+                }
+            } catch (error) {
+                state.orders = [];
+                handleError(error, '订单列表加载失败');
+            }
+            renderOrders();
+        }
+
+        async function submitOrder() {
+            const course = state.selectedCourse;
+            const studentAccount = document.getElementById('studentAccount').value.trim();
+            const studentPassword = document.getElementById('studentPassword').value;
+            const remark = document.getElementById('orderRemark').value.trim();
+
+            if (!getAuthToken()) {
+                showMessage('请先登录后再提交刷课订单', 'warning');
+                return;
+            }
+            if (!course) {
+                showMessage('请先选择课程', 'warning');
+                return;
+            }
+            if (!studentAccount || !studentPassword) {
+                showMessage('请填写完整的刷课账号和密码', 'warning');
+                return;
+            }
+            if (state.points < Number(course.requiredPoints || 0)) {
+                showMessage(`积分不足，该课程需要 ${course.requiredPoints} 积分`, 'error');
+                return;
+            }
+
+            try {
+                showLoading('正在提交刷课订单...');
+                const response = await post(API_ENDPOINTS.courseBrush.submit, {
+                    courseId: course.id,
+                    studentAccount,
+                    studentPassword,
+                    remark,
+                });
+                hideLoading();
+                if (!response.success) {
+                    showMessage(response.message || '提交失败', 'error');
+                    return;
+                }
+
+                state.points = setCampusPoints(Number(response.data?.remainingPoints ?? state.points));
+                renderPoints();
+                document.getElementById('studentAccount').value = '';
+                document.getElementById('studentPassword').value = '';
+                document.getElementById('orderRemark').value = '';
+                showMessage(`订单已提交，已扣除 ${course.requiredPoints} 积分`, 'success');
+                await loadOrders();
+            } catch (error) {
+                hideLoading();
+                handleError(error, '刷课订单提交失败');
+            }
+        }
+
+        function bindEvents() {
+            document.getElementById('courseSelect').addEventListener('change', (event) => {
+                const nextId = Number(event.target.value);
+                state.selectedCourse = state.courses.find((course) => Number(course.id) === nextId) || null;
+                renderSelectedCourse();
+            });
+
+            document.getElementById('submitOrderBtn').addEventListener('click', submitOrder);
+            document.getElementById('refreshOrdersBtn').addEventListener('click', loadOrders);
+            document.getElementById('statusFilter').addEventListener('change', loadOrders);
+            window.addEventListener('click', (event) => {
+                if (event.target === document.getElementById('redeemModal')) {
+                    closeRedeemModal();
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            bindEvents();
+            await loadPoints();
+            await loadCourses();
+            await loadOrders();
+        });
+    </script>
+</body>
+</html>

@@ -97,6 +97,15 @@ const API_ENDPOINTS = {
         automationSubmit: `${API_BASE_URL}/checkin/automation/submit`, // POST - 自动化签到脚本入口
     },
 
+    // 代刷课相关
+    courseBrush: {
+        courses: `${API_BASE_URL}/course-brush/courses`,       // GET - 获取可下单课程
+        submit: `${API_BASE_URL}/course-brush/submit`,         // POST - 提交代刷课订单
+        myOrders: `${API_BASE_URL}/course-brush/my-orders`,    // GET - 获取我的订单
+        automationSpec: `${API_BASE_URL}/course-brush/automation/spec`, // GET - 自动化刷课说明
+        automationSubmit: `${API_BASE_URL}/course-brush/automation/submit`, // POST - 自动化刷课脚本回写
+    },
+
     // 二手物品交易相关
     secondhand: {
         list: `${API_BASE_URL}/secondhand/list`,               // GET - 兼容旧版商品列表
@@ -169,6 +178,10 @@ const API_ENDPOINTS = {
         pointsHistory: `${API_BASE_URL}/points/admin/history`,  // GET - 管理员查看积分流水
         resourceUploadMaterial: `${API_BASE_URL}/resources/admin/materials/upload`, // POST - 管理员上传学习资料
         resourceUploadSoftware: `${API_BASE_URL}/resources/admin/software/upload`, // POST - 管理员上传学习软件
+        courseBrushCourses: `${API_BASE_URL}/course-brush/admin/courses`, // GET/POST - 管理员课程配置
+        courseBrushCourseStatusBase: `${API_BASE_URL}/course-brush/admin/courses`, // POST - 管理员启用/停用课程
+        courseBrushOrders: `${API_BASE_URL}/course-brush/admin/orders`, // GET - 管理员查看刷课订单
+        courseBrushOrderStatusBase: `${API_BASE_URL}/course-brush/admin/orders`, // POST - 管理员更新刷课订单状态
         recommendAdminList: `${API_BASE_URL}/recommend/admin/list`, // GET - 管理员查询好物
         recommendAdminCreate: `${API_BASE_URL}/recommend/admin/create`, // POST - 管理员上架好物
         recommendAdminStatusBase: `${API_BASE_URL}/recommend/admin`, // POST - 管理员上下架
