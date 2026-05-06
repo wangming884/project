@@ -4,7 +4,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.campus.common.Result;
 import com.campus.entity.SecondhandProduct;
 import com.campus.service.SecondhandService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -19,6 +25,7 @@ import java.util.Map;
  * @author Campus Platform Team
  */
 @RestController
+@Validated
 @RequestMapping("/secondhand")
 public class SecondhandController {
     
@@ -58,18 +65,18 @@ public class SecondhandController {
      */
     @PostMapping("/publish")
     public Result<Map<String, Object>> publishProduct(
-            @RequestBody Map<String, Object> request,
+            @Valid @RequestBody PublishProductRequest request,
             Authentication authentication) {
         Long userId = currentUserId(authentication);
-        String title = (String) request.get("title");
-        String description = (String) request.get("description");
-        BigDecimal price = new BigDecimal(request.get("price").toString());
-        String category = (String) request.get("category");
-        String images = (String) request.getOrDefault("images", "");
-        String contact = (String) request.getOrDefault("contact", "");
-
         Map<String, Object> result = secondhandService.publishProduct(
-            userId, title, description, price, category, images, contact);
+            userId,
+            request.getTitle(),
+            request.getDescription(),
+            request.getPrice(),
+            request.getCategory(),
+            request.getImages(),
+            request.getContact()
+        );
         return Result.success(result);
     }
     
@@ -116,18 +123,18 @@ public class SecondhandController {
     @PutMapping("/products/{productId}")
     public Result<Map<String, Object>> updateProduct(
             @PathVariable Long productId,
-            @RequestBody Map<String, Object> request,
+            @RequestBody UpdateProductRequest request,
             Authentication authentication) {
         Long userId = currentUserId(authentication);
-        String title = (String) request.get("title");
-        String description = (String) request.get("description");
-        BigDecimal price = request.get("price") != null 
-            ? new BigDecimal(request.get("price").toString()) : null;
-        String category = (String) request.get("category");
-        String contact = (String) request.get("contact");
-        
         Map<String, Object> result = secondhandService.updateProduct(
-            productId, userId, title, description, price, category, contact);
+            productId,
+            userId,
+            request.getTitle(),
+            request.getDescription(),
+            request.getPrice(),
+            request.getCategory(),
+            request.getContact()
+        );
         return Result.success(result);
     }
     
@@ -137,12 +144,11 @@ public class SecondhandController {
     @PatchMapping("/products/{productId}/status")
     public Result<Map<String, Object>> updateStatus(
             @PathVariable Long productId,
-            @RequestBody Map<String, String> request,
+            @Valid @RequestBody UpdateProductStatusRequest request,
             Authentication authentication) {
         Long userId = currentUserId(authentication);
-        String status = request.get("status");
-        
-        Map<String, Object> result = secondhandService.updateStatus(productId, userId, status);
+
+        Map<String, Object> result = secondhandService.updateStatus(productId, userId, request.getStatus());
         return Result.success(result);
     }
     
@@ -217,14 +223,8 @@ public class SecondhandController {
      * 兼容旧版前端 - 联系卖家
      */
     @PostMapping("/contact")
-    public Result<Map<String, Object>> contactCompat(@RequestBody Map<String, Object> request) {
-        if (request.get("productId") == null) {
-            return Result.error("productId 不能为空");
-        }
-
-        Long productId = Long.valueOf(request.get("productId").toString());
-        Map<String, Object> detail = secondhandService.getProductDetail(productId);
-        SecondhandProduct product = (SecondhandProduct) detail.get("product");
+    public Result<Map<String, Object>> contactCompat(@Valid @RequestBody ContactProductRequest request) {
+        SecondhandProduct product = secondhandService.getProductContactInfo(request.getProductId());
         if (product == null) {
             return Result.error("商品不存在");
         }
@@ -266,12 +266,11 @@ public class SecondhandController {
     @PostMapping("/admin/products/{productId}/status")
     public Result<Map<String, Object>> adminForceStatus(
             @PathVariable Long productId,
-            @RequestBody Map<String, String> request,
+            @Valid @RequestBody UpdateProductStatusRequest request,
             Authentication authentication) {
         try {
             Long operatorUserId = currentUserId(authentication);
-            String status = request.get("status");
-            Map<String, Object> result = secondhandService.adminForceStatus(operatorUserId, productId, status);
+            Map<String, Object> result = secondhandService.adminForceStatus(operatorUserId, productId, request.getStatus());
             return Result.success("状态更新成功", result);
         } catch (Exception e) {
             return Result.error(e.getMessage());
@@ -292,5 +291,46 @@ public class SecondhandController {
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
+    }
+
+    @Data
+    static class PublishProductRequest {
+        @NotBlank(message = "商品标题不能为空")
+        private String title;
+
+        private String description;
+
+        @NotNull(message = "价格不能为空")
+        @DecimalMin(value = "0.01", message = "价格必须大于 0")
+        private BigDecimal price;
+
+        @NotBlank(message = "商品分类不能为空")
+        private String category;
+
+        private String images;
+
+        @NotBlank(message = "联系方式不能为空")
+        private String contact;
+    }
+
+    @Data
+    static class UpdateProductRequest {
+        private String title;
+        private String description;
+        private BigDecimal price;
+        private String category;
+        private String contact;
+    }
+
+    @Data
+    static class UpdateProductStatusRequest {
+        @NotBlank(message = "状态不能为空")
+        private String status;
+    }
+
+    @Data
+    static class ContactProductRequest {
+        @NotNull(message = "productId 不能为空")
+        private Long productId;
     }
 }
