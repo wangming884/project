@@ -19,6 +19,8 @@ global.localStorage = {
 
 const {
     request,
+    get,
+    patch,
     isOfflineFallbackError,
     sanitizeUrl,
     REQUEST_TIMEOUT_ERROR_CODE,
@@ -60,6 +62,38 @@ test('request returns parsed JSON body for successful responses', async () => {
     assert.equal(capturedOptions.method, 'POST');
     assert.equal(capturedOptions.headers.get('Content-Type'), 'application/json');
     assert.equal(capturedOptions.body, JSON.stringify({ name: 'campus' }));
+});
+
+test('get forwards query params and custom request options', async () => {
+    let capturedUrl = '';
+    let capturedOptions = null;
+
+    global.fetch = async (url, options) => {
+        capturedUrl = url;
+        capturedOptions = options;
+        return new Response(JSON.stringify({
+            success: true,
+            data: { ok: true },
+        }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+        });
+    };
+
+    const controller = new AbortController();
+    await get('https://example.com/api/products', {
+        keyword: 'ipad',
+        category: 'electronics',
+    }, {
+        headers: { 'X-Test': '1' },
+        signal: controller.signal,
+    });
+
+    assert.equal(capturedUrl, 'https://example.com/api/products?keyword=ipad&category=electronics');
+    assert.equal(capturedOptions.method, 'GET');
+    assert.equal(capturedOptions.headers.get('X-Test'), '1');
+    assert.ok(capturedOptions.signal);
+    assert.equal(capturedOptions.signal.aborted, false);
 });
 
 test('request throws HTTP errors with response status', async () => {
@@ -131,6 +165,30 @@ test('request converts timeout aborts into API errors', async () => {
             return true;
         }
     ));
+});
+
+test('patch serializes JSON body like other mutating requests', async () => {
+    let capturedOptions = null;
+
+    global.fetch = async (url, options) => {
+        capturedOptions = options;
+        return new Response(JSON.stringify({
+            success: true,
+            data: { updated: true },
+        }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+        });
+    };
+
+    const response = await patch('https://example.com/api/products/1/status', {
+        status: 'sold',
+    });
+
+    assert.equal(response.success, true);
+    assert.equal(capturedOptions.method, 'PATCH');
+    assert.equal(capturedOptions.headers.get('Content-Type'), 'application/json');
+    assert.equal(capturedOptions.body, JSON.stringify({ status: 'sold' }));
 });
 
 test('sanitizeUrl blocks unsupported protocols and keeps safe addresses', () => {

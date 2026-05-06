@@ -236,7 +236,7 @@ async function request(url, options = {}) {
 /**
  * GET 请求
  */
-async function get(url, params = {}) {
+async function get(url, params = {}, options = {}) {
     const searchParams = new URLSearchParams();
     Object.entries(params || {}).forEach(([key, value]) => {
         if (value === undefined || value === null) {
@@ -259,36 +259,50 @@ async function get(url, params = {}) {
     const queryString = searchParams.toString();
     const fullUrl = queryString ? `${url}?${queryString}` : url;
     
-    return request(fullUrl, { method: 'GET' });
+    return request(fullUrl, { method: 'GET', ...options });
 }
 
 /**
  * POST 请求
  */
-async function post(url, data = {}) {
+async function post(url, data = {}, options = {}) {
     return request(url, {
         method: 'POST',
-        body: data,
+        ...options,
+        body: options.body !== undefined ? options.body : data,
     });
 }
 
 /**
  * PUT 请求
  */
-async function put(url, data = {}) {
+async function put(url, data = {}, options = {}) {
     return request(url, {
         method: 'PUT',
-        body: data,
+        ...options,
+        body: options.body !== undefined ? options.body : data,
+    });
+}
+
+/**
+ * PATCH 请求
+ */
+async function patch(url, data = {}, options = {}) {
+    return request(url, {
+        method: 'PATCH',
+        ...options,
+        body: options.body !== undefined ? options.body : data,
     });
 }
 
 /**
  * DELETE 请求
  */
-async function del(url, data = {}) {
+async function del(url, data = {}, options = {}) {
     return request(url, {
         method: 'DELETE',
-        body: data,
+        ...options,
+        body: options.body !== undefined ? options.body : data,
     });
 }
 
@@ -655,7 +669,7 @@ if (typeof module !== 'undefined' && module.exports) {
         REQUEST_TIMEOUT_ERROR_CODE,
         escapeHtml,
         sanitizeUrl,
-        request, get, post, put, del,
+        request, get, post, put, patch, del,
         showLoading, hideLoading,
         showMessage, handleError,
         setStorage, getStorage, removeStorage, clearStorage,

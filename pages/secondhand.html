@@ -5,463 +5,950 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>校园二手集市 - 校园综合服务平台</title>
     <style>
-        /* 基础样式重置 */
-        body { 
-            margin: 0; 
-            padding: 0; 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: #f4f7f6; 
-            color: #333; 
-            min-height: 100vh; 
+        :root {
+            --bg: #f5f8fc;
+            --surface: rgba(255, 255, 255, 0.94);
+            --surface-strong: #ffffff;
+            --text: #17324d;
+            --muted: #6b7a90;
+            --border: rgba(23, 50, 77, 0.1);
+            --brand: #0f6cbd;
+            --brand-deep: #0b5aa0;
+            --brand-soft: #d9eeff;
+            --success: #0f766e;
+            --success-soft: #d7f7f2;
+            --warning: #b45309;
+            --warning-soft: #ffedd5;
+            --shadow: 0 18px 42px rgba(15, 108, 189, 0.08);
         }
-        
-        /* 顶部导航栏样式 */
-        header { 
-            background: #ffffff; 
-            padding: 1rem 5%; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--text);
+            font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(15, 108, 189, 0.14), transparent 28%),
+                radial-gradient(circle at top right, rgba(16, 185, 129, 0.12), transparent 26%),
+                linear-gradient(180deg, #fbfdff 0%, var(--bg) 100%);
         }
-        .logo { 
-            font-size: 1.5rem; 
-            font-weight: bold; 
-            color: #3182ce; 
-            letter-spacing: 0.5px; 
+
+        a { color: inherit; }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(14px);
+            background: rgba(251, 253, 255, 0.86);
+            border-bottom: 1px solid rgba(23, 50, 77, 0.08);
+        }
+
+        .topbar,
+        .container {
+            width: min(1200px, calc(100% - 32px));
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+
+        .brand-block {
+            display: grid;
+            gap: 0.22rem;
+        }
+
+        .logo {
             text-decoration: none;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--brand);
+            letter-spacing: 0.02em;
         }
+
+        .brand-subtitle {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
         .header-actions {
             display: flex;
-            gap: 15px;
-        }
-        .btn {
-            padding: 0.5rem 1.2rem;
-            border-radius: 20px;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            border: none;
-        }
-        .btn-primary {
-            background: #3182ce;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #2b6cb0;
-            transform: translateY(-2px);
-        }
-        .btn-outline {
-            background: transparent;
-            color: #4a5568;
-            border: 1px solid #cbd5e0;
-        }
-        .btn-outline:hover {
-            background: #edf2f7;
-            color: #2d3748;
-        }
-
-        /* 页面主体 */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 5%;
-        }
-
-        /* 搜索和分类区域 */
-        .search-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 2.5rem;
-        }
-        .search-bar {
-            display: flex;
-            width: 100%;
-            max-width: 600px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border-radius: 30px;
-            overflow: hidden;
-            background: white;
-        }
-        .search-bar input {
-            flex: 1;
-            border: none;
-            padding: 1rem 1.5rem;
-            font-size: 1rem;
-            outline: none;
-        }
-        .search-bar button {
-            background: #3182ce;
-            color: white;
-            border: none;
-            padding: 0 2rem;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .search-bar button:hover {
-            background: #2b6cb0;
-        }
-
-        .categories {
-            display: flex;
-            gap: 15px;
-            margin-top: 1.5rem;
+            gap: 0.7rem;
             flex-wrap: wrap;
-            justify-content: center;
+            justify-content: flex-end;
         }
-        .category-tag {
-            padding: 0.4rem 1.2rem;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 20px;
-            color: #4a5568;
+
+        .btn {
+            border: none;
+            border-radius: 999px;
+            padding: 0.75rem 1.05rem;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-        }
-        .category-tag:hover, .category-tag.active {
-            background: #ebf8ff;
-            color: #3182ce;
-            border-color: #3182ce;
+            text-decoration: none;
+            font: inherit;
+            font-weight: 700;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
         }
 
-        /* 商品网格 */
-        .product-grid {
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            color: #fff;
+            background: linear-gradient(135deg, var(--brand) 0%, #2d8fe2 100%);
+            box-shadow: 0 12px 24px rgba(15, 108, 189, 0.22);
+        }
+
+        .btn-outline {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(23, 50, 77, 0.12);
+        }
+
+        .btn-soft {
+            color: var(--brand);
+            background: var(--brand-soft);
+        }
+
+        .btn[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .container {
+            padding: 1.25rem 0 2.5rem;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 2rem;
+            gap: 1rem;
         }
 
-        /* 商品卡片 */
-        .product-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        .hero,
+        .panel,
+        .summary-card,
+        .empty-state {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .hero {
+            padding: 1.2rem;
+            display: grid;
+            grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.95fr);
+            gap: 1rem;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(1.95rem, 4vw, 2.7rem);
+            line-height: 1.08;
+        }
+
+        .hero p {
+            margin: 0.9rem 0 0;
+            color: var(--muted);
+            line-height: 1.75;
+        }
+
+        .hero-tags {
+            margin-top: 1rem;
             display: flex;
-            flex-direction: column;
+            gap: 0.6rem;
+            flex-wrap: wrap;
         }
+
+        .hero-tags span {
+            border-radius: 999px;
+            padding: 0.45rem 0.8rem;
+            font-size: 0.88rem;
+            font-weight: 800;
+        }
+
+        .tag-live { color: var(--brand); background: var(--brand-soft); }
+        .tag-safe { color: var(--success); background: var(--success-soft); }
+        .tag-fast { color: var(--warning); background: var(--warning-soft); }
+
+        .hero-side {
+            display: grid;
+            gap: 0.8rem;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .summary-card {
+            padding: 1rem;
+            background: var(--surface-strong);
+        }
+
+        .summary-card .label {
+            color: var(--muted);
+            font-size: 0.86rem;
+        }
+
+        .summary-card .value {
+            margin-top: 0.45rem;
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        .panel {
+            padding: 1rem;
+        }
+
+        .panel-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.8rem;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            margin-bottom: 0.9rem;
+        }
+
+        .panel-head h2,
+        .result-bar h2 {
+            margin: 0;
+            font-size: 1.05rem;
+        }
+
+        .panel-head p,
+        .result-meta,
+        .result-text {
+            margin: 0.35rem 0 0;
+            color: var(--muted);
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(180px, 0.55fr)) auto;
+            gap: 0.8rem;
+            align-items: end;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 0.32rem;
+        }
+
+        label {
+            color: var(--muted);
+            font-size: 0.84rem;
+            font-weight: 700;
+        }
+
+        input,
+        select {
+            width: 100%;
+            border-radius: 14px;
+            border: 1px solid rgba(23, 50, 77, 0.14);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 0.8rem 0.9rem;
+            font: inherit;
+            color: var(--text);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .result-bar {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(23, 50, 77, 0.08);
+            border-radius: 22px;
+            overflow: hidden;
+            display: grid;
+            grid-template-rows: 180px auto;
+            box-shadow: 0 14px 30px rgba(15, 108, 189, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+            transform: translateY(-3px);
+            box-shadow: 0 22px 36px rgba(15, 108, 189, 0.1);
         }
+
         .product-img {
             width: 100%;
-            height: 180px;
+            height: 100%;
             object-fit: cover;
-            background: #edf2f7;
             display: block;
+            background: #edf4fb;
         }
-        .product-info {
-            padding: 1.2rem;
+
+        .product-content {
+            padding: 1rem;
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .product-top {
             display: flex;
-            flex-direction: column;
-            flex: 1;
+            justify-content: space-between;
+            gap: 0.8rem;
+            align-items: flex-start;
         }
+
         .product-title {
-            font-size: 1.1rem;
-            color: #2d3748;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
+            margin: 0;
+            font-size: 1.02rem;
+            line-height: 1.45;
+        }
+
+        .price {
+            flex-shrink: 0;
+            color: #c2410c;
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .badges {
+            display: flex;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            border-radius: 999px;
+            padding: 0.38rem 0.68rem;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .badge-category {
+            color: var(--brand);
+            background: var(--brand-soft);
+        }
+
+        .badge-status {
+            color: var(--success);
+            background: var(--success-soft);
+        }
+
+        .product-desc {
+            margin: 0;
+            color: #42556e;
+            line-height: 1.7;
+            min-height: 3.4em;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        .product-price {
-            color: #e53e3e;
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-bottom: 0.8rem;
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.65rem;
         }
-        .product-meta {
-            font-size: 0.85rem;
-            color: #718096;
-            margin-bottom: 1rem;
-            margin-top: auto;
+
+        .meta-box {
+            border-radius: 14px;
+            padding: 0.72rem 0.78rem;
+            background: rgba(245, 248, 252, 0.9);
+            border: 1px solid rgba(23, 50, 77, 0.05);
+        }
+
+        .meta-label {
+            color: var(--muted);
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+
+        .meta-value {
+            margin-top: 0.28rem;
+            line-height: 1.55;
+            word-break: break-word;
+        }
+
+        .product-footer {
             display: flex;
             justify-content: space-between;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
         }
-        .buy-btn {
-            width: 100%;
-            padding: 0.6rem;
-            background: #ebf8ff;
-            color: #3182ce;
-            border: 1px solid transparent;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
+
+        .product-time {
+            color: var(--muted);
+            font-size: 0.82rem;
         }
-        .product-card:hover .buy-btn {
-            background: #3182ce;
-            color: white;
+
+        .product-actions {
+            display: flex;
+            gap: 0.55rem;
+            flex-wrap: wrap;
+        }
+
+        .empty-state {
+            padding: 2rem 1rem;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .empty-state strong {
+            display: block;
+            margin-bottom: 0.45rem;
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.8rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .pagination-info {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .pagination-actions {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 980px) {
+            .hero,
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .topbar,
+            .result-bar,
+            .product-top,
+            .product-footer,
+            .pagination {
+                align-items: stretch;
+            }
+
+            .header-actions,
+            .filter-actions,
+            .product-actions,
+            .pagination-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .hero-side,
+            .meta-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <header>
-        <a href="main.html" class="logo">MyBrand校园 - 二手集市</a>
-        <div class="header-actions">
-            <button class="btn btn-primary" onclick="window.location.href='secondhand-manage.html'">➕ 发布管理</button>
-            <a href="main.html" class="btn btn-outline">返回大厅</a>
+        <div class="topbar">
+            <div class="brand-block">
+                <a href="main.html" class="logo">MyBrand校园 · 二手集市</a>
+                <div class="brand-subtitle">真实商品列表、真实搜索筛选、真实卖家联系链路</div>
+            </div>
+            <div class="header-actions">
+                <a href="secondhand-manage.html" class="btn btn-primary">发布 / 管理我的二手</a>
+                <a href="main.html" class="btn btn-outline">返回大厅</a>
+            </div>
         </div>
     </header>
 
     <main class="container">
-        <div class="search-section">
-            <div class="search-bar">
-                <input type="text" placeholder="搜索需要的书籍、数码产品、生活用品等...">
-                <button>搜 索</button>
-            </div>
-            <div class="categories">
-                <span class="category-tag active">全部闲置</span>
-                <span class="category-tag">教材书籍</span>
-                <span class="category-tag">数码电子</span>
-                <span class="category-tag">生活用品</span>
-                <span class="category-tag">交通出行</span>
-            </div>
-        </div>
-
-        <div class="product-grid">
-            <!-- 商品 1 -->
-            <div class="product-card">
-                <img class="product-img" src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=400" alt="高等数学教材">
-                <div class="product-info">
-                    <div class="product-title">高等数学（第七版）上下册 几乎全新</div>
-                    <div class="product-price">￥ 25.00</div>
-                    <div class="product-meta">
-                        <span>👤 李同学</span>
-                        <span>🕐 2小时前</span>
-                    </div>
-                    <button class="buy-btn" onclick="alert('卖家微信/QQ信息已复制！')">联系卖家</button>
+        <section class="hero">
+            <div>
+                <h1>把校园里的闲置、教材、数码和生活用品，收进一个真正能交易的大厅。</h1>
+                <p>这一页现在直接连接 Java 后端商品接口，不再混用静态示例卡片。你可以按分类、关键词和排序方式筛选真实商品，联系卖家时也会通过接口读取当前联系方式。</p>
+                <div class="hero-tags">
+                    <span class="tag-live">真实数据</span>
+                    <span class="tag-safe">安全输出</span>
+                    <span class="tag-fast">筛选更快</span>
                 </div>
             </div>
-
-            <!-- 商品 2 -->
-            <div class="product-card">
-                <img class="product-img" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400" alt="降噪耳机">
-                <div class="product-info">
-                    <div class="product-title">九成新 索尼降噪耳机 毕业出清</div>
-                    <div class="product-price">￥ 450.00</div>
-                    <div class="product-meta">
-                        <span>👤 王学长</span>
-                        <span>🕐 5小时前</span>
-                    </div>
-                    <button class="buy-btn" onclick="alert('卖家微信/QQ信息已复制！')">联系卖家</button>
-                </div>
+            <div class="hero-side">
+                <article class="summary-card">
+                    <div class="label">当前结果总数</div>
+                    <div class="value" id="totalCount">0</div>
+                </article>
+                <article class="summary-card">
+                    <div class="label">当前分类</div>
+                    <div class="value" id="categoryLabel">全部</div>
+                </article>
+                <article class="summary-card">
+                    <div class="label">排序方式</div>
+                    <div class="value" id="sortLabel">最新</div>
+                </article>
+                <article class="summary-card">
+                    <div class="label">当前页</div>
+                    <div class="value" id="pageLabel">1 / 1</div>
+                </article>
             </div>
+        </section>
 
-            <!-- 商品 3 -->
-            <div class="product-card">
-                <img class="product-img" src="https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&q=80&w=400" alt="代步自行车">
-                <div class="product-info">
-                    <div class="product-title">校园代步自行车 送车锁打气筒</div>
-                    <div class="product-price">￥ 120.00</div>
-                    <div class="product-meta">
-                        <span>👤 赵同学</span>
-                        <span>🕐 1天前</span>
-                    </div>
-                    <button class="buy-btn" onclick="alert('卖家微信/QQ信息已复制！')">联系卖家</button>
+        <section class="panel">
+            <div class="panel-head">
+                <div>
+                    <h2>筛选真实商品</h2>
+                    <p>支持关键词搜索、分类过滤和排序切换。默认只展示可售商品。</p>
                 </div>
+                <button id="refreshBtn" type="button" class="btn btn-soft">刷新数据</button>
             </div>
+            <form id="filterForm" class="filter-grid">
+                <div class="form-group">
+                    <label for="keywordInput">关键词</label>
+                    <input id="keywordInput" type="search" placeholder="搜索书籍、耳机、自行车、宿舍神器...">
+                </div>
+                <div class="form-group">
+                    <label for="categorySelect">分类</label>
+                    <select id="categorySelect"></select>
+                </div>
+                <div class="form-group">
+                    <label for="sortSelect">排序</label>
+                    <select id="sortSelect"></select>
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary">搜索商品</button>
+                    <button id="resetBtn" type="button" class="btn btn-outline">重置筛选</button>
+                </div>
+            </form>
+        </section>
 
-            <!-- 商品 4 -->
-            <div class="product-card">
-                <img class="product-img" src="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&q=80&w=400" alt="民谣吉他">
-                <div class="product-info">
-                    <div class="product-title">民谣吉他 适合新手入门 音质好</div>
-                    <div class="product-price">￥ 180.00</div>
-                    <div class="product-meta">
-                        <span>👤 陈同学</span>
-                        <span>🕐 2天前</span>
-                    </div>
-                    <button class="buy-btn" onclick="alert('卖家微信/QQ信息已复制！')">联系卖家</button>
+        <section class="panel">
+            <div class="result-bar">
+                <div>
+                    <h2>商品大厅</h2>
+                    <p id="resultText" class="result-text">正在准备真实商品数据...</p>
                 </div>
+                <div id="resultMeta" class="result-meta">默认按最新发布时间排序</div>
             </div>
-        </div>
+        </section>
+
+        <section id="productGrid" class="grid"></section>
+
+        <section class="panel pagination">
+            <div id="paginationInfo" class="pagination-info">第 1 页，共 1 页</div>
+            <div class="pagination-actions">
+                <button id="prevPageBtn" type="button" class="btn btn-outline">上一页</button>
+                <button id="nextPageBtn" type="button" class="btn btn-outline">下一页</button>
+            </div>
+        </section>
     </main>
 
-    <!-- 引入 API 配置和工具函数 -->
     <script src="../js/api-config.js"></script>
     <script src="../js/api-utils.js"></script>
-    
     <script>
-        // ==================== 商品列表加载 ====================
-        let currentCategory = 'all';
-        let allProducts = [];
+        const CATEGORY_OPTIONS = [
+            { value: '', label: '全部闲置' },
+            { value: 'books', label: '教材书籍' },
+            { value: 'electronics', label: '数码电子' },
+            { value: 'daily', label: '生活用品' },
+            { value: 'transport', label: '交通出行' },
+        ];
 
-        // 页面加载时获取商品列表
-        document.addEventListener('DOMContentLoaded', loadProducts);
+        const SORT_OPTIONS = [
+            { value: 'latest', label: '最新发布' },
+            { value: 'price_asc', label: '价格从低到高' },
+            { value: 'price_desc', label: '价格从高到低' },
+            { value: 'views', label: '浏览量优先' },
+        ];
 
-        async function loadProducts(category = 'all') {
-            currentCategory = category;
-            
-            try {
-                showLoading('加载中...');
-                
-                // 调用商品列表 API
-                const response = await get(API_ENDPOINTS.secondhand.list, {
-                    category: category === 'all' ? '' : category,
-                    page: 1,
-                    pageSize: 20,
-                });
-                
-                hideLoading();
-                
-                if (response.success && response.data) {
-                    allProducts = response.data.list || [];
-                    renderProducts(allProducts);
-                } else {
-                    showMessage('加载商品失败', 'error');
-                }
-            } catch (error) {
-                // 降级：显示静态数据
-                hideLoading();
-                console.warn('后端未连接，显示示例数据');
-                renderStaticProducts();
+        const CATEGORY_LABELS = CATEGORY_OPTIONS.reduce((map, item) => {
+            map[item.value] = item.label;
+            return map;
+        }, {});
+
+        const SORT_LABELS = SORT_OPTIONS.reduce((map, item) => {
+            map[item.value] = item.label;
+            return map;
+        }, {});
+
+        const state = {
+            keyword: '',
+            category: '',
+            sortBy: 'latest',
+            page: 1,
+            pageSize: 12,
+            total: 0,
+            pages: 1,
+            products: [],
+        };
+
+        const productGridEl = document.getElementById('productGrid');
+        const resultTextEl = document.getElementById('resultText');
+        const resultMetaEl = document.getElementById('resultMeta');
+        const paginationInfoEl = document.getElementById('paginationInfo');
+        const prevPageBtnEl = document.getElementById('prevPageBtn');
+        const nextPageBtnEl = document.getElementById('nextPageBtn');
+        const totalCountEl = document.getElementById('totalCount');
+        const categoryLabelEl = document.getElementById('categoryLabel');
+        const sortLabelEl = document.getElementById('sortLabel');
+        const pageLabelEl = document.getElementById('pageLabel');
+        const keywordInputEl = document.getElementById('keywordInput');
+        const categorySelectEl = document.getElementById('categorySelect');
+        const sortSelectEl = document.getElementById('sortSelect');
+
+        function ensureSuccess(response, fallbackMessage) {
+            if (!response || response.success !== true) {
+                throw new Error(response?.message || fallbackMessage);
             }
+            return response.data;
         }
 
-        // 渲染商品列表
+        function escapeSvgText(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function createPlaceholderImage(title) {
+            const safeTitle = escapeSvgText(String(title || '校园二手').slice(0, 16));
+            const svg = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360">
+                    <defs>
+                        <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#d9eeff" />
+                            <stop offset="100%" stop-color="#eff8ff" />
+                        </linearGradient>
+                    </defs>
+                    <rect width="600" height="360" fill="url(#g)" />
+                    <circle cx="500" cy="70" r="56" fill="rgba(15,108,189,0.12)" />
+                    <circle cx="110" cy="290" r="90" fill="rgba(16,185,129,0.10)" />
+                    <text x="50%" y="46%" font-size="36" text-anchor="middle" fill="#0f6cbd" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-weight="700">校园二手</text>
+                    <text x="50%" y="60%" font-size="20" text-anchor="middle" fill="#42556e" font-family="Segoe UI, Microsoft YaHei, sans-serif">${safeTitle}</text>
+                </svg>
+            `;
+            return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+        }
+
         function normalizePrice(value) {
-            const num = Number(value);
-            return Number.isFinite(num) ? num.toFixed(2) : '0.00';
+            const numberValue = Number(value);
+            return Number.isFinite(numberValue) ? numberValue.toFixed(2) : '0.00';
         }
 
-        function getSafeProductImage(url) {
-            return sanitizeUrl(url, {
-                fallback: 'https://via.placeholder.com/400x180?text=No+Image',
+        function formatCategory(category) {
+            return CATEGORY_LABELS[category] || category || '全部闲置';
+        }
+
+        function formatSort(sortBy) {
+            return SORT_LABELS[sortBy] || '最新发布';
+        }
+
+        function formatPage(page, pages) {
+            const current = Number(page) || 1;
+            const totalPages = Math.max(1, Number(pages) || 1);
+            return `${current} / ${totalPages}`;
+        }
+
+        function formatDateTime(value) {
+            if (!value) {
+                return '-';
+            }
+            const normalized = String(value).replace(' ', 'T');
+            const date = new Date(normalized);
+            if (Number.isNaN(date.getTime())) {
+                return value;
+            }
+            return date.toLocaleString('zh-CN', { hour12: false });
+        }
+
+        function getPrimaryImage(product) {
+            const rawImage = String(product?.images || '')
+                .split(',')
+                .map((item) => item.trim())
+                .find(Boolean);
+
+            return sanitizeUrl(rawImage, {
+                fallback: createPlaceholderImage(product?.title),
                 allowRelative: true,
             });
         }
 
-        function renderProducts(products) {
-            const grid = document.querySelector('.product-grid');
-            
-            if (!products || products.length === 0) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #718096; padding: 3rem;">暂无商品</p>';
-                return;
-            }
-            
-            grid.innerHTML = products.map(product => `
-                <div class="product-card">
-                    <img class="product-img" src="${escapeHtml(getSafeProductImage(product.image))}" alt="${escapeHtml(product.title || '未命名商品')}">
-                    <div class="product-info">
-                        <div class="product-title">${escapeHtml(product.title || '未命名商品')}</div>
-                        <div class="product-price">￥ ${normalizePrice(product.price)}</div>
-                        <div class="product-meta">
-                            <span>👤 ${escapeHtml(product.seller || '匿名卖家')}</span>
-                            <span>🕐 ${escapeHtml(getRelativeTime(product.createdAt || Date.now()))}</span>
-                        </div>
-                        <button class="buy-btn" data-product-id="${escapeHtml(product.id)}" data-seller="${escapeHtml(product.seller || '匿名卖家')}">联系卖家</button>
-                    </div>
-                </div>
+        function getProductDescription(product) {
+            const description = String(product?.description || '').trim();
+            return description || '卖家暂未填写补充说明，可以先联系确认成色、配件和交易地点。';
+        }
+
+        function renderSelectOptions(selectEl, options) {
+            selectEl.innerHTML = options.map((item) => `
+                <option value="${escapeHtml(item.value)}">${escapeHtml(item.label)}</option>
             `).join('');
         }
 
-        // 显示静态示例数据
-        function renderStaticProducts() {
-            // 保持现有的静态HTML不变
+        function syncControlsFromState() {
+            keywordInputEl.value = state.keyword;
+            categorySelectEl.value = state.category;
+            sortSelectEl.value = state.sortBy;
         }
 
-        // 联系卖家
+        function renderSummary() {
+            totalCountEl.textContent = String(Number(state.total || 0));
+            categoryLabelEl.textContent = formatCategory(state.category).replace('闲置', '');
+            sortLabelEl.textContent = formatSort(state.sortBy).replace('发布', '');
+            pageLabelEl.textContent = formatPage(state.page, state.pages);
+        }
+
+        function renderPagination() {
+            paginationInfoEl.textContent = `第 ${state.page} 页，共 ${state.pages} 页，共 ${state.total} 条真实商品`;
+            prevPageBtnEl.disabled = state.page <= 1;
+            nextPageBtnEl.disabled = state.page >= state.pages;
+        }
+
+        function renderEmptyState(message, description) {
+            productGridEl.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <strong>${escapeHtml(message)}</strong>
+                    <div>${escapeHtml(description)}</div>
+                </div>
+            `;
+        }
+
+        function renderProducts() {
+            if (!state.products.length) {
+                renderEmptyState(
+                    '当前筛选下暂无商品',
+                    state.keyword
+                        ? '可以试试更换关键词、切换分类，或者返回发布管理页先发布一条商品。'
+                        : '还没有匹配到可售商品，可以稍后刷新，或前往发布管理页上架第一条闲置。'
+                );
+                return;
+            }
+
+            productGridEl.innerHTML = state.products.map((product) => `
+                <article class="product-card">
+                    <img class="product-img" src="${escapeHtml(getPrimaryImage(product))}" alt="${escapeHtml(product.title || '校园二手商品')}">
+                    <div class="product-content">
+                        <div class="product-top">
+                            <h3 class="product-title">${escapeHtml(product.title || '未命名商品')}</h3>
+                            <div class="price">￥ ${escapeHtml(normalizePrice(product.price))}</div>
+                        </div>
+
+                        <div class="badges">
+                            <span class="badge badge-category">${escapeHtml(formatCategory(product.category))}</span>
+                            <span class="badge badge-status">可售中</span>
+                        </div>
+
+                        <p class="product-desc">${escapeHtml(getProductDescription(product))}</p>
+
+                        <div class="meta-grid">
+                            <div class="meta-box">
+                                <div class="meta-label">卖家</div>
+                                <div class="meta-value">${escapeHtml(product.sellerName || '匿名卖家')}</div>
+                            </div>
+                            <div class="meta-box">
+                                <div class="meta-label">浏览量</div>
+                                <div class="meta-value">${escapeHtml(String(product.views ?? 0))}</div>
+                            </div>
+                        </div>
+
+                        <div class="product-footer">
+                            <div class="product-time">发布时间：${escapeHtml(formatDateTime(product.createdAt))}</div>
+                            <div class="product-actions">
+                                <button
+                                    type="button"
+                                    class="btn btn-soft"
+                                    data-action="contact"
+                                    data-product-id="${escapeHtml(product.id)}"
+                                    data-seller-name="${escapeHtml(product.sellerName || '匿名卖家')}"
+                                >联系卖家</button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        async function loadProducts({ withLoading = true } = {}) {
+            try {
+                if (withLoading) {
+                    showLoading('正在同步二手大厅...');
+                }
+
+                const pageData = ensureSuccess(await get(API_ENDPOINTS.secondhand.products, {
+                    keyword: state.keyword,
+                    category: state.category,
+                    sortBy: state.sortBy,
+                    page: state.page,
+                    pageSize: state.pageSize,
+                }), '商品列表加载失败');
+
+                state.products = Array.isArray(pageData?.records) ? pageData.records : [];
+                state.total = Number(pageData?.total || 0);
+                state.page = Number(pageData?.current || state.page || 1);
+                state.pages = Math.max(1, Number(pageData?.pages || 1));
+
+                resultTextEl.textContent = state.total
+                    ? `当前展示第 ${state.page} 页，共命中 ${state.total} 条可售商品。`
+                    : '当前筛选下没有匹配的可售商品。';
+                resultMetaEl.textContent = state.keyword
+                    ? `关键词“${state.keyword}”正在按 ${formatSort(state.sortBy)} 展示`
+                    : `当前分类：${formatCategory(state.category)}，按 ${formatSort(state.sortBy)} 展示`;
+
+                renderSummary();
+                renderProducts();
+                renderPagination();
+            } catch (error) {
+                state.products = [];
+                state.total = 0;
+                state.page = 1;
+                state.pages = 1;
+                resultTextEl.textContent = '二手商品加载失败，请检查后端连接或稍后重试。';
+                resultMetaEl.textContent = '当前页面不再回退到静态示例卡片，只展示真实接口结果。';
+                renderSummary();
+                renderEmptyState('暂时无法获取商品数据', '后端恢复后刷新即可继续浏览真实商品。');
+                renderPagination();
+                handleError(error, '商品列表加载失败');
+            } finally {
+                hideLoading();
+            }
+        }
+
         async function contactSeller(productId, sellerName) {
             try {
-                showLoading('获取联系方式...');
-                
-                const response = await post(API_ENDPOINTS.secondhand.contact, {
+                showLoading('正在获取卖家联系方式...');
+                const data = ensureSuccess(await post(API_ENDPOINTS.secondhand.contact, {
                     productId,
-                });
-                
+                }), '获取联系方式失败');
                 hideLoading();
-                
-                if (response.success && response.data) {
-                    const contact = response.data.contact;
-                    showMessage(`卖家 ${sellerName} 的联系方式：${contact}`, 'success', 5000);
-                    
-                    // 复制到剪贴板
-                    if (navigator.clipboard) {
-                        navigator.clipboard.writeText(contact);
+
+                const contact = String(data?.contact || '').trim();
+                if (!contact) {
+                    showMessage('卖家暂未公开联系方式', 'warning');
+                    return;
+                }
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    try {
+                        await navigator.clipboard.writeText(contact);
+                        showMessage(`已复制 ${sellerName} 的联系方式：${contact}`, 'success', 4500);
+                        return;
+                    } catch (error) {
+                        console.warn('复制联系方式失败:', error);
                     }
-                } else {
-                    showMessage(response.message || '获取联系方式失败', 'error');
                 }
+
+                showMessage(`${sellerName} 的联系方式：${contact}`, 'success', 4500);
             } catch (error) {
                 hideLoading();
-                showMessage('卖家微信/QQ信息已复制！', 'success');
+                handleError(error, '获取联系方式失败');
             }
         }
 
-        document.querySelector('.product-grid').addEventListener('click', (event) => {
-            const target = event.target;
-            if (!target.classList.contains('buy-btn') || !target.dataset.productId) {
-                return;
-            }
-            contactSeller(target.dataset.productId, target.dataset.seller || '匿名卖家');
-        });
-
-        // 搜索功能
-        document.querySelector('.search-bar button').addEventListener('click', handleSearch);
-        document.querySelector('.search-bar input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleSearch();
-        });
-
-        async function handleSearch() {
-            const keyword = document.querySelector('.search-bar input').value.trim();
-            
-            if (!keyword) {
-                loadProducts(currentCategory);
-                return;
-            }
-            
-            try {
-                showLoading('搜索中...');
-                
-                const response = await get(API_ENDPOINTS.secondhand.search, {
-                    keyword,
-                    category: currentCategory === 'all' ? '' : currentCategory,
-                });
-                
-                hideLoading();
-                
-                if (response.success) {
-                    renderProducts(response.data.list || []);
-                } else {
-                    showMessage('搜索失败', 'error');
-                }
-            } catch (error) {
-                hideLoading();
-                handleError(error, '搜索失败');
+        function updateStateFromForm(resetPage = true) {
+            state.keyword = keywordInputEl.value.trim();
+            state.category = categorySelectEl.value;
+            state.sortBy = sortSelectEl.value;
+            if (resetPage) {
+                state.page = 1;
             }
         }
 
-        // 分类切换
-        document.querySelectorAll('.category-tag').forEach(tag => {
-            tag.addEventListener('click', function() {
-                document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                
-                const categoryMap = {
-                    '全部闲置': 'all',
-                    '教材书籍': 'books',
-                    '数码电子': 'electronics',
-                    '生活用品': 'daily',
-                    '交通出行': 'transport',
-                };
-                
-                const category = categoryMap[this.textContent] || 'all';
-                loadProducts(category);
+        function resetFilters() {
+            state.keyword = '';
+            state.category = '';
+            state.sortBy = 'latest';
+            state.page = 1;
+            syncControlsFromState();
+        }
+
+        function bindEvents() {
+            document.getElementById('filterForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                updateStateFromForm();
+                await loadProducts();
             });
+
+            document.getElementById('resetBtn').addEventListener('click', async () => {
+                resetFilters();
+                await loadProducts();
+            });
+
+            document.getElementById('refreshBtn').addEventListener('click', async () => {
+                updateStateFromForm(false);
+                await loadProducts();
+            });
+
+            categorySelectEl.addEventListener('change', async () => {
+                updateStateFromForm();
+                await loadProducts();
+            });
+
+            sortSelectEl.addEventListener('change', async () => {
+                updateStateFromForm();
+                await loadProducts();
+            });
+
+            prevPageBtnEl.addEventListener('click', async () => {
+                if (state.page <= 1) {
+                    return;
+                }
+                state.page -= 1;
+                await loadProducts();
+            });
+
+            nextPageBtnEl.addEventListener('click', async () => {
+                if (state.page >= state.pages) {
+                    return;
+                }
+                state.page += 1;
+                await loadProducts();
+            });
+
+            productGridEl.addEventListener('click', async (event) => {
+                const target = event.target.closest('[data-action="contact"]');
+                if (!target) {
+                    return;
+                }
+
+                await contactSeller(target.dataset.productId, target.dataset.sellerName || '卖家');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            renderSelectOptions(categorySelectEl, CATEGORY_OPTIONS);
+            renderSelectOptions(sortSelectEl, SORT_OPTIONS);
+            syncControlsFromState();
+            renderSummary();
+            renderPagination();
+            bindEvents();
+            await loadProducts();
         });
     </script>
 </body>
 </html>
-

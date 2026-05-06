@@ -1103,10 +1103,7 @@
         async function updateProductStatus(url, status) {
             try {
                 showLoading('正在更新商品状态...');
-                ensureSuccess(await request(url, {
-                    method: 'PATCH',
-                    body: { status },
-                }), '状态更新失败');
+                ensureSuccess(await patch(url, { status }), '状态更新失败');
                 hideLoading();
                 showMessage('商品状态已更新', 'success');
                 await loadMyData(false);
@@ -1119,9 +1116,7 @@
         async function deleteProduct(url) {
             try {
                 showLoading('正在删除商品记录...');
-                ensureSuccess(await request(url, {
-                    method: 'DELETE',
-                }), '删除失败');
+                ensureSuccess(await del(url), '删除失败');
                 hideLoading();
                 showMessage('商品记录已删除', 'success');
                 await loadMyData(false);
