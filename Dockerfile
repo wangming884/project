@@ -14,6 +14,9 @@ COPY js/    /usr/share/nginx/html/js/
 # index.html 放到根目录（首页入口）
 COPY pages/index.html /usr/share/nginx/html/index.html
 
+# 首页引用的图片放到根目录
+COPY pages/view.jpg /usr/share/nginx/html/view.jpg
+
 # 暴露端口
 EXPOSE 80
 
