@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公告发布 - 管理后台</title>
+    <style>
+        :root { --bg: #f3f6fb; --surface: #ffffff; --text: #1f2937; --muted: #6b7280; --brand: #2563eb; --success: #10b981; --danger: #ef4444; --border: #e5e7eb; }
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; }
+        .topbar { max-width: 1200px; margin: 0 auto; padding: 0.95rem 5%; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        .topbar h1 { margin: 0; font-size: 1.2rem; }
+        .topbar small { color: var(--muted); display: block; margin-top: 0.15rem; }
+        .top-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+        .btn { border: none; border-radius: 10px; cursor: pointer; padding: 0.55rem 0.95rem; font-weight: 600; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; }
+        .btn-primary { background: var(--brand); color: #fff; }
+        .btn-muted { background: #eef2ff; color: #3730a3; }
+        .btn-danger { background: #fee2e2; color: #b91c1c; }
+        .container { max-width: 1200px; margin: 1.2rem auto; padding: 0 5% 2rem; }
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; }
+        .panel h2 { margin: 0 0 0.7rem; font-size: 1rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.7rem; }
+        .form-group label { font-size: 0.82rem; color: var(--muted); }
+        .form-group input { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; }
+        .form-group select { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; background: #fff; }
+        .form-group textarea { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; background: #fff; min-height: 96px; resize: vertical; font-family: inherit; }
+        .form-group input:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
+        .form-group select:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
+        .form-group textarea:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
+        .adjust-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
+        .empty { color: var(--muted); font-size: 0.9rem; padding: 0.5rem 0; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 640px; }
+        th, td { text-align: left; border-bottom: 1px solid var(--border); padding: 0.65rem 0.4rem; font-size: 0.88rem; vertical-align: top; }
+        th { color: var(--muted); font-weight: 600; }
+        .ops { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .btn-ok, .btn-no { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; }
+        .btn-ok { background: #dcfce7; color: #166534; }
+        .btn-no { background: #fee2e2; color: #991b1b; }
+        .btn-pick { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #dbeafe; color: #1d4ed8; }
+        .btn-ban { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #fee2e2; color: #991b1b; }
+        .btn-enable { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #dcfce7; color: #166534; }
+        .status-pill { display: inline-block; font-size: 0.75rem; padding: 0.1rem 0.45rem; border-radius: 999px; font-weight: 700; }
+        .status-enabled { background: #dcfce7; color: #166534; }
+        .status-disabled { background: #fee2e2; color: #991b1b; }
+        @media (max-width: 980px) { .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div id="admin-app">
+        <div class="container">
+            <section class="panel">
+                <h2>公告发布</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>公告范围</label>
+                        <select id="announcementScope">
+                            <option value="all">全站通用</option>
+                            <option value="recommend">站长好物页</option>
+                            <option value="substitute">代课平台页</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>公告标题</label>
+                        <input type="text" id="announcementTitle" placeholder="输入公告标题">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>公告内容</label>
+                    <textarea id="announcementContent" placeholder="输入公告内容"></textarea>
+                </div>
+                <div class="adjust-actions">
+                    <button class="btn btn-primary" type="button" id="publishAnnouncementBtn">发布公告</button>
+                    <button class="btn btn-muted" type="button" id="refreshAnnouncementBtn">刷新公告</button>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h2>公告列表</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>范围</th>
+                                <th>标题</th>
+                                <th>内容</th>
+                                <th>发布时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="announcementTableBody">
+                            <tr>
+                                <td colspan="4" class="empty">点击"刷新公告"加载数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="../js/api-config.js"></script>
+    <script src="../js/api-utils.js"></script>
+    <script src="../js/admin-auth.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script>
+        var announcements = {};
+        var scopeLabels = {
+            all: '全站通用',
+            recommend: '站长好物页',
+            substitute: '代课平台页'
+        };
+
+        function renderAnnouncementTable() {
+            var tbody = document.getElementById('announcementTableBody');
+            var list = announcements.list || announcements;
+            if (!list || (Array.isArray(list) && list.length === 0)) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty">暂无公告数据</td></tr>';
+                return;
+            }
+
+            var rows = Array.isArray(list) ? list : [];
+            if (rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty">暂无公告数据</td></tr>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < rows.length; i++) {
+                var r = rows[i];
+                var scope = scopeLabels[r.scope] || r.scope || '-';
+                var title = r.title || '-';
+                var content = r.content || '-';
+                if (content.length > 60) {
+                    content = content.substring(0, 60) + '...';
+                }
+                var publishTime = r.publishTime || r.createTime || r.createdAt || '-';
+                if (publishTime !== '-' && typeof publishTime === 'string' && publishTime.indexOf('T') !== -1) {
+                    publishTime = publishTime.replace('T', ' ');
+                }
+                html += '<tr>'
+                    + '<td>' + escapeHtml(String(scope)) + '</td>'
+                    + '<td>' + escapeHtml(String(title)) + '</td>'
+                    + '<td>' + escapeHtml(String(content)) + '</td>'
+                    + '<td>' + escapeHtml(String(publishTime)) + '</td>'
+                    + '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        async function loadAnnouncements() {
+            var tbody = document.getElementById('announcementTableBody');
+            tbody.innerHTML = '<tr><td colspan="4" class="empty">正在加载公告列表...</td></tr>';
+
+            try {
+                var resp = await get(API_ENDPOINTS.admin.announcementAdminList, { page: 1, pageSize: 100 });
+                announcements = resp && resp.data ? resp.data : resp;
+                renderAnnouncementTable();
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty">加载失败，请刷新重试</td></tr>';
+                handleError(err, '加载公告列表失败');
+            }
+        }
+
+        async function publishAnnouncement() {
+            var scope = document.getElementById('announcementScope').value;
+            var title = document.getElementById('announcementTitle').value.trim();
+            var content = document.getElementById('announcementContent').value.trim();
+
+            if (!title) {
+                showMessage('请输入公告标题', 'warning');
+                return;
+            }
+            if (!content) {
+                showMessage('请输入公告内容', 'warning');
+                return;
+            }
+
+            var payload = {
+                scope: scope,
+                title: title,
+                content: content
+            };
+
+            try {
+                await post(API_ENDPOINTS.admin.announcementPublish, payload);
+                showMessage('发布成功', 'success');
+                document.getElementById('announcementTitle').value = '';
+                document.getElementById('announcementContent').value = '';
+                await loadAnnouncements();
+            } catch (err) {
+                handleError(err, '发布公告失败');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!initAdminPage('公告发布')) {
+                return;
+            }
+            loadAnnouncements();
+
+            document.getElementById('publishAnnouncementBtn').addEventListener('click', publishAnnouncement);
+            document.getElementById('refreshAnnouncementBtn').addEventListener('click', loadAnnouncements);
+        });
+    </script>
+</body>
+</html>

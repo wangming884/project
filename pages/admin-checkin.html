@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>签到审核 - 管理后台</title>
+    <style>
+        :root { --bg: #f3f6fb; --surface: #ffffff; --text: #1f2937; --muted: #6b7280; --brand: #2563eb; --success: #10b981; --danger: #ef4444; --border: #e5e7eb; }
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; }
+        .topbar { max-width: 1200px; margin: 0 auto; padding: 0.95rem 5%; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        .topbar h1 { margin: 0; font-size: 1.2rem; }
+        .topbar small { color: var(--muted); display: block; margin-top: 0.15rem; }
+        .top-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+        .btn { border: none; border-radius: 10px; cursor: pointer; padding: 0.55rem 0.95rem; font-weight: 600; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; }
+        .btn-primary { background: var(--brand); color: #fff; }
+        .btn-muted { background: #eef2ff; color: #3730a3; }
+        .btn-danger { background: #fee2e2; color: #b91c1c; }
+        .container { max-width: 1200px; margin: 1.2rem auto; padding: 0 5% 2rem; }
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; }
+        .panel h2 { margin: 0 0 0.7rem; font-size: 1rem; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 640px; }
+        th, td { text-align: left; border-bottom: 1px solid var(--border); padding: 0.65rem 0.4rem; font-size: 0.88rem; vertical-align: top; }
+        th { color: var(--muted); font-weight: 600; }
+        .ops { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .btn-ok, .btn-no { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; }
+        .btn-ok { background: #dcfce7; color: #166534; }
+        .btn-no { background: #fee2e2; color: #991b1b; }
+        .empty { color: var(--muted); font-size: 0.9rem; padding: 0.5rem 0; }
+    </style>
+</head>
+<body>
+    <div id="admin-app">
+        <div class="container">
+            <section class="panel">
+                <h2>签到审核中心</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>用户名</th>
+                                <th>位置</th>
+                                <th>签到时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingTableBody">
+                            <tr>
+                                <td colspan="5" class="empty">正在加载待审核记录...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="../js/api-config.js"></script>
+    <script src="../js/api-utils.js"></script>
+    <script src="../js/admin-auth.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script>
+        var pendingRecords = [];
+
+        function renderPendingTable() {
+            var tbody = document.getElementById('pendingTableBody');
+            if (!pendingRecords || pendingRecords.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty">暂无待审核的签到记录</td></tr>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < pendingRecords.length; i++) {
+                var r = pendingRecords[i];
+                var id = r.id != null ? r.id : '-';
+                var username = r.username || r.userName || r.nickName || '-';
+                var location = r.location || r.address || r.checkinLocation || '-';
+                var time = r.checkinTime || r.createTime || r.createdAt || '-';
+                if (time !== '-' && typeof time === 'string' && time.indexOf('T') !== -1) {
+                    time = time.replace('T', ' ');
+                }
+                html += '<tr>'
+                    + '<td>' + escapeHtml(String(id)) + '</td>'
+                    + '<td>' + escapeHtml(String(username)) + '</td>'
+                    + '<td>' + escapeHtml(String(location)) + '</td>'
+                    + '<td>' + escapeHtml(String(time)) + '</td>'
+                    + '<td class="ops">'
+                    + '<button class="btn-ok" data-id="' + escapeHtml(String(id)) + '" data-status="approved">通过</button>'
+                    + '<button class="btn-no" data-id="' + escapeHtml(String(id)) + '" data-status="rejected">驳回</button>'
+                    + '</td>'
+                    + '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        async function loadPending() {
+            var tbody = document.getElementById('pendingTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" class="empty">正在加载待审核记录...</td></tr>';
+
+            try {
+                var resp = await get(API_ENDPOINTS.admin.checkinPending, { page: 1, pageSize: 50 });
+                var rows = extractRows(resp && resp.data);
+                pendingRecords = rows;
+                renderPendingTable();
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty">加载失败，请刷新重试</td></tr>';
+                handleError(err, '加载待审核记录失败');
+            }
+        }
+
+        async function reviewCheckin(recordId, status) {
+            var url = API_ENDPOINTS.admin.checkinApproveBase + '/' + recordId;
+            var reviewRemark = status === 'approved' ? '审核通过' : '审核驳回';
+            try {
+                await post(url, { status: status, reviewRemark: reviewRemark });
+                showMessage(status === 'approved' ? '已通过' : '已驳回', 'success');
+                await loadPending();
+            } catch (err) {
+                handleError(err, '审核操作失败');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!initAdminPage('签到审核')) {
+                return;
+            }
+            loadPending();
+
+            var tbody = document.getElementById('pendingTableBody');
+            tbody.addEventListener('click', function (e) {
+                var target = e.target;
+                if (target.classList.contains('btn-ok') || target.classList.contains('btn-no')) {
+                    var id = target.getAttribute('data-id');
+                    var status = target.getAttribute('data-status');
+                    if (id && status) {
+                        reviewCheckin(id, status);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

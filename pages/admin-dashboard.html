@@ -23,51 +23,25 @@
         .topbar small { color: var(--muted); display: block; margin-top: 0.15rem; }
         .top-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
         .btn { border: none; border-radius: 10px; cursor: pointer; padding: 0.55rem 0.95rem; font-weight: 600; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; }
-        .btn-primary { background: var(--brand); color: #fff; }
         .btn-muted { background: #eef2ff; color: #3730a3; }
         .btn-danger { background: #fee2e2; color: #b91c1c; }
-        .container { max-width: 1200px; margin: 1.2rem auto; padding: 0 5% 2rem; display: grid; gap: 1rem; }
-        .cards { display: grid; gap: 0.9rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+        .container { max-width: 1200px; margin: 1.2rem auto; padding: 0 5% 2rem; }
+        .cards { display: grid; gap: 0.9rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 1.5rem; }
         .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; }
-        .card h3 { margin: 0 0 0.5rem; font-size: 0.96rem; color: var(--muted); }
-        .card .num { font-size: 1.65rem; font-weight: 700; }
-        .grid { display: grid; gap: 1rem; grid-template-columns: 1.3fr 1fr; }
-        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; }
-        .panel h2 { margin: 0 0 0.7rem; font-size: 1rem; }
+        .card h3 { margin: 0 0 0.5rem; font-size: 0.9rem; color: var(--muted); }
+        .card .num { font-size: 1.6rem; font-weight: 700; }
+        .nav-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+        .nav-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.3rem; text-decoration: none; color: var(--text); transition: all 0.2s; display: block; }
+        .nav-card:hover { border-color: var(--brand); box-shadow: 0 4px 15px rgba(37,99,235,0.1); transform: translateY(-2px); }
+        .nav-card .icon { font-size: 2rem; margin-bottom: 0.6rem; }
+        .nav-card h3 { margin: 0 0 0.35rem; font-size: 1.05rem; }
+        .nav-card p { margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+        .section-title { font-size: 1.1rem; font-weight: 700; margin: 1.5rem 0 0.8rem; }
         .permissions { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.6rem; }
         .perm-item { border: 1px dashed #bfdbfe; background: #eff6ff; border-radius: 10px; padding: 0.65rem; font-size: 0.88rem; color: #1e3a8a; }
-        .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 640px; }
-        th, td { text-align: left; border-bottom: 1px solid var(--border); padding: 0.65rem 0.4rem; font-size: 0.88rem; vertical-align: top; }
-        th { color: var(--muted); font-weight: 600; }
-        .ops { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-        .btn-ok, .btn-no { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; }
-        .btn-ok { background: #dcfce7; color: #166534; }
-        .btn-no { background: #fee2e2; color: #991b1b; }
-        .btn-pick { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #dbeafe; color: #1d4ed8; }
-        .btn-ban { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #fee2e2; color: #991b1b; }
-        .btn-enable { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #dcfce7; color: #166534; }
-        .status-pill { display: inline-block; font-size: 0.75rem; padding: 0.1rem 0.45rem; border-radius: 999px; font-weight: 700; }
-        .status-enabled { background: #dcfce7; color: #166534; }
-        .status-disabled { background: #fee2e2; color: #991b1b; }
-        .point-tool-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1rem; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
-        .form-group { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.7rem; }
-        .form-group label { font-size: 0.82rem; color: var(--muted); }
-        .form-group input { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; }
-        .form-group select { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; background: #fff; }
-        .form-group textarea { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; background: #fff; min-height: 96px; resize: vertical; font-family: inherit; }
-        .form-group input:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
-        .form-group select:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
-        .form-group textarea:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
-        .adjust-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; }
+        .panel h2 { margin: 0 0 0.7rem; font-size: 1rem; }
         .empty { color: var(--muted); font-size: 0.9rem; padding: 0.5rem 0; }
-        .upload-result { margin-top: 0.7rem; padding: 0.7rem; background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; font-size: 0.84rem; color: #334155; }
-        @media (max-width: 980px) {
-            .grid { grid-template-columns: 1fr; }
-            .point-tool-grid { grid-template-columns: 1fr; }
-            .form-row { grid-template-columns: 1fr; }
-        }
     </style>
 </head>
 <body>
@@ -79,14 +53,13 @@
             </div>
             <div class="top-actions">
                 <a class="btn btn-muted" href="main.html">前台大厅</a>
-                <button class="btn btn-primary" type="button" id="refreshBtn">刷新数据</button>
                 <button class="btn btn-danger" type="button" id="logoutBtn">退出管理员</button>
             </div>
         </div>
     </header>
 
-    <main class="container">
-        <section class="cards">
+    <div class="container">
+        <section class="cards" id="statsCards">
             <article class="card">
                 <h3>待审核签到</h3>
                 <div class="num" id="pendingCount">0</div>
@@ -104,389 +77,75 @@
                 <div class="num" id="courseBrushOrderCount">0</div>
             </article>
             <article class="card">
-                <h3>管理员权限</h3>
-                <div class="num" style="color:#2563eb;">ALL</div>
-            </article>
-            <article class="card">
                 <h3>平台用户数</h3>
                 <div class="num" id="userCount">0</div>
             </article>
         </section>
 
-        <section class="grid">
-            <article class="panel">
-                <h2>签到审核中心</h2>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>用户名</th>
-                                <th>位置</th>
-                                <th>签到时间</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pendingTableBody">
-                            <tr><td colspan="5" class="empty">加载中...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </article>
-
-            <aside class="panel">
-                <h2>管理员权限清单</h2>
-                <div class="permissions">
-                    <div class="perm-item">审核晚寝签到</div>
-                    <div class="perm-item">查看全站任务</div>
-                    <div class="perm-item">管理二手商品</div>
-                    <div class="perm-item">访问全模块页面</div>
-                    <div class="perm-item">执行状态变更操作</div>
-                    <div class="perm-item">管理员专属登录态</div>
-                    <div class="perm-item">启用/禁用用户账号</div>
-                    <div class="perm-item">重置用户签到连续记录</div>
-                    <div class="perm-item">查看全站积分流水</div>
-                    <div class="perm-item">管理员强制状态修改</div>
-                    <div class="perm-item">上传学习资料/学习软件</div>
-                    <div class="perm-item">管理代刷课课程与订单</div>
-                    <div class="perm-item">上架/下架站长好物</div>
-                    <div class="perm-item">编辑发布前台公告</div>
-                </div>
-                <p class="empty" style="margin-top:0.8rem;">提示：管理员登录后签发专属 token，并具备超级权限（后端 `userId=0`）。</p>
-            </aside>
+        <div class="section-title">管理模块</div>
+        <section class="nav-grid">
+            <a class="nav-card" href="admin-checkin.html">
+                <div class="icon">📋</div>
+                <h3>签到审核</h3>
+                <p>审核晚寝签到记录，通过或驳回用户的签到申请</p>
+            </a>
+            <a class="nav-card" href="admin-users.html">
+                <div class="icon">👥</div>
+                <h3>用户积分管理</h3>
+                <p>管理用户账号状态、调整积分、查看积分流水</p>
+            </a>
+            <a class="nav-card" href="admin-courses.html">
+                <div class="icon">📚</div>
+                <h3>代刷课管理</h3>
+                <p>管理刷课课程配置和刷课订单状态</p>
+            </a>
+            <a class="nav-card" href="admin-resources.html">
+                <div class="icon">📁</div>
+                <h3>学习资源上传</h3>
+                <p>上传学习资料和学习软件到云存储</p>
+            </a>
+            <a class="nav-card" href="admin-recommends.html">
+                <div class="icon">⭐</div>
+                <h3>站长好物管理</h3>
+                <p>上架、下架推荐商品，管理好物列表</p>
+            </a>
+            <a class="nav-card" href="admin-announcements.html">
+                <div class="icon">📢</div>
+                <h3>公告发布</h3>
+                <p>发布和管理前台公告信息</p>
+            </a>
         </section>
 
+        <div class="section-title" style="margin-top:2rem;">管理员权限清单</div>
         <section class="panel">
-            <h2>用户积分管理（管理员）</h2>
-            <div class="point-tool-grid">
-                <div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="userSearchInput">搜索用户（用户名/邮箱）</label>
-                            <input id="userSearchInput" type="text" placeholder="例如：demo 或 demo@example.com">
-                        </div>
-                        <div class="form-group" style="justify-content:flex-end;">
-                            <label>&nbsp;</label>
-                            <button class="btn btn-primary" type="button" id="userSearchBtn">查询用户</button>
-                        </div>
-                    </div>
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>用户名</th>
-                                    <th>邮箱</th>
-                                    <th>当前积分</th>
-                                    <th>账号状态</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody id="usersTableBody">
-                                <tr><td colspan="6" class="empty">加载中...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div>
-                    <div class="form-group">
-                        <label for="targetUserId">目标用户ID</label>
-                        <input id="targetUserId" type="text" placeholder="请先从左侧选择用户" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="targetUserName">目标用户名</label>
-                        <input id="targetUserName" type="text" placeholder="请先从左侧选择用户" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="deltaInput">调整积分（正数增加，负数扣除）</label>
-                        <input id="deltaInput" type="number" placeholder="例如：20 或 -10">
-                    </div>
-                    <div class="form-group">
-                        <label for="reasonInput">调整原因</label>
-                        <input id="reasonInput" type="text" placeholder="例如：活动奖励 / 违规扣分">
-                    </div>
-                    <div class="adjust-actions">
-                        <button class="btn btn-primary" type="button" id="submitAdjustBtn">确认调整</button>
-                        <button class="btn btn-muted" type="button" id="quickAddBtn">+10</button>
-                        <button class="btn btn-muted" type="button" id="quickSubBtn">-10</button>
-                        <button class="btn btn-muted" type="button" id="enableUserBtn">启用账号</button>
-                        <button class="btn btn-danger" type="button" id="disableUserBtn">禁用账号</button>
-                        <button class="btn btn-muted" type="button" id="resetSigninBtn">重置签到</button>
-                    </div>
-                </div>
+            <div class="permissions">
+                <div class="perm-item">审核晚寝签到</div>
+                <div class="perm-item">查看全站任务</div>
+                <div class="perm-item">管理二手商品</div>
+                <div class="perm-item">访问全模块页面</div>
+                <div class="perm-item">执行状态变更操作</div>
+                <div class="perm-item">管理员专属登录态</div>
+                <div class="perm-item">启用/禁用用户账号</div>
+                <div class="perm-item">重置用户签到连续记录</div>
+                <div class="perm-item">查看全站积分流水</div>
+                <div class="perm-item">管理员强制状态修改</div>
+                <div class="perm-item">上传学习资料/学习软件</div>
+                <div class="perm-item">管理代刷课课程与订单</div>
+                <div class="perm-item">上架/下架站长好物</div>
+                <div class="perm-item">编辑发布前台公告</div>
             </div>
-            <div class="table-wrap" style="margin-top:1rem;">
-                <h2 style="margin-top:0;">所选用户积分流水</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>时间</th>
-                            <th>类型</th>
-                            <th>变动</th>
-                            <th>余额</th>
-                            <th>说明</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historyTableBody">
-                        <tr><td colspan="5" class="empty">请选择用户后加载</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <p class="empty" style="margin-top:0.8rem;">提示：管理员登录后签发专属 token，并具备超级权限（后端 userId=0）。</p>
         </section>
-
-        <section class="panel">
-            <h2>代刷课管理（管理员）</h2>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="courseBrushCourseId">课程ID（编辑时自动填充）</label>
-                    <input id="courseBrushCourseId" type="text" placeholder="新增课程时留空" readonly>
-                </div>
-                <div class="form-group">
-                    <label for="courseBrushEnabledSelect">课程状态</label>
-                    <select id="courseBrushEnabledSelect">
-                        <option value="1">启用</option>
-                        <option value="0">停用</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="courseBrushNameInput">课程名称</label>
-                    <input id="courseBrushNameInput" type="text" placeholder="例如：学习通章节任务">
-                </div>
-                <div class="form-group">
-                    <label for="courseBrushCodeInput">课程编号 / 识别码</label>
-                    <input id="courseBrushCodeInput" type="text" placeholder="例如：xxt-chapter">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="courseBrushPointsInput">所需积分</label>
-                    <input id="courseBrushPointsInput" type="number" placeholder="例如：15">
-                </div>
-                <div class="form-group">
-                    <label for="courseBrushOrdersStatusFilter">订单状态筛选</label>
-                    <select id="courseBrushOrdersStatusFilter">
-                        <option value="all">全部状态</option>
-                        <option value="pending">待处理</option>
-                        <option value="processing">处理中</option>
-                        <option value="completed">已完成</option>
-                        <option value="failed">失败</option>
-                        <option value="cancelled">已取消</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="courseBrushDescInput">课程说明</label>
-                <textarea id="courseBrushDescInput" placeholder="简要说明该课程适用的平台、处理方式或注意事项"></textarea>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="courseBrushOrdersKeywordInput">订单关键词</label>
-                    <input id="courseBrushOrdersKeywordInput" type="text" placeholder="搜索用户名、课程、账号、备注、请求ID">
-                </div>
-                <div class="form-group" style="justify-content:flex-end;">
-                    <label>&nbsp;</label>
-                    <div class="adjust-actions">
-                        <button class="btn btn-primary" type="button" id="saveCourseBrushCourseBtn">保存课程</button>
-                        <button class="btn btn-muted" type="button" id="resetCourseBrushCourseBtn">重置表单</button>
-                        <button class="btn btn-muted" type="button" id="refreshCourseBrushBtn">刷新课程与订单</button>
-                    </div>
-                </div>
-            </div>
-            <div class="table-wrap" style="margin-top:1rem;">
-                <h2 style="margin-top:0;">课程列表</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>课程名称</th>
-                            <th>编号</th>
-                            <th>积分</th>
-                            <th>状态</th>
-                            <th>说明</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="courseBrushCoursesTableBody">
-                        <tr><td colspan="7" class="empty">加载中...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="table-wrap" style="margin-top:1rem;">
-                <h2 style="margin-top:0;">刷课订单列表</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>用户</th>
-                            <th>课程</th>
-                            <th>账号</th>
-                            <th>积分</th>
-                            <th>状态</th>
-                            <th>结果</th>
-                            <th>时间</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="courseBrushOrdersTableBody">
-                        <tr><td colspan="9" class="empty">加载中...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <section class="panel">
-            <h2>学习资源上传（管理员）</h2>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="resourceTypeSelect">资源类型</label>
-                    <select id="resourceTypeSelect">
-                        <option value="materials">学习资料</option>
-                        <option value="software">学习软件</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="resourceMimeInput">MIME 类型（可自动识别）</label>
-                    <input id="resourceMimeInput" type="text" placeholder="例如：application/pdf">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="resourceNameInput">资源名称（可自动填充）</label>
-                    <input id="resourceNameInput" type="text" placeholder="请选择本地文件或手动输入文件名">
-                </div>
-                <div class="form-group" style="justify-content:flex-end;">
-                    <label>&nbsp;</label>
-                    <div class="adjust-actions">
-                        <input id="resourceFileInput" type="file" style="display:none;">
-                        <button class="btn btn-muted" type="button" id="pickResourceFileBtn">选择文件</button>
-                        <button class="btn btn-primary" type="button" id="submitResourceUploadBtn">发起上传</button>
-                    </div>
-                </div>
-            </div>
-            <div id="resourceUploadResult" class="upload-result">提示：当前为 Google Drive 预留接入模式，上传成功后会返回预留会话信息。</div>
-        </section>
-
-        <section class="panel">
-            <h2>站长好物上架管理（管理员）</h2>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="recommendTitleInput">商品标题</label>
-                    <input id="recommendTitleInput" type="text" placeholder="例如：护眼台灯">
-                </div>
-                <div class="form-group">
-                    <label for="recommendPriceInput">现价（元）</label>
-                    <input id="recommendPriceInput" type="number" step="0.01" placeholder="例如：69.00">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="recommendOriginalPriceInput">原价（元）</label>
-                    <input id="recommendOriginalPriceInput" type="number" step="0.01" placeholder="例如：129.00">
-                </div>
-                <div class="form-group">
-                    <label for="recommendBadgeInput">角标文案（可选）</label>
-                    <input id="recommendBadgeInput" type="text" placeholder="例如：爆款推荐">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="recommendEmojiInput">展示 Emoji（可选）</label>
-                    <input id="recommendEmojiInput" type="text" placeholder="例如：💡">
-                </div>
-                <div class="form-group">
-                    <label for="recommendBuyUrlInput">外部购买链接（可选）</label>
-                    <input id="recommendBuyUrlInput" type="text" placeholder="https://example.com/product/xxx">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="recommendDescInput">商品描述</label>
-                <input id="recommendDescInput" type="text" placeholder="简要描述卖点（1-2句）">
-            </div>
-            <div class="adjust-actions">
-                <button class="btn btn-primary" type="button" id="submitRecommendCreateBtn">上架商品</button>
-                <button class="btn btn-muted" type="button" id="refreshRecommendBtn">刷新好物列表</button>
-            </div>
-            <div class="table-wrap" style="margin-top:1rem;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>标题</th>
-                            <th>价格</th>
-                            <th>状态</th>
-                            <th>更新时间</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="recommendTableBody">
-                        <tr><td colspan="6" class="empty">加载中...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <section class="panel">
-            <h2>公告发布（管理员）</h2>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="announcementScopeSelect">发布范围</label>
-                    <select id="announcementScopeSelect">
-                        <option value="all">全站通用</option>
-                        <option value="recommend">站长好物页</option>
-                        <option value="substitute">代课平台页</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="announcementTitleInput">公告标题</label>
-                    <input id="announcementTitleInput" type="text" placeholder="例如：期末周服务时间调整">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="announcementContentInput">公告内容</label>
-                <textarea id="announcementContentInput" placeholder="请输入要发布给前台用户的公告内容"></textarea>
-            </div>
-            <div class="adjust-actions">
-                <button class="btn btn-primary" type="button" id="publishAnnouncementBtn">发布公告</button>
-                <button class="btn btn-muted" type="button" id="refreshAnnouncementBtn">刷新公告</button>
-            </div>
-            <div class="table-wrap" style="margin-top:1rem;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>范围</th>
-                            <th>标题</th>
-                            <th>内容</th>
-                            <th>发布时间</th>
-                        </tr>
-                    </thead>
-                    <tbody id="announcementTableBody">
-                        <tr><td colspan="4" class="empty">加载中...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </main>
+    </div>
 
     <script src="../js/api-config.js"></script>
     <script src="../js/api-utils.js"></script>
     <script src="../js/admin-auth.js"></script>
     <script>
-        let pendingRecords = [];
-        let users = [];
-        let selectedUser = null;
-        let pointsHistory = [];
-        let recommendProducts = [];
-        let announcements = {};
-        let courseBrushCourses = [];
-        let courseBrushOrders = [];
-
-        function renderText(value, fallback = '-') {
-            if (value === undefined || value === null || value === '') {
-                return escapeHtml(fallback);
-            }
-            return escapeHtml(value);
+        function initAdminIdentity() {
+            var session = getAdminSession();
+            var modeText = session && session.mode === 'offline' ? '离线模式' : '服务端模式';
+            document.getElementById('adminIdentity').textContent = '当前管理员：' + (session && session.username ? session.username : '未知') + ' · ' + modeText;
         }
 
         function extractRows(payload) {
@@ -505,873 +164,42 @@
             return rows.length;
         }
 
-        function renderPendingTable() {
-            const body = document.getElementById('pendingTableBody');
-            if (!pendingRecords.length) {
-                body.innerHTML = '<tr><td colspan="5" class="empty">当前没有待审核记录</td></tr>';
-                return;
-            }
-
-            body.innerHTML = pendingRecords.map((item) => `
-                <tr>
-                    <td>${renderText(item.id)}</td>
-                    <td>${renderText(item.username)}</td>
-                    <td>${renderText(item.location)}</td>
-                    <td>${renderText(item.checkinTime)}</td>
-                    <td>
-                        <div class="ops">
-                            <button type="button" class="btn-ok" data-id="${renderText(item.id, '')}" data-status="approved">通过</button>
-                            <button type="button" class="btn-no" data-id="${renderText(item.id, '')}" data-status="rejected">驳回</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function renderHistoryTable() {
-            const body = document.getElementById('historyTableBody');
-            if (!selectedUser) {
-                body.innerHTML = '<tr><td colspan="5" class="empty">请选择用户后加载</td></tr>';
-                return;
-            }
-            if (!pointsHistory.length) {
-                body.innerHTML = '<tr><td colspan="5" class="empty">该用户暂无积分流水</td></tr>';
-                return;
-            }
-            body.innerHTML = pointsHistory.map((item) => `
-                <tr>
-                    <td>${renderText(item.createdAt)}</td>
-                    <td>${renderText(item.type)}</td>
-                    <td>${renderText(item.amount, 0)}</td>
-                    <td>${renderText(item.balance, 0)}</td>
-                    <td>${renderText(item.description)}</td>
-                </tr>
-            `).join('');
-        }
-
-        function renderRecommendTable() {
-            const body = document.getElementById('recommendTableBody');
-            if (!recommendProducts.length) {
-                body.innerHTML = '<tr><td colspan="6" class="empty">暂无好物商品</td></tr>';
-                return;
-            }
-
-            body.innerHTML = recommendProducts.map((item) => {
-                const isOn = (item.status || '').toLowerCase() === 'on';
-                return `
-                    <tr>
-                        <td>${renderText(item.id)}</td>
-                        <td>${renderText(item.title)}</td>
-                        <td>￥${renderText(item.price, 0)}</td>
-                        <td>
-                            <span class="status-pill ${isOn ? 'status-enabled' : 'status-disabled'}">
-                                ${isOn ? '上架中' : '已下架'}
-                            </span>
-                        </td>
-                        <td>${renderText(item.updatedAt)}</td>
-                        <td>
-                            <div class="ops">
-                                <button type="button" class="${isOn ? 'btn-ban' : 'btn-enable'}" data-recommend-id="${renderText(item.id, '')}" data-action="toggle-recommend" data-status="${isOn ? 'off' : 'on'}">
-                                    ${isOn ? '下架' : '上架'}
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function renderAnnouncementTable() {
-            const body = document.getElementById('announcementTableBody');
-            const rows = ['all', 'recommend', 'substitute']
-                .map((scope) => ({ scope, item: announcements?.[scope] }))
-                .filter((row) => !!row.item);
-
-            const scopeLabel = {
-                all: '全站通用',
-                recommend: '站长好物页',
-                substitute: '代课平台页',
-            };
-
-            if (!rows.length) {
-                body.innerHTML = '<tr><td colspan="4" class="empty">暂无公告</td></tr>';
-                return;
-            }
-
-            body.innerHTML = rows.map((row) => `
-                <tr>
-                    <td>${renderText(scopeLabel[row.scope] || row.scope)}</td>
-                    <td>${renderText(row.item.title)}</td>
-                    <td>${renderText(row.item.content)}</td>
-                    <td>${renderText(row.item.publishedAt)}</td>
-                </tr>
-            `).join('');
-        }
-
-        function renderCourseBrushCoursesTable() {
-            const body = document.getElementById('courseBrushCoursesTableBody');
-            if (!courseBrushCourses.length) {
-                body.innerHTML = '<tr><td colspan="7" class="empty">当前没有课程配置</td></tr>';
-                return;
-            }
-
-            body.innerHTML = courseBrushCourses.map((item) => {
-                const enabled = Number(item.enabled) === 1;
-                return `
-                    <tr>
-                        <td>${renderText(item.id)}</td>
-                        <td>${renderText(item.courseName)}</td>
-                        <td>${renderText(item.courseCode)}</td>
-                        <td>${renderText(item.requiredPoints, 0)}</td>
-                        <td>
-                            <span class="status-pill ${enabled ? 'status-enabled' : 'status-disabled'}">
-                                ${enabled ? '启用' : '停用'}
-                            </span>
-                        </td>
-                        <td>${renderText(item.description)}</td>
-                        <td>
-                            <div class="ops">
-                                <button type="button" class="btn-pick" data-course-id="${renderText(item.id, '')}" data-action="edit-course">编辑</button>
-                                <button type="button" class="${enabled ? 'btn-ban' : 'btn-enable'}" data-course-id="${renderText(item.id, '')}" data-action="toggle-course" data-enabled="${enabled ? 0 : 1}">
-                                    ${enabled ? '停用' : '启用'}
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function renderCourseBrushOrdersTable() {
-            const body = document.getElementById('courseBrushOrdersTableBody');
-            if (!courseBrushOrders.length) {
-                body.innerHTML = '<tr><td colspan="9" class="empty">当前没有匹配订单</td></tr>';
-                return;
-            }
-
-            const statusLabel = {
-                pending: '待处理',
-                processing: '处理中',
-                completed: '已完成',
-                failed: '失败',
-                cancelled: '已取消',
-            };
-
-            body.innerHTML = courseBrushOrders.map((item) => `
-                <tr>
-                    <td>${renderText(item.id)}</td>
-                    <td>${renderText(item.username)}</td>
-                    <td>${renderText(item.courseName)}</td>
-                    <td>${renderText(item.studentAccount)}</td>
-                    <td>${renderText(item.requiredPoints, 0)}</td>
-                    <td>${renderText(statusLabel[item.status] || item.status)}</td>
-                    <td>${renderText(item.resultMessage)}</td>
-                    <td>${renderText(item.submittedAt || item.createdAt)}</td>
-                    <td>
-                        <div class="ops">
-                            <button type="button" class="btn-pick" data-order-id="${renderText(item.id, '')}" data-action="order-status" data-status="processing">处理中</button>
-                            <button type="button" class="btn-enable" data-order-id="${renderText(item.id, '')}" data-action="order-status" data-status="completed">完成</button>
-                            <button type="button" class="btn-ban" data-order-id="${renderText(item.id, '')}" data-action="order-status" data-status="failed">失败</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function resetCourseBrushCourseForm() {
-            document.getElementById('courseBrushCourseId').value = '';
-            document.getElementById('courseBrushNameInput').value = '';
-            document.getElementById('courseBrushCodeInput').value = '';
-            document.getElementById('courseBrushPointsInput').value = '';
-            document.getElementById('courseBrushDescInput').value = '';
-            document.getElementById('courseBrushEnabledSelect').value = '1';
-        }
-
-        function fillCourseBrushCourseForm(course) {
-            document.getElementById('courseBrushCourseId').value = course?.id ?? '';
-            document.getElementById('courseBrushNameInput').value = course?.courseName ?? '';
-            document.getElementById('courseBrushCodeInput').value = course?.courseCode ?? '';
-            document.getElementById('courseBrushPointsInput').value = course?.requiredPoints ?? '';
-            document.getElementById('courseBrushDescInput').value = course?.description ?? '';
-            document.getElementById('courseBrushEnabledSelect').value = String(course?.enabled ?? 1);
-        }
-
-        async function reviewCheckin(recordId, status) {
+        async function loadStats() {
             try {
-                showLoading('提交审核中...');
-                const url = `${API_ENDPOINTS.admin.checkinApproveBase}/${recordId}`;
-                const response = await post(url, {
-                    status,
-                    reviewRemark: status === 'approved' ? '管理员审核通过' : '管理员审核驳回',
-                });
-                hideLoading();
-
-                if (!response.success) {
-                    showMessage(response.message || '审核失败', 'error');
-                    return;
-                }
-
-                showMessage(status === 'approved' ? '审核通过成功' : '驳回成功', 'success');
-                await loadDashboardData();
-            } catch (error) {
-                hideLoading();
-                handleError(error, '审核失败');
-            }
-        }
-
-        async function loadDashboardData() {
-            const token = getStorage('authToken');
-            if (!token) {
-                showMessage('当前为离线模式，部分后台数据不可用', 'warning');
-            }
-
-            try {
-                const [pendingRes, productRes, taskRes, courseBrushOrderRes] = await Promise.all([
-                    get(API_ENDPOINTS.admin.checkinPending, { page: 1, pageSize: 20 }),
+                var results = await Promise.all([
+                    get(API_ENDPOINTS.admin.checkinPending, { page: 1, pageSize: 1 }),
                     get(API_ENDPOINTS.admin.secondhandAdminProducts, { page: 1, pageSize: 1 }),
                     get(API_ENDPOINTS.admin.substituteAdminTasks, { page: 1, pageSize: 1 }),
                     get(API_ENDPOINTS.admin.courseBrushOrders, { page: 1, pageSize: 1 }),
+                    get(API_ENDPOINTS.admin.pointsUsers, { page: 1, pageSize: 1 }),
                 ]);
 
-                pendingRecords = extractRows(pendingRes?.data);
-                renderPendingTable();
-                document.getElementById('pendingCount').textContent = extractTotal(pendingRes?.data, pendingRecords);
+                var pendingRows = extractRows(results[0]?.data);
+                document.getElementById('pendingCount').textContent = extractTotal(results[0]?.data, pendingRows);
 
-                const productRows = extractRows(productRes?.data);
-                document.getElementById('secondhandCount').textContent = extractTotal(productRes?.data, productRows);
+                var productRows = extractRows(results[1]?.data);
+                document.getElementById('secondhandCount').textContent = extractTotal(results[1]?.data, productRows);
 
-                const taskRows = extractRows(taskRes?.data);
-                document.getElementById('taskCount').textContent = extractTotal(taskRes?.data, taskRows);
+                var taskRows = extractRows(results[2]?.data);
+                document.getElementById('taskCount').textContent = extractTotal(results[2]?.data, taskRows);
 
-                const courseBrushOrderRows = extractRows(courseBrushOrderRes?.data);
-                document.getElementById('courseBrushOrderCount').textContent = extractTotal(courseBrushOrderRes?.data, courseBrushOrderRows);
+                var orderRows = extractRows(results[3]?.data);
+                document.getElementById('courseBrushOrderCount').textContent = extractTotal(results[3]?.data, orderRows);
+
+                var userRows = extractRows(results[4]?.data);
+                document.getElementById('userCount').textContent = extractTotal(results[4]?.data, userRows);
             } catch (error) {
-                renderPendingTable();
-                showMessage('后台数据加载失败，请检查后端是否已启动', 'warning');
+                // 静默处理，统计卡片显示默认 0
             }
         }
 
-        async function loadCourseBrushCourses() {
-            try {
-                const response = await get(API_ENDPOINTS.admin.courseBrushCourses, { page: 1, pageSize: 100 });
-                if (!response.success || !response.data) {
-                    courseBrushCourses = [];
-                    renderCourseBrushCoursesTable();
-                    return;
-                }
-                courseBrushCourses = extractRows(response.data);
-                renderCourseBrushCoursesTable();
-            } catch (error) {
-                courseBrushCourses = [];
-                renderCourseBrushCoursesTable();
-                showMessage('刷课课程加载失败', 'warning');
-            }
-        }
-
-        async function loadCourseBrushOrders() {
-            try {
-                const response = await get(API_ENDPOINTS.admin.courseBrushOrders, {
-                    status: document.getElementById('courseBrushOrdersStatusFilter').value,
-                    keyword: document.getElementById('courseBrushOrdersKeywordInput').value.trim(),
-                    page: 1,
-                    pageSize: 50,
-                });
-                if (!response.success || !response.data) {
-                    courseBrushOrders = [];
-                    renderCourseBrushOrdersTable();
-                    return;
-                }
-                courseBrushOrders = extractRows(response.data);
-                renderCourseBrushOrdersTable();
-            } catch (error) {
-                courseBrushOrders = [];
-                renderCourseBrushOrdersTable();
-                showMessage('刷课订单加载失败', 'warning');
-            }
-        }
-
-        async function submitCourseBrushCourse() {
-            const courseIdValue = document.getElementById('courseBrushCourseId').value.trim();
-            const courseName = document.getElementById('courseBrushNameInput').value.trim();
-            const courseCode = document.getElementById('courseBrushCodeInput').value.trim();
-            const requiredPoints = Number(document.getElementById('courseBrushPointsInput').value);
-            const description = document.getElementById('courseBrushDescInput').value.trim();
-            const enabled = Number(document.getElementById('courseBrushEnabledSelect').value);
-
-            if (!courseName) {
-                showMessage('请输入课程名称', 'warning');
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof requireAdminAuth === 'function' && !requireAdminAuth()) {
                 return;
             }
-            if (!Number.isFinite(requiredPoints) || requiredPoints <= 0) {
-                showMessage('请输入正确的所需积分', 'warning');
-                return;
-            }
-
-            try {
-                showLoading('正在保存刷课课程...');
-                const response = await post(API_ENDPOINTS.admin.courseBrushCourses, {
-                    courseId: courseIdValue ? Number(courseIdValue) : null,
-                    courseName,
-                    courseCode,
-                    requiredPoints,
-                    description,
-                    enabled,
-                });
-                hideLoading();
-                if (!response.success) {
-                    showMessage(response.message || '课程保存失败', 'error');
-                    return;
-                }
-                showMessage('刷课课程保存成功', 'success');
-                resetCourseBrushCourseForm();
-                await loadCourseBrushCourses();
-                await loadDashboardData();
-            } catch (error) {
-                hideLoading();
-                handleError(error, '课程保存失败');
-            }
-        }
-
-        async function updateCourseBrushCourseStatus(courseId, enabled) {
-            try {
-                showLoading(enabled === 1 ? '正在启用课程...' : '正在停用课程...');
-                const response = await post(`${API_ENDPOINTS.admin.courseBrushCourseStatusBase}/${courseId}/status`, { enabled });
-                hideLoading();
-                if (!response.success) {
-                    showMessage(response.message || '课程状态更新失败', 'error');
-                    return;
-                }
-                showMessage(enabled === 1 ? '课程已启用' : '课程已停用', 'success');
-                await loadCourseBrushCourses();
-            } catch (error) {
-                hideLoading();
-                handleError(error, '课程状态更新失败');
-            }
-        }
-
-        async function updateCourseBrushOrderStatus(orderId, status) {
-            const resultMessage = status === 'completed'
-                ? '管理员标记为已完成'
-                : (status === 'processing' ? '管理员已接入处理队列' : '管理员标记处理失败');
-            try {
-                showLoading('正在更新刷课订单状态...');
-                const response = await post(`${API_ENDPOINTS.admin.courseBrushOrderStatusBase}/${orderId}/status`, {
-                    status,
-                    resultMessage,
-                });
-                hideLoading();
-                if (!response.success) {
-                    showMessage(response.message || '订单状态更新失败', 'error');
-                    return;
-                }
-                showMessage('刷课订单状态已更新', 'success');
-                await loadCourseBrushOrders();
-                await loadDashboardData();
-            } catch (error) {
-                hideLoading();
-                handleError(error, '订单状态更新失败');
-            }
-        }
-
-        async function loadRecommendProducts() {
-            try {
-                const response = await get(API_ENDPOINTS.admin.recommendAdminList, { page: 1, pageSize: 100 });
-                if (!response.success || !response.data) {
-                    recommendProducts = [];
-                    renderRecommendTable();
-                    return;
-                }
-                recommendProducts = response.data.list || [];
-                renderRecommendTable();
-            } catch (error) {
-                recommendProducts = [];
-                renderRecommendTable();
-                showMessage('好物列表加载失败', 'warning');
-            }
-        }
-
-        async function loadAnnouncements() {
-            try {
-                const response = await get(API_ENDPOINTS.admin.announcementAdminList);
-                if (!response.success || !response.data) {
-                    announcements = {};
-                    renderAnnouncementTable();
-                    return;
-                }
-                announcements = response.data || {};
-                renderAnnouncementTable();
-            } catch (error) {
-                announcements = {};
-                renderAnnouncementTable();
-                showMessage('公告加载失败', 'warning');
-            }
-        }
-
-        async function submitRecommendCreate() {
-            const title = document.getElementById('recommendTitleInput').value.trim();
-            const description = document.getElementById('recommendDescInput').value.trim();
-            const price = Number(document.getElementById('recommendPriceInput').value);
-            const originalPriceRaw = document.getElementById('recommendOriginalPriceInput').value.trim();
-            const originalPrice = originalPriceRaw ? Number(originalPriceRaw) : null;
-            const badge = document.getElementById('recommendBadgeInput').value.trim();
-            const imageEmoji = document.getElementById('recommendEmojiInput').value.trim();
-            const buyUrl = document.getElementById('recommendBuyUrlInput').value.trim();
-
-            if (!title) {
-                showMessage('请输入商品标题', 'warning');
-                return;
-            }
-            if (!Number.isFinite(price) || price <= 0) {
-                showMessage('请输入正确的商品价格', 'warning');
-                return;
-            }
-
-            try {
-                showLoading('正在上架商品...');
-                const response = await post(API_ENDPOINTS.admin.recommendAdminCreate, {
-                    title,
-                    description,
-                    price,
-                    originalPrice,
-                    badge,
-                    imageEmoji,
-                    buyUrl,
-                });
-                hideLoading();
-                if (!response.success) {
-                    showMessage(response.message || '上架失败', 'error');
-                    return;
-                }
-                showMessage('站长好物上架成功', 'success');
-
-                document.getElementById('recommendTitleInput').value = '';
-                document.getElementById('recommendDescInput').value = '';
-                document.getElementById('recommendPriceInput').value = '';
-                document.getElementById('recommendOriginalPriceInput').value = '';
-                document.getElementById('recommendBadgeInput').value = '';
-                document.getElementById('recommendEmojiInput').value = '';
-                document.getElementById('recommendBuyUrlInput').value = '';
-                await loadRecommendProducts();
-            } catch (error) {
-                hideLoading();
-                handleError(error, '上架失败');
-            }
-        }
-
-        async function updateRecommendStatus(productId, status) {
-            try {
-                showLoading(status === 'on' ? '正在上架...' : '正在下架...');
-                const url = `${API_ENDPOINTS.admin.recommendAdminStatusBase}/${productId}/status`;
-                const response = await post(url, { status });
-                hideLoading();
-                if (!response.success) {
-                    showMessage(response.message || '状态更新失败', 'error');
-                    return;
-                }
-                showMessage(status === 'on' ? '已上架' : '已下架', 'success');
-                await loadRecommendProducts();
-            } catch (error) {
-                hideLoading();
-                handleError(error, '状态更新失败');
-            }
-        }
-
-        async function publishAnnouncement() {
-            const scope = document.getElementById('announcementScopeSelect').value;
-            const title = document.getElementById('announcementTitleInput').value.trim();
-            const content = document.getElementById('announcementContentInput').value.trim();
-
-            if (!title) {
-                showMessage('请输入公告标题', 'warning');
-                return;
-            }
-            if (!content) {
-                showMessage('请输入公告内容', 'warning');
-                return;
-            }
-
-            try {
-                showLoading('正在发布公告...');
-                const response = await post(API_ENDPOINTS.admin.announcementPublish, { scope, title, content });
-                hideLoading();
-                if (!response.success) {
-                    showMessage(response.message || '公告发布失败', 'error');
-                    return;
-                }
-                showMessage('公告发布成功', 'success');
-                document.getElementById('announcementTitleInput').value = '';
-                document.getElementById('announcementContentInput').value = '';
-                await loadAnnouncements();
-            } catch (error) {
-                hideLoading();
-                handleError(error, '公告发布失败');
-            }
-        }
-
-        function renderUsersTable() {
-            const body = document.getElementById('usersTableBody');
-            if (!users.length) {
-                body.innerHTML = '<tr><td colspan="6" class="empty">没有匹配的用户</td></tr>';
-                return;
-            }
-
-            body.innerHTML = users.map((item) => {
-                const enabled = Number(item.status) === 1;
-                return `
-                    <tr>
-                        <td>${renderText(item.id)}</td>
-                        <td>${renderText(item.username)}</td>
-                        <td>${renderText(item.email)}</td>
-                        <td>${renderText(item.points, 0)}</td>
-                        <td>
-                            <span class="status-pill ${enabled ? 'status-enabled' : 'status-disabled'}">
-                                ${enabled ? '正常' : '禁用'}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="ops">
-                                <button type="button" class="btn-pick" data-user-id="${renderText(item.id, '')}" data-action="select">选择</button>
-                                <button type="button" class="${enabled ? 'btn-ban' : 'btn-enable'}" data-user-id="${renderText(item.id, '')}" data-action="toggle-status" data-status="${enabled ? 0 : 1}">
-                                    ${enabled ? '禁用' : '启用'}
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        async function fillSelectedUser(user) {
-            selectedUser = user;
-            document.getElementById('targetUserId').value = user?.id ?? '';
-            document.getElementById('targetUserName').value = user?.username ?? '';
-            await loadSelectedUserHistory();
-        }
-
-        async function loadUsers(keyword = '') {
-            try {
-                const response = await get(API_ENDPOINTS.admin.pointsUsers, { keyword, page: 1, pageSize: 20 });
-                if (!response.success || !response.data) {
-                    users = [];
-                    renderUsersTable();
-                    return;
-                }
-                users = response.data.list || [];
-                document.getElementById('userCount').textContent = response.data.total ?? users.length;
-                renderUsersTable();
-
-                if (selectedUser) {
-                    const refreshOne = users.find((item) => Number(item.id) === Number(selectedUser.id));
-                    if (refreshOne) {
-                        selectedUser = refreshOne;
-                    }
-                }
-            } catch (error) {
-                users = [];
-                renderUsersTable();
-                showMessage('用户列表加载失败', 'warning');
-            }
-        }
-
-        async function loadSelectedUserHistory() {
-            if (!selectedUser || !selectedUser.id) {
-                pointsHistory = [];
-                renderHistoryTable();
-                return;
-            }
-            try {
-                const response = await get(API_ENDPOINTS.admin.pointsHistory, {
-                    userId: selectedUser.id,
-                    page: 1,
-                    pageSize: 20,
-                });
-                if (!response.success || !response.data) {
-                    pointsHistory = [];
-                    renderHistoryTable();
-                    return;
-                }
-                pointsHistory = response.data.list || [];
-                renderHistoryTable();
-            } catch (error) {
-                pointsHistory = [];
-                renderHistoryTable();
-                showMessage('积分流水加载失败', 'warning');
-            }
-        }
-
-        async function submitPointsAdjust() {
-            const userId = Number(document.getElementById('targetUserId').value);
-            const delta = Number(document.getElementById('deltaInput').value);
-            const reason = document.getElementById('reasonInput').value.trim();
-
-            if (!userId) {
-                showMessage('请先选择目标用户', 'warning');
-                return;
-            }
-            if (!Number.isFinite(delta) || delta === 0) {
-                showMessage('请输入非0的积分调整值', 'warning');
-                return;
-            }
-            if (!reason) {
-                showMessage('请填写调整原因', 'warning');
-                return;
-            }
-
-            try {
-                showLoading('积分调整中...');
-                const response = await post(API_ENDPOINTS.admin.pointsAdjust, { userId, delta, reason });
-                hideLoading();
-                if (!response.success) {
-                    showMessage(response.message || '积分调整失败', 'error');
-                    return;
-                }
-                showMessage('积分调整成功', 'success');
-                document.getElementById('deltaInput').value = '';
-                document.getElementById('reasonInput').value = '';
-                await loadUsers(document.getElementById('userSearchInput').value.trim());
-                await loadSelectedUserHistory();
-            } catch (error) {
-                hideLoading();
-                handleError(error, '积分调整失败');
-            }
-        }
-
-        async function updateUserStatus(status) {
-            const userId = Number(document.getElementById('targetUserId').value);
-            const reason = document.getElementById('reasonInput').value.trim() || '管理员操作';
-            if (!userId) {
-                showMessage('请先选择目标用户', 'warning');
-                return;
-            }
-            try {
-                showLoading(status === 1 ? '正在启用账号...' : '正在禁用账号...');
-                const url = `${API_ENDPOINTS.admin.pointsUserStatusBase}/${userId}/status`;
-                const response = await post(url, { status, reason });
-                hideLoading();
-                if (!response.success) {
-                    showMessage(response.message || '账号状态更新失败', 'error');
-                    return;
-                }
-                showMessage(status === 1 ? '账号已启用' : '账号已禁用', 'success');
-                await loadUsers(document.getElementById('userSearchInput').value.trim());
-                await loadSelectedUserHistory();
-            } catch (error) {
-                hideLoading();
-                handleError(error, '账号状态更新失败');
-            }
-        }
-
-        async function resetSelectedUserSignin() {
-            const userId = Number(document.getElementById('targetUserId').value);
-            const reason = document.getElementById('reasonInput').value.trim() || '管理员重置';
-            if (!userId) {
-                showMessage('请先选择目标用户', 'warning');
-                return;
-            }
-            try {
-                showLoading('正在重置签到信息...');
-                const url = `${API_ENDPOINTS.admin.pointsResetSigninBase}/${userId}/reset-signin`;
-                const response = await post(url, { reason });
-                hideLoading();
-                if (!response.success) {
-                    showMessage(response.message || '重置失败', 'error');
-                    return;
-                }
-                showMessage('签到信息重置成功', 'success');
-                await loadUsers(document.getElementById('userSearchInput').value.trim());
-                await loadSelectedUserHistory();
-            } catch (error) {
-                hideLoading();
-                handleError(error, '重置签到失败');
-            }
-        }
-
-        function setResourceUploadResult(text) {
-            const el = document.getElementById('resourceUploadResult');
-            if (el) {
-                el.textContent = text;
-            }
-        }
-
-        function pickResourceFile() {
-            const fileInput = document.getElementById('resourceFileInput');
-            if (fileInput) {
-                fileInput.click();
-            }
-        }
-
-        function handleResourceFilePicked(event) {
-            const file = event.target.files && event.target.files[0];
-            if (!file) {
-                return;
-            }
-            document.getElementById('resourceNameInput').value = file.name || '';
-            if (file.type) {
-                document.getElementById('resourceMimeInput').value = file.type;
-            }
-        }
-
-        async function submitResourceUpload() {
-            const type = document.getElementById('resourceTypeSelect').value;
-            const fileName = document.getElementById('resourceNameInput').value.trim();
-            const mimeType = document.getElementById('resourceMimeInput').value.trim() || 'application/octet-stream';
-
-            if (!fileName) {
-                showMessage('请先选择文件或填写资源名称', 'warning');
-                return;
-            }
-
-            const endpoint = type === 'software'
-                ? API_ENDPOINTS.admin.resourceUploadSoftware
-                : API_ENDPOINTS.admin.resourceUploadMaterial;
-
-            try {
-                showLoading('正在发起上传会话...');
-                const response = await post(endpoint, { fileName, mimeType });
-                hideLoading();
-                if (!response.success) {
-                    showMessage(response.message || '上传会话创建失败', 'error');
-                    return;
-                }
-
-                const data = response.data || {};
-                const message = data.message || '上传会话创建成功';
-                setResourceUploadResult(
-                    `状态：${message} | 类型：${data.resourceType || type} | 文件：${data.fileName || fileName} | 提供方：${data.provider || 'google-drive'}`
-                );
-                showMessage('管理员上传会话创建成功', 'success');
-            } catch (error) {
-                hideLoading();
-                handleError(error, '上传会话创建失败');
-            }
-        }
-
-        function initAdminIdentity() {
-            const session = getAdminSession();
-            const modeText = session?.mode === 'offline' ? '离线模式' : '服务端模式';
-            document.getElementById('adminIdentity').textContent = `当前管理员：${session?.username || '未知'} · ${modeText}`;
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!requireAdminAuth()) {
-                return;
-            }
-
             initAdminIdentity();
-            loadDashboardData();
-            loadUsers();
-            loadCourseBrushCourses();
-            loadCourseBrushOrders();
-            loadRecommendProducts();
-            loadAnnouncements();
-            renderHistoryTable();
-
-            document.getElementById('refreshBtn').addEventListener('click', loadDashboardData);
+            loadStats();
             document.getElementById('logoutBtn').addEventListener('click', adminLogout);
-            document.getElementById('userSearchBtn').addEventListener('click', () => {
-                loadUsers(document.getElementById('userSearchInput').value.trim());
-            });
-            document.getElementById('submitAdjustBtn').addEventListener('click', submitPointsAdjust);
-            document.getElementById('quickAddBtn').addEventListener('click', () => {
-                document.getElementById('deltaInput').value = 10;
-            });
-            document.getElementById('quickSubBtn').addEventListener('click', () => {
-                document.getElementById('deltaInput').value = -10;
-            });
-            document.getElementById('enableUserBtn').addEventListener('click', () => updateUserStatus(1));
-            document.getElementById('disableUserBtn').addEventListener('click', () => updateUserStatus(0));
-            document.getElementById('resetSigninBtn').addEventListener('click', resetSelectedUserSignin);
-            document.getElementById('pickResourceFileBtn').addEventListener('click', pickResourceFile);
-            document.getElementById('submitResourceUploadBtn').addEventListener('click', submitResourceUpload);
-            document.getElementById('resourceFileInput').addEventListener('change', handleResourceFilePicked);
-            document.getElementById('saveCourseBrushCourseBtn').addEventListener('click', submitCourseBrushCourse);
-            document.getElementById('resetCourseBrushCourseBtn').addEventListener('click', resetCourseBrushCourseForm);
-            document.getElementById('refreshCourseBrushBtn').addEventListener('click', async () => {
-                await loadCourseBrushCourses();
-                await loadCourseBrushOrders();
-                await loadDashboardData();
-            });
-            document.getElementById('courseBrushOrdersStatusFilter').addEventListener('change', loadCourseBrushOrders);
-            document.getElementById('submitRecommendCreateBtn').addEventListener('click', submitRecommendCreate);
-            document.getElementById('refreshRecommendBtn').addEventListener('click', loadRecommendProducts);
-            document.getElementById('publishAnnouncementBtn').addEventListener('click', publishAnnouncement);
-            document.getElementById('refreshAnnouncementBtn').addEventListener('click', loadAnnouncements);
-            document.getElementById('pendingTableBody').addEventListener('click', (event) => {
-                const target = event.target;
-                const recordId = target.dataset.id;
-                const status = target.dataset.status;
-                if (!recordId || !status) {
-                    return;
-                }
-                reviewCheckin(recordId, status);
-            });
-            document.getElementById('usersTableBody').addEventListener('click', async (event) => {
-                const target = event.target;
-                const userId = Number(target.dataset.userId);
-                const action = target.dataset.action;
-                if (!userId || !action) {
-                    return;
-                }
-
-                const user = users.find((item) => Number(item.id) === userId);
-                if (!user) {
-                    return;
-                }
-
-                if (action === 'select') {
-                    await fillSelectedUser(user);
-                    showMessage(`已选择用户：${user.username}`, 'info');
-                    return;
-                }
-
-                if (action === 'toggle-status') {
-                    await fillSelectedUser(user);
-                    await updateUserStatus(Number(target.dataset.status));
-                }
-            });
-            document.getElementById('recommendTableBody').addEventListener('click', async (event) => {
-                const target = event.target;
-                const action = target.dataset.action;
-                const productId = Number(target.dataset.recommendId);
-                const status = target.dataset.status;
-                if (action !== 'toggle-recommend' || !productId || !status) {
-                    return;
-                }
-                await updateRecommendStatus(productId, status);
-            });
-            document.getElementById('courseBrushCoursesTableBody').addEventListener('click', async (event) => {
-                const target = event.target;
-                const courseId = Number(target.dataset.courseId);
-                const action = target.dataset.action;
-                if (!courseId || !action) {
-                    return;
-                }
-
-                const course = courseBrushCourses.find((item) => Number(item.id) === courseId);
-                if (!course) {
-                    return;
-                }
-
-                if (action === 'edit-course') {
-                    fillCourseBrushCourseForm(course);
-                    showMessage(`已载入课程：${course.courseName}`, 'info');
-                    return;
-                }
-
-                if (action === 'toggle-course') {
-                    await updateCourseBrushCourseStatus(courseId, Number(target.dataset.enabled));
-                }
-            });
-            document.getElementById('courseBrushOrdersTableBody').addEventListener('click', async (event) => {
-                const target = event.target;
-                const orderId = Number(target.dataset.orderId);
-                const action = target.dataset.action;
-                const status = target.dataset.status;
-                if (action !== 'order-status' || !orderId || !status) {
-                    return;
-                }
-                await updateCourseBrushOrderStatus(orderId, status);
-            });
         });
     </script>
 </body>

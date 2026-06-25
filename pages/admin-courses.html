@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代刷课管理 - 管理后台</title>
+    <style>
+        :root { --bg: #f3f6fb; --surface: #ffffff; --text: #1f2937; --muted: #6b7280; --brand: #2563eb; --success: #10b981; --danger: #ef4444; --border: #e5e7eb; }
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; }
+        .topbar { max-width: 1200px; margin: 0 auto; padding: 0.95rem 5%; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        .topbar h1 { margin: 0; font-size: 1.2rem; }
+        .topbar small { color: var(--muted); display: block; margin-top: 0.15rem; }
+        .top-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+        .btn { border: none; border-radius: 10px; cursor: pointer; padding: 0.55rem 0.95rem; font-weight: 600; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; }
+        .btn-primary { background: var(--brand); color: #fff; }
+        .btn-muted { background: #eef2ff; color: #3730a3; }
+        .btn-danger { background: #fee2e2; color: #b91c1c; }
+        .container { max-width: 1200px; margin: 1.2rem auto; padding: 0 5% 2rem; }
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; }
+        .panel h2 { margin: 0 0 0.7rem; font-size: 1rem; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 640px; }
+        th, td { text-align: left; border-bottom: 1px solid var(--border); padding: 0.65rem 0.4rem; font-size: 0.88rem; vertical-align: top; }
+        th { color: var(--muted); font-weight: 600; }
+        .ops { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .btn-ok, .btn-no { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; }
+        .btn-ok { background: #dcfce7; color: #166534; }
+        .btn-no { background: #fee2e2; color: #991b1b; }
+        .btn-pick { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #dbeafe; color: #1d4ed8; }
+        .btn-ban { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #fee2e2; color: #991b1b; }
+        .btn-enable { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #dcfce7; color: #166534; }
+        .status-pill { display: inline-block; font-size: 0.75rem; padding: 0.1rem 0.45rem; border-radius: 999px; font-weight: 700; }
+        .status-enabled { background: #dcfce7; color: #166534; }
+        .status-disabled { background: #fee2e2; color: #991b1b; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.7rem; }
+        .form-group label { font-size: 0.82rem; color: var(--muted); }
+        .form-group input { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; }
+        .form-group select { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; background: #fff; }
+        .form-group textarea { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; background: #fff; min-height: 96px; resize: vertical; font-family: inherit; }
+        .form-group input:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
+        .form-group select:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
+        .form-group textarea:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
+        .adjust-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
+        .empty { color: var(--muted); font-size: 0.9rem; padding: 0.5rem 0; }
+        @media (max-width: 980px) { .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div id="admin-app">
+        <div class="container">
+            <section class="panel">
+                <h2>代刷课管理</h2>
+
+                <!-- 课程表单 -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>课程 ID（只读）</label>
+                        <input type="text" id="courseBrushId" readonly placeholder="新建时留空">
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select id="courseBrushStatus">
+                            <option value="enabled">启用</option>
+                            <option value="disabled">停用</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>课程名称</label>
+                        <input type="text" id="courseBrushName" placeholder="请输入课程名称">
+                    </div>
+                    <div class="form-group">
+                        <label>课程编号</label>
+                        <input type="text" id="courseBrushCode" placeholder="请输入课程编号">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>积分</label>
+                        <input type="number" id="courseBrushPoints" placeholder="请输入所需积分">
+                    </div>
+                    <div class="form-group">
+                        <label>课程说明</label>
+                        <textarea id="courseBrushDesc" placeholder="请输入课程说明"></textarea>
+                    </div>
+                </div>
+                <div class="adjust-actions">
+                    <button class="btn btn-primary" type="button" id="saveCourseBrushBtn">保存课程</button>
+                    <button class="btn btn-muted" type="button" id="resetCourseBrushBtn">重置表单</button>
+                    <button class="btn btn-muted" type="button" id="refreshCourseBrushBtn">刷新课程与订单</button>
+                </div>
+
+                <!-- 订单筛选 -->
+                <div class="form-row" style="margin-top: 1rem;">
+                    <div class="form-group">
+                        <label>订单状态筛选</label>
+                        <select id="courseBrushOrderFilter">
+                            <option value="">全部</option>
+                            <option value="pending">待处理</option>
+                            <option value="processing">处理中</option>
+                            <option value="completed">已完成</option>
+                            <option value="failed">失败</option>
+                            <option value="cancelled">已取消</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>关键词搜索</label>
+                        <input type="text" id="courseBrushOrderKeyword" placeholder="搜索用户 / 课程 / 账号">
+                    </div>
+                </div>
+
+                <!-- 课程列表 -->
+                <h2 style="margin-top: 1rem;">课程列表</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>课程名称</th>
+                                <th>编号</th>
+                                <th>积分</th>
+                                <th>状态</th>
+                                <th>说明</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="courseBrushCoursesTableBody">
+                            <tr>
+                                <td colspan="7" class="empty">正在加载课程列表...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 订单列表 -->
+                <h2 style="margin-top: 1rem;">订单列表</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>用户</th>
+                                <th>课程</th>
+                                <th>账号</th>
+                                <th>积分</th>
+                                <th>状态</th>
+                                <th>结果</th>
+                                <th>时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="courseBrushOrdersTableBody">
+                            <tr>
+                                <td colspan="9" class="empty">正在加载订单列表...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="../js/api-config.js"></script>
+    <script src="../js/api-utils.js"></script>
+    <script src="../js/admin-auth.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script>
+        var courseBrushCourses = [];
+        var courseBrushOrders = [];
+
+        // ==================== 课程表单 ====================
+
+        function resetCourseBrushCourseForm() {
+            document.getElementById('courseBrushId').value = '';
+            document.getElementById('courseBrushStatus').value = 'enabled';
+            document.getElementById('courseBrushName').value = '';
+            document.getElementById('courseBrushCode').value = '';
+            document.getElementById('courseBrushPoints').value = '';
+            document.getElementById('courseBrushDesc').value = '';
+        }
+
+        function fillCourseBrushCourseForm(course) {
+            document.getElementById('courseBrushId').value = course.id != null ? course.id : '';
+            document.getElementById('courseBrushStatus').value = course.status === 'disabled' ? 'disabled' : 'enabled';
+            document.getElementById('courseBrushName').value = course.name || course.courseName || '';
+            document.getElementById('courseBrushCode').value = course.code || course.courseCode || '';
+            document.getElementById('courseBrushPoints').value = course.points != null ? course.points : '';
+            document.getElementById('courseBrushDesc').value = course.description || course.desc || '';
+        }
+
+        // ==================== 课程渲染 ====================
+
+        function renderCourseBrushCoursesTable() {
+            var tbody = document.getElementById('courseBrushCoursesTableBody');
+            if (!courseBrushCourses || courseBrushCourses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty">暂无课程数据</td></tr>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < courseBrushCourses.length; i++) {
+                var c = courseBrushCourses[i];
+                var id = c.id != null ? c.id : '-';
+                var name = c.name || c.courseName || '-';
+                var code = c.code || c.courseCode || '-';
+                var points = c.points != null ? c.points : '-';
+                var desc = c.description || c.desc || '-';
+                var isEnabled = c.status !== 'disabled';
+                var statusLabel = isEnabled ? '启用' : '停用';
+                var statusClass = isEnabled ? 'status-enabled' : 'status-disabled';
+                var toggleLabel = isEnabled ? '停用' : '启用';
+                var toggleClass = isEnabled ? 'btn-ban' : 'btn-enable';
+
+                html += '<tr>'
+                    + '<td>' + escapeHtml(String(id)) + '</td>'
+                    + '<td>' + escapeHtml(String(name)) + '</td>'
+                    + '<td>' + escapeHtml(String(code)) + '</td>'
+                    + '<td>' + escapeHtml(String(points)) + '</td>'
+                    + '<td><span class="status-pill ' + escapeHtml(statusClass) + '">' + escapeHtml(statusLabel) + '</span></td>'
+                    + '<td>' + escapeHtml(String(desc)) + '</td>'
+                    + '<td class="ops">'
+                    + '<button class="btn-pick" data-action="edit-course" data-id="' + escapeHtml(String(id)) + '">编辑</button>'
+                    + '<button class="' + escapeHtml(toggleClass) + '" data-action="toggle-course" data-id="' + escapeHtml(String(id)) + '" data-enabled="' + (isEnabled ? 'false' : 'true') + '">' + escapeHtml(toggleLabel) + '</button>'
+                    + '</td>'
+                    + '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        // ==================== 订单渲染 ====================
+
+        function renderCourseBrushOrdersTable() {
+            var tbody = document.getElementById('courseBrushOrdersTableBody');
+
+            var filterStatus = document.getElementById('courseBrushOrderFilter').value;
+            var keyword = document.getElementById('courseBrushOrderKeyword').value.trim().toLowerCase();
+
+            var filtered = [];
+            for (var i = 0; i < courseBrushOrders.length; i++) {
+                var o = courseBrushOrders[i];
+                var orderStatus = o.status || '';
+
+                if (filterStatus && orderStatus !== filterStatus) {
+                    continue;
+                }
+
+                if (keyword) {
+                    var user = String(o.username || o.userName || o.nickName || '').toLowerCase();
+                    var courseName = String(o.courseName || o.course || '').toLowerCase();
+                    var account = String(o.account || o.courseAccount || '').toLowerCase();
+                    if (user.indexOf(keyword) === -1 && courseName.indexOf(keyword) === -1 && account.indexOf(keyword) === -1) {
+                        continue;
+                    }
+                }
+
+                filtered.push(o);
+            }
+
+            if (!filtered || filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="empty">暂无订单数据</td></tr>';
+                return;
+            }
+
+            var statusMap = {
+                pending: '待处理',
+                processing: '处理中',
+                completed: '已完成',
+                failed: '失败',
+                cancelled: '已取消'
+            };
+
+            var html = '';
+            for (var j = 0; j < filtered.length; j++) {
+                var r = filtered[j];
+                var orderId = r.id != null ? r.id : '-';
+                var user = r.username || r.userName || r.nickName || '-';
+                var course = r.courseName || r.course || '-';
+                var account = r.account || r.courseAccount || '-';
+                var rPoints = r.points != null ? r.points : '-';
+                var statusText = statusMap[r.status] || r.status || '-';
+                var result = r.result || r.remark || '-';
+                var time = r.createTime || r.createdAt || r.time || '-';
+                if (time !== '-' && typeof time === 'string' && time.indexOf('T') !== -1) {
+                    time = time.replace('T', ' ');
+                }
+
+                html += '<tr>'
+                    + '<td>' + escapeHtml(String(orderId)) + '</td>'
+                    + '<td>' + escapeHtml(String(user)) + '</td>'
+                    + '<td>' + escapeHtml(String(course)) + '</td>'
+                    + '<td>' + escapeHtml(String(account)) + '</td>'
+                    + '<td>' + escapeHtml(String(rPoints)) + '</td>'
+                    + '<td>' + escapeHtml(String(statusText)) + '</td>'
+                    + '<td>' + escapeHtml(String(result)) + '</td>'
+                    + '<td>' + escapeHtml(String(time)) + '</td>'
+                    + '<td class="ops">';
+
+                if (r.status === 'pending' || r.status === 'processing') {
+                    html += '<button class="btn-ok" data-action="order-status" data-id="' + escapeHtml(String(orderId)) + '" data-status="completed">完成</button>'
+                        + '<button class="btn-no" data-action="order-status" data-id="' + escapeHtml(String(orderId)) + '" data-status="failed">失败</button>'
+                        + '<button class="btn-no" data-action="order-status" data-id="' + escapeHtml(String(orderId)) + '" data-status="cancelled">取消</button>';
+                } else {
+                    html += '<span style="color:var(--muted);font-size:0.76rem;">无可用操作</span>';
+                }
+
+                html += '</td></tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        // ==================== 数据加载 ====================
+
+        async function loadCourseBrushCourses() {
+            var tbody = document.getElementById('courseBrushCoursesTableBody');
+            tbody.innerHTML = '<tr><td colspan="7" class="empty">正在加载课程列表...</td></tr>';
+
+            try {
+                var resp = await get(API_ENDPOINTS.admin.courseBrushCourses, { page: 1, pageSize: 200 });
+                var rows = extractRows(resp && resp.data);
+                courseBrushCourses = rows;
+                renderCourseBrushCoursesTable();
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty">加载失败，请刷新重试</td></tr>';
+                handleError(err, '加载课程列表失败');
+            }
+        }
+
+        async function loadCourseBrushOrders() {
+            var tbody = document.getElementById('courseBrushOrdersTableBody');
+            tbody.innerHTML = '<tr><td colspan="9" class="empty">正在加载订单列表...</td></tr>';
+
+            try {
+                var resp = await get(API_ENDPOINTS.admin.courseBrushOrders, { page: 1, pageSize: 200 });
+                var rows = extractRows(resp && resp.data);
+                courseBrushOrders = rows;
+                renderCourseBrushOrdersTable();
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="9" class="empty">加载失败，请刷新重试</td></tr>';
+                handleError(err, '加载订单列表失败');
+            }
+        }
+
+        function loadAllCourseBrushData() {
+            loadCourseBrushCourses();
+            loadCourseBrushOrders();
+        }
+
+        // ==================== 提交与更新 ====================
+
+        async function submitCourseBrushCourse() {
+            var id = document.getElementById('courseBrushId').value.trim();
+            var status = document.getElementById('courseBrushStatus').value;
+            var name = document.getElementById('courseBrushName').value.trim();
+            var code = document.getElementById('courseBrushCode').value.trim();
+            var points = document.getElementById('courseBrushPoints').value.trim();
+            var desc = document.getElementById('courseBrushDesc').value.trim();
+
+            if (!name) {
+                showMessage('请输入课程名称', 'warning');
+                return;
+            }
+
+            var payload = {
+                name: name,
+                code: code,
+                status: status,
+                description: desc
+            };
+
+            if (points !== '') {
+                payload.points = Number(points);
+            }
+
+            if (id) {
+                payload.id = Number(id);
+            }
+
+            try {
+                if (id) {
+                    await post(API_ENDPOINTS.admin.courseBrushCourses + '/' + id, payload);
+                    showMessage('课程更新成功', 'success');
+                } else {
+                    await post(API_ENDPOINTS.admin.courseBrushCourses, payload);
+                    showMessage('课程创建成功', 'success');
+                }
+                resetCourseBrushCourseForm();
+                await loadCourseBrushCourses();
+            } catch (err) {
+                handleError(err, '保存课程失败');
+            }
+        }
+
+        async function updateCourseBrushCourseStatus(id, enabled) {
+            var statusValue = enabled ? 'enabled' : 'disabled';
+            try {
+                await post(API_ENDPOINTS.admin.courseBrushCourseStatusBase + '/' + id + '/status', { status: statusValue });
+                showMessage('课程状态已更新', 'success');
+                await loadCourseBrushCourses();
+            } catch (err) {
+                handleError(err, '更新课程状态失败');
+            }
+        }
+
+        async function updateCourseBrushOrderStatus(orderId, status) {
+            try {
+                await post(API_ENDPOINTS.admin.courseBrushOrderStatusBase + '/' + orderId + '/status', { status: status });
+                showMessage('订单状态已更新', 'success');
+                await loadCourseBrushOrders();
+            } catch (err) {
+                handleError(err, '更新订单状态失败');
+            }
+        }
+
+        // ==================== 初始化 ====================
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!initAdminPage('代刷课管理')) {
+                return;
+            }
+
+            loadAllCourseBrushData();
+
+            // 保存课程
+            document.getElementById('saveCourseBrushBtn').addEventListener('click', function () {
+                submitCourseBrushCourse();
+            });
+
+            // 重置表单
+            document.getElementById('resetCourseBrushBtn').addEventListener('click', function () {
+                resetCourseBrushCourseForm();
+            });
+
+            // 刷新全部数据
+            document.getElementById('refreshCourseBrushBtn').addEventListener('click', function () {
+                loadAllCourseBrushData();
+            });
+
+            // 订单筛选
+            document.getElementById('courseBrushOrderFilter').addEventListener('change', function () {
+                renderCourseBrushOrdersTable();
+            });
+            document.getElementById('courseBrushOrderKeyword').addEventListener('input', function () {
+                renderCourseBrushOrdersTable();
+            });
+
+            // 课程表格事件委托
+            document.getElementById('courseBrushCoursesTableBody').addEventListener('click', function (e) {
+                var target = e.target;
+                var action = target.getAttribute('data-action');
+                var id = target.getAttribute('data-id');
+
+                if (!action || !id) return;
+
+                if (action === 'edit-course') {
+                    var course = null;
+                    for (var i = 0; i < courseBrushCourses.length; i++) {
+                        if (String(courseBrushCourses[i].id) === String(id)) {
+                            course = courseBrushCourses[i];
+                            break;
+                        }
+                    }
+                    if (course) {
+                        fillCourseBrushCourseForm(course);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                } else if (action === 'toggle-course') {
+                    var enabled = target.getAttribute('data-enabled') === 'true';
+                    updateCourseBrushCourseStatus(id, enabled);
+                }
+            });
+
+            // 订单表格事件委托
+            document.getElementById('courseBrushOrdersTableBody').addEventListener('click', function (e) {
+                var target = e.target;
+                var action = target.getAttribute('data-action');
+                var orderId = target.getAttribute('data-id');
+                var status = target.getAttribute('data-status');
+
+                if (!action || !orderId) return;
+
+                if (action === 'order-status' && status) {
+                    updateCourseBrushOrderStatus(orderId, status);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

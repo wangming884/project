@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户积分管理 - 管理后台</title>
+    <style>
+        :root { --bg: #f3f6fb; --surface: #ffffff; --text: #1f2937; --muted: #6b7280; --brand: #2563eb; --success: #10b981; --danger: #ef4444; --border: #e5e7eb; }
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; }
+        .topbar { max-width: 1200px; margin: 0 auto; padding: 0.95rem 5%; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        .topbar h1 { margin: 0; font-size: 1.2rem; }
+        .topbar small { color: var(--muted); display: block; margin-top: 0.15rem; }
+        .top-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+        .btn { border: none; border-radius: 10px; cursor: pointer; padding: 0.55rem 0.95rem; font-weight: 600; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; }
+        .btn-primary { background: var(--brand); color: #fff; }
+        .btn-muted { background: #eef2ff; color: #3730a3; }
+        .btn-danger { background: #fee2e2; color: #b91c1c; }
+        .container { max-width: 1200px; margin: 1.2rem auto; padding: 0 5% 2rem; }
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; }
+        .panel h2 { margin: 0 0 0.7rem; font-size: 1rem; }
+        .grid { display: grid; gap: 1rem; grid-template-columns: 1.3fr 1fr; }
+        .point-tool-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1rem; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 640px; }
+        th, td { text-align: left; border-bottom: 1px solid var(--border); padding: 0.65rem 0.4rem; font-size: 0.88rem; vertical-align: top; }
+        th { color: var(--muted); font-weight: 600; }
+        .ops { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .btn-pick { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #dbeafe; color: #1d4ed8; }
+        .btn-ban { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #fee2e2; color: #991b1b; }
+        .btn-enable { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #dcfce7; color: #166534; }
+        .status-pill { display: inline-block; font-size: 0.75rem; padding: 0.1rem 0.45rem; border-radius: 999px; font-weight: 700; }
+        .status-enabled { background: #dcfce7; color: #166534; }
+        .status-disabled { background: #fee2e2; color: #991b1b; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.7rem; }
+        .form-group label { font-size: 0.82rem; color: var(--muted); }
+        .form-group input { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; }
+        .form-group input:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
+        .adjust-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
+        .empty { color: var(--muted); font-size: 0.9rem; padding: 0.5rem 0; }
+        @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } .point-tool-grid { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div id="admin-app">
+        <div class="container">
+            <section class="panel">
+                <h2>用户积分管理</h2>
+                <div class="point-tool-grid">
+                    <div>
+                        <div class="form-group" style="flex-direction:row;gap:0.5rem;align-items:flex-end;">
+                            <div style="flex:1;">
+                                <label for="userSearchInput">搜索用户（用户名/邮箱）</label>
+                                <input type="text" id="userSearchInput" placeholder="输入用户名或邮箱搜索">
+                            </div>
+                            <button class="btn btn-primary" id="userSearchBtn" type="button">搜索</button>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>用户名</th>
+                                        <th>邮箱</th>
+                                        <th>当前积分</th>
+                                        <th>账号状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                    <tr>
+                                        <td colspan="6" class="empty">请输入关键词后点击搜索</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>目标用户 ID</label>
+                                <input type="text" id="targetUserId" readonly placeholder="未选择">
+                            </div>
+                            <div class="form-group">
+                                <label>目标用户名</label>
+                                <input type="text" id="targetUserName" readonly placeholder="未选择">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="deltaInput">积分变动数量（正数增加，负数扣减）</label>
+                            <input type="number" id="deltaInput" placeholder="例如：10 或 -10">
+                        </div>
+                        <div class="form-group">
+                            <label for="reasonInput">变动原因</label>
+                            <input type="text" id="reasonInput" placeholder="例如：管理员手动调整">
+                        </div>
+                        <div class="adjust-actions">
+                            <button class="btn btn-primary" id="submitAdjustBtn" type="button">确认调整</button>
+                            <button class="btn btn-muted" id="quickAddBtn" type="button">+10</button>
+                            <button class="btn btn-muted" id="quickSubBtn" type="button">-10</button>
+                        </div>
+                        <div class="adjust-actions" style="margin-top:0.8rem;">
+                            <button class="btn btn-primary" id="enableUserBtn" type="button">启用账号</button>
+                            <button class="btn btn-danger" id="disableUserBtn" type="button">禁用账号</button>
+                            <button class="btn btn-muted" id="resetSigninBtn" type="button">重置签到</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel" style="margin-top:1rem;">
+                <h2>所选用户积分流水</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>类型</th>
+                                <th>变动</th>
+                                <th>余额</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr>
+                                <td colspan="5" class="empty">请先选择一个用户</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="../js/api-config.js"></script>
+    <script src="../js/api-utils.js"></script>
+    <script src="../js/admin-auth.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script>
+        var users = [];
+        var selectedUser = null;
+        var pointsHistory = [];
+
+        function renderUsersTable() {
+            var tbody = document.getElementById('usersTableBody');
+            if (!users || users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty">暂无用户数据</td></tr>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < users.length; i++) {
+                var u = users[i];
+                var id = u.id != null ? u.id : '-';
+                var username = u.username || u.userName || u.nickName || '-';
+                var email = u.email || '-';
+                var points = u.points != null ? u.points : (u.balance != null ? u.balance : 0);
+                var status = u.status || u.accountStatus || 'enabled';
+                var isEnabled = status === 'enabled' || status === 'active' || status === 1;
+                var statusLabel = isEnabled ? '正常' : '已禁用';
+                var statusClass = isEnabled ? 'status-enabled' : 'status-disabled';
+                var toggleBtnClass = isEnabled ? 'btn-ban' : 'btn-enable';
+                var toggleBtnLabel = isEnabled ? '禁用' : '启用';
+                var toggleStatus = isEnabled ? 'disabled' : 'enabled';
+
+                html += '<tr>'
+                    + '<td>' + escapeHtml(String(id)) + '</td>'
+                    + '<td>' + escapeHtml(String(username)) + '</td>'
+                    + '<td>' + escapeHtml(String(email)) + '</td>'
+                    + '<td>' + escapeHtml(String(points)) + '</td>'
+                    + '<td><span class="status-pill ' + escapeHtml(statusClass) + '">' + escapeHtml(statusLabel) + '</span></td>'
+                    + '<td class="ops">'
+                    + '<button class="btn-pick" data-action="select" data-index="' + i + '">选择</button>'
+                    + '<button class="' + escapeHtml(toggleBtnClass) + '" data-action="toggle-status" data-index="' + i + '" data-status="' + escapeHtml(toggleStatus) + '">' + escapeHtml(toggleBtnLabel) + '</button>'
+                    + '</td>'
+                    + '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        function renderHistoryTable() {
+            var tbody = document.getElementById('historyTableBody');
+            if (!pointsHistory || pointsHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty">暂无积分流水记录</td></tr>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < pointsHistory.length; i++) {
+                var r = pointsHistory[i];
+                var time = r.createTime || r.createdAt || r.time || '-';
+                if (time !== '-' && typeof time === 'string' && time.indexOf('T') !== -1) {
+                    time = time.replace('T', ' ');
+                }
+                var type = r.type || r.changeType || '-';
+                var delta = r.delta != null ? r.delta : (r.change != null ? r.change : '-');
+                if (typeof delta === 'number' && delta > 0) {
+                    delta = '+' + delta;
+                }
+                var balance = r.balance != null ? r.balance : (r.afterPoints != null ? r.afterPoints : '-');
+                var desc = r.reason || r.description || r.remark || '-';
+
+                html += '<tr>'
+                    + '<td>' + escapeHtml(String(time)) + '</td>'
+                    + '<td>' + escapeHtml(String(type)) + '</td>'
+                    + '<td>' + escapeHtml(String(delta)) + '</td>'
+                    + '<td>' + escapeHtml(String(balance)) + '</td>'
+                    + '<td>' + escapeHtml(String(desc)) + '</td>'
+                    + '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        function fillSelectedUser(user) {
+            selectedUser = user;
+            document.getElementById('targetUserId').value = user.id != null ? user.id : '';
+            document.getElementById('targetUserName').value = user.username || user.userName || user.nickName || '';
+        }
+
+        async function loadUsers(keyword) {
+            var tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '<tr><td colspan="6" class="empty">正在搜索...</td></tr>';
+
+            try {
+                var params = { page: 1, pageSize: 50 };
+                if (keyword) {
+                    params.keyword = keyword;
+                }
+                var resp = await get(API_ENDPOINTS.admin.pointsUsers, params);
+                var rows = extractRows(resp && resp.data);
+                users = rows;
+                renderUsersTable();
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty">搜索失败，请重试</td></tr>';
+                handleError(err, '加载用户列表失败');
+            }
+        }
+
+        async function loadSelectedUserHistory() {
+            var tbody = document.getElementById('historyTableBody');
+            if (!selectedUser || selectedUser.id == null) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty">请先选择一个用户</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '<tr><td colspan="5" class="empty">正在加载积分流水...</td></tr>';
+
+            try {
+                var resp = await get(API_ENDPOINTS.admin.pointsHistory, { userId: selectedUser.id, page: 1, pageSize: 100 });
+                var rows = extractRows(resp && resp.data);
+                pointsHistory = rows;
+                renderHistoryTable();
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty">加载流水失败，请重试</td></tr>';
+                handleError(err, '加载积分流水失败');
+            }
+        }
+
+        async function submitPointsAdjust() {
+            if (!selectedUser || selectedUser.id == null) {
+                showMessage('请先选择一个用户', 'warning');
+                return;
+            }
+
+            var deltaVal = document.getElementById('deltaInput').value;
+            var reason = document.getElementById('reasonInput').value.trim();
+
+            if (!deltaVal || isNaN(Number(deltaVal))) {
+                showMessage('请输入有效的积分数值', 'warning');
+                return;
+            }
+
+            var delta = Number(deltaVal);
+            if (delta === 0) {
+                showMessage('变动数量不能为 0', 'warning');
+                return;
+            }
+
+            if (!reason) {
+                reason = '管理员手动调整';
+            }
+
+            try {
+                await post(API_ENDPOINTS.admin.pointsAdjust, {
+                    userId: selectedUser.id,
+                    delta: delta,
+                    reason: reason,
+                });
+                showMessage('积分调整成功', 'success');
+                document.getElementById('deltaInput').value = '';
+                document.getElementById('reasonInput').value = '';
+                await loadUsers(document.getElementById('userSearchInput').value.trim());
+                await loadSelectedUserHistory();
+                // 重新选中当前用户以刷新积分显示
+                for (var i = 0; i < users.length; i++) {
+                    if (String(users[i].id) === String(selectedUser.id)) {
+                        fillSelectedUser(users[i]);
+                        break;
+                    }
+                }
+            } catch (err) {
+                handleError(err, '积分调整失败');
+            }
+        }
+
+        async function updateUserStatus(status) {
+            if (!selectedUser || selectedUser.id == null) {
+                showMessage('请先选择一个用户', 'warning');
+                return;
+            }
+
+            var actionLabel = status === 'enabled' ? '启用' : '禁用';
+
+            try {
+                var url = API_ENDPOINTS.admin.pointsUserStatusBase + '/' + selectedUser.id + '/status';
+                await post(url, { status: status });
+                showMessage('已' + actionLabel + '该用户', 'success');
+                await loadUsers(document.getElementById('userSearchInput').value.trim());
+                for (var i = 0; i < users.length; i++) {
+                    if (String(users[i].id) === String(selectedUser.id)) {
+                        fillSelectedUser(users[i]);
+                        break;
+                    }
+                }
+            } catch (err) {
+                handleError(err, actionLabel + '用户失败');
+            }
+        }
+
+        async function resetSelectedUserSignin() {
+            if (!selectedUser || selectedUser.id == null) {
+                showMessage('请先选择一个用户', 'warning');
+                return;
+            }
+
+            try {
+                var url = API_ENDPOINTS.admin.pointsResetSigninBase + '/' + selectedUser.id + '/reset-signin';
+                await post(url, {});
+                showMessage('已重置签到记录', 'success');
+                await loadUsers(document.getElementById('userSearchInput').value.trim());
+                for (var i = 0; i < users.length; i++) {
+                    if (String(users[i].id) === String(selectedUser.id)) {
+                        fillSelectedUser(users[i]);
+                        break;
+                    }
+                }
+            } catch (err) {
+                handleError(err, '重置签到失败');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!initAdminPage('用户积分管理')) {
+                return;
+            }
+
+            // 搜索按钮
+            document.getElementById('userSearchBtn').addEventListener('click', function () {
+                var keyword = document.getElementById('userSearchInput').value.trim();
+                loadUsers(keyword);
+            });
+
+            // 回车搜索
+            document.getElementById('userSearchInput').addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    var keyword = document.getElementById('userSearchInput').value.trim();
+                    loadUsers(keyword);
+                }
+            });
+
+            // 用户表格事件委托（选择 / 切换状态）
+            document.getElementById('usersTableBody').addEventListener('click', function (e) {
+                var target = e.target;
+                if (!target.getAttribute('data-action')) return;
+
+                var action = target.getAttribute('data-action');
+                var index = parseInt(target.getAttribute('data-index'), 10);
+                if (isNaN(index) || !users[index]) return;
+
+                if (action === 'select') {
+                    fillSelectedUser(users[index]);
+                    loadSelectedUserHistory();
+                } else if (action === 'toggle-status') {
+                    var status = target.getAttribute('data-status');
+                    selectedUser = users[index];
+                    updateUserStatus(status);
+                }
+            });
+
+            // 确认调整
+            document.getElementById('submitAdjustBtn').addEventListener('click', function () {
+                submitPointsAdjust();
+            });
+
+            // 快速 +10
+            document.getElementById('quickAddBtn').addEventListener('click', function () {
+                document.getElementById('deltaInput').value = '10';
+                submitPointsAdjust();
+            });
+
+            // 快速 -10
+            document.getElementById('quickSubBtn').addEventListener('click', function () {
+                document.getElementById('deltaInput').value = '-10';
+                submitPointsAdjust();
+            });
+
+            // 启用账号
+            document.getElementById('enableUserBtn').addEventListener('click', function () {
+                updateUserStatus('enabled');
+            });
+
+            // 禁用账号
+            document.getElementById('disableUserBtn').addEventListener('click', function () {
+                updateUserStatus('disabled');
+            });
+
+            // 重置签到
+            document.getElementById('resetSigninBtn').addEventListener('click', function () {
+                resetSelectedUserSignin();
+            });
+        });
+    </script>
+</body>
+</html>

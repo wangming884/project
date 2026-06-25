@@ -46,8 +46,7 @@ function hasAdminPermission(permission = 'all') {
 function requireAdminAuth() {
     const session = getAdminSession();
     if (!session) {
-        const from = encodeURIComponent(window.location.pathname);
-        window.location.href = `admin-login.html?from=${from}`;
+        window.location.href = 'index.html';
         return false;
     }
     return true;
@@ -56,5 +55,5 @@ function requireAdminAuth() {
 function adminLogout() {
     removeStorage(ADMIN_SESSION_KEY);
     clearAuthSession();
-    window.location.href = 'admin-login.html';
+    window.location.href = 'index.html';
 }

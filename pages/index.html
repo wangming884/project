@@ -13,8 +13,6 @@
         .logo { font-size: 1.5rem; font-weight: bold; color: #3182ce; letter-spacing: 0.5px; }
         .auth-buttons button { background: #3182ce; color: white; border: none; padding: 0.5rem 1.2rem; margin-left: 0.8rem; cursor: pointer; border-radius: 20px; font-size: 1rem; transition: all 0.3s ease; }
         .auth-buttons button.register-btn { background: #38b2ac; }
-        .auth-buttons button.admin-btn { background: #1f2937; }
-        .auth-buttons button.admin-btn:hover { box-shadow: 0 4px 10px rgba(31,41,55,0.28); }
         .auth-buttons button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
         /* 首页主体内容 */
@@ -50,6 +48,12 @@
         #registerModal .submit-btn { background: #38b2ac; }
         #registerModal .submit-btn:hover { background: #319795; }
         
+        /* 验证码行 */
+        .captcha-row { display: flex; align-items: center; gap: 0.6rem; }
+        .captcha-row input { flex: 1; }
+        .captcha-row canvas { cursor: pointer; border-radius: 4px; border: 1px solid #ccc; flex-shrink: 0; }
+        .captcha-row canvas:hover { border-color: #3182ce; }
+
         /* 弹窗底部切换链接 */
         .modal-footer { margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: #666; border-top: 1px solid #eee; padding-top: 1rem; }
         .modal-footer button { color: #3182ce; text-decoration: none; font-weight: bold; cursor: pointer; transition: color 0.2s; background: transparent; border: none; padding: 0; font: inherit; }
@@ -64,7 +68,6 @@
     <header>
         <div class="logo">MyBrand</div>
         <div class="auth-buttons">
-            <button class="admin-btn" onclick="window.location.href='admin-login.html'">管理员入口</button>
             <button type="button" data-modal-target="loginModal">登录</button>
             <button type="button" class="register-btn" data-modal-target="registerModal">注册</button>
         </div>
@@ -93,6 +96,13 @@
                     <label for="login-password">密码</label>
                     <input type="password" id="login-password" required>
                 </div>
+                <div class="form-group">
+                    <label>验证码</label>
+                    <div class="captcha-row">
+                        <input type="text" id="login-captcha" placeholder="输入验证码" required maxlength="4" autocomplete="off">
+                        <canvas id="login-captcha-canvas" width="120" height="40" title="点击刷新验证码"></canvas>
+                    </div>
+                </div>
                 <button type="submit" class="submit-btn">登录</button>
                 <div class="modal-footer">
                     还没有账号？ <button type="button" data-modal-close="loginModal" data-modal-target="registerModal">立即注册</button>
@@ -119,6 +129,13 @@
                     <label for="reg-password">设置密码</label>
                     <input type="password" id="reg-password" required minlength="6">
                 </div>
+                <div class="form-group">
+                    <label>验证码</label>
+                    <div class="captcha-row">
+                        <input type="text" id="reg-captcha" placeholder="输入验证码" required maxlength="4" autocomplete="off">
+                        <canvas id="reg-captcha-canvas" width="120" height="40" title="点击刷新验证码"></canvas>
+                    </div>
+                </div>
                 <button type="submit" class="submit-btn">立即注册</button>
                 <div class="modal-footer">
                     已有账号？ <button type="button" data-modal-close="registerModal" data-modal-target="loginModal">直接登录</button>
@@ -130,7 +147,9 @@
     <!-- 引入 API 配置和工具函数 -->
     <script src="../js/api-config.js"></script>
     <script src="../js/api-utils.js"></script>
-    
+    <script src="../js/admin-auth.js"></script>
+    <script src="../js/captcha.js"></script>
+
     <!-- 引入 particles.js 库 -->
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script src="../js/index-page.js"></script>

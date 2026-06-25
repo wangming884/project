@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>站长好物管理 - 管理后台</title>
+    <style>
+        :root { --bg: #f3f6fb; --surface: #ffffff; --text: #1f2937; --muted: #6b7280; --brand: #2563eb; --success: #10b981; --danger: #ef4444; --border: #e5e7eb; }
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; }
+        .topbar { max-width: 1200px; margin: 0 auto; padding: 0.95rem 5%; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        .topbar h1 { margin: 0; font-size: 1.2rem; }
+        .topbar small { color: var(--muted); display: block; margin-top: 0.15rem; }
+        .top-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+        .btn { border: none; border-radius: 10px; cursor: pointer; padding: 0.55rem 0.95rem; font-weight: 600; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; }
+        .btn-primary { background: var(--brand); color: #fff; }
+        .btn-muted { background: #eef2ff; color: #3730a3; }
+        .btn-danger { background: #fee2e2; color: #b91c1c; }
+        .container { max-width: 1200px; margin: 1.2rem auto; padding: 0 5% 2rem; }
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; }
+        .panel h2 { margin: 0 0 0.7rem; font-size: 1rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.7rem; }
+        .form-group label { font-size: 0.82rem; color: var(--muted); }
+        .form-group input { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; }
+        .form-group select { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; background: #fff; }
+        .form-group textarea { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem; font-size: 0.88rem; background: #fff; min-height: 96px; resize: vertical; font-family: inherit; }
+        .form-group input:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
+        .form-group select:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
+        .form-group textarea:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
+        .adjust-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
+        .empty { color: var(--muted); font-size: 0.9rem; padding: 0.5rem 0; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 640px; }
+        th, td { text-align: left; border-bottom: 1px solid var(--border); padding: 0.65rem 0.4rem; font-size: 0.88rem; vertical-align: top; }
+        th { color: var(--muted); font-weight: 600; }
+        .ops { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .btn-ok, .btn-no { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; }
+        .btn-ok { background: #dcfce7; color: #166534; }
+        .btn-no { background: #fee2e2; color: #991b1b; }
+        .btn-pick { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #dbeafe; color: #1d4ed8; }
+        .btn-ban { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #fee2e2; color: #991b1b; }
+        .btn-enable { border: none; cursor: pointer; border-radius: 8px; padding: 0.35rem 0.55rem; font-size: 0.76rem; font-weight: 600; background: #dcfce7; color: #166534; }
+        .status-pill { display: inline-block; font-size: 0.75rem; padding: 0.1rem 0.45rem; border-radius: 999px; font-weight: 700; }
+        .status-enabled { background: #dcfce7; color: #166534; }
+        .status-disabled { background: #fee2e2; color: #991b1b; }
+        @media (max-width: 980px) { .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div id="admin-app">
+        <div class="container">
+            <section class="panel">
+                <h2>站长好物上架管理</h2>
+                <div class="form-group">
+                    <label>商品标题</label>
+                    <input type="text" id="recommendTitle" placeholder="输入商品标题">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>价格</label>
+                        <input type="number" id="recommendPrice" step="0.01" placeholder="输入价格">
+                    </div>
+                    <div class="form-group">
+                        <label>原价</label>
+                        <input type="number" id="recommendOriginalPrice" step="0.01" placeholder="输入原价">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>角标</label>
+                        <input type="text" id="recommendBadge" placeholder="例：热卖、新品">
+                    </div>
+                    <div class="form-group">
+                        <label>Emoji</label>
+                        <input type="text" id="recommendEmoji" placeholder="输入 Emoji">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>购买链接</label>
+                    <input type="text" id="recommendBuyUrl" placeholder="输入商品购买 URL">
+                </div>
+                <div class="form-group">
+                    <label>商品描述</label>
+                    <input type="text" id="recommendDescription" placeholder="输入商品描述">
+                </div>
+                <div class="adjust-actions">
+                    <button class="btn btn-primary" type="button" id="submitRecommendBtn">上架商品</button>
+                    <button class="btn btn-muted" type="button" id="refreshRecommendBtn">刷新好物列表</button>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h2>好物列表</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>标题</th>
+                                <th>价格</th>
+                                <th>状态</th>
+                                <th>更新时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recommendTableBody">
+                            <tr>
+                                <td colspan="6" class="empty">点击"刷新好物列表"加载数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="../js/api-config.js"></script>
+    <script src="../js/api-utils.js"></script>
+    <script src="../js/admin-auth.js"></script>
+    <script src="../js/admin-common.js"></script>
+    <script>
+        var recommendProducts = [];
+
+        function renderRecommendTable() {
+            var tbody = document.getElementById('recommendTableBody');
+            if (!recommendProducts || recommendProducts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty">暂无好物数据</td></tr>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < recommendProducts.length; i++) {
+                var r = recommendProducts[i];
+                var id = r.id != null ? r.id : '-';
+                var title = r.title || '-';
+                var price = r.price != null ? r.price : '-';
+                var status = r.status || '-';
+                var updateTime = r.updateTime || r.createTime || r.createdAt || '-';
+                if (updateTime !== '-' && typeof updateTime === 'string' && updateTime.indexOf('T') !== -1) {
+                    updateTime = updateTime.replace('T', ' ');
+                }
+                var statusLabel = status === 'enabled' || status === 'active'
+                    ? '<span class="status-pill status-enabled">上架</span>'
+                    : '<span class="status-pill status-disabled">下架</span>';
+                var toggleLabel = status === 'enabled' || status === 'active' ? '下架' : '上架';
+                var toggleStatus = status === 'enabled' || status === 'active' ? 'disabled' : 'enabled';
+                html += '<tr>'
+                    + '<td>' + escapeHtml(String(id)) + '</td>'
+                    + '<td>' + escapeHtml(String(title)) + '</td>'
+                    + '<td>' + escapeHtml(String(price)) + '</td>'
+                    + '<td>' + statusLabel + '</td>'
+                    + '<td>' + escapeHtml(String(updateTime)) + '</td>'
+                    + '<td class="ops">'
+                    + '<button class="btn-ok toggle-recommend" data-id="' + escapeHtml(String(id)) + '" data-status="' + toggleStatus + '">' + toggleLabel + '</button>'
+                    + '</td>'
+                    + '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        async function loadRecommendProducts() {
+            var tbody = document.getElementById('recommendTableBody');
+            tbody.innerHTML = '<tr><td colspan="6" class="empty">正在加载好物列表...</td></tr>';
+
+            try {
+                var resp = await get(API_ENDPOINTS.admin.recommendAdminList, { page: 1, pageSize: 100 });
+                var rows = extractRows(resp && resp.data);
+                recommendProducts = rows;
+                renderRecommendTable();
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty">加载失败，请刷新重试</td></tr>';
+                handleError(err, '加载好物列表失败');
+            }
+        }
+
+        async function submitRecommendCreate() {
+            var title = document.getElementById('recommendTitle').value.trim();
+            var price = document.getElementById('recommendPrice').value;
+            var originalPrice = document.getElementById('recommendOriginalPrice').value;
+            var badge = document.getElementById('recommendBadge').value.trim();
+            var emoji = document.getElementById('recommendEmoji').value.trim();
+            var buyUrl = document.getElementById('recommendBuyUrl').value.trim();
+            var description = document.getElementById('recommendDescription').value.trim();
+
+            if (!title) {
+                showMessage('请输入商品标题', 'warning');
+                return;
+            }
+
+            var payload = {
+                title: title,
+                price: price ? parseFloat(price) : null,
+                originalPrice: originalPrice ? parseFloat(originalPrice) : null,
+                badge: badge || null,
+                emoji: emoji || null,
+                buyUrl: buyUrl || null,
+                description: description || null
+            };
+
+            try {
+                await post(API_ENDPOINTS.admin.recommendAdminCreate, payload);
+                showMessage('上架成功', 'success');
+                document.getElementById('recommendTitle').value = '';
+                document.getElementById('recommendPrice').value = '';
+                document.getElementById('recommendOriginalPrice').value = '';
+                document.getElementById('recommendBadge').value = '';
+                document.getElementById('recommendEmoji').value = '';
+                document.getElementById('recommendBuyUrl').value = '';
+                document.getElementById('recommendDescription').value = '';
+                await loadRecommendProducts();
+            } catch (err) {
+                handleError(err, '上架失败');
+            }
+        }
+
+        async function updateRecommendStatus(productId, status) {
+            var url = API_ENDPOINTS.admin.recommendAdminStatusBase + '/' + productId + '/status';
+            try {
+                await post(url, { status: status });
+                showMessage(status === 'enabled' ? '已上架' : '已下架', 'success');
+                await loadRecommendProducts();
+            } catch (err) {
+                handleError(err, '状态更新失败');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!initAdminPage('站长好物管理')) {
+                return;
+            }
+            loadRecommendProducts();
+
+            document.getElementById('submitRecommendBtn').addEventListener('click', submitRecommendCreate);
+            document.getElementById('refreshRecommendBtn').addEventListener('click', loadRecommendProducts);
+
+            document.getElementById('recommendTableBody').addEventListener('click', function (e) {
+                var target = e.target;
+                if (target.classList.contains('toggle-recommend')) {
+                    var id = target.getAttribute('data-id');
+                    var status = target.getAttribute('data-status');
+                    if (id && status) {
+                        updateRecommendStatus(id, status);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
