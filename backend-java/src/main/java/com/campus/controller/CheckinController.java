@@ -58,7 +58,7 @@ public class CheckinController {
     public Result<Map<String, Object>> submitCheckin(
             @RequestBody Map<String, Object> request,
             Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         String location = "";
         Object dormObj = request.get("dorm");
         if (dormObj instanceof String && !((String) dormObj).isBlank()) {
@@ -93,7 +93,7 @@ public class CheckinController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize,
             Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         Page<CheckinRecord> records = checkinService.getCheckinRecords(userId, page, pageSize);
         return Result.success(records);
     }
@@ -103,7 +103,7 @@ public class CheckinController {
      */
     @GetMapping("/today")
     public Result<Map<String, Object>> getTodayStatus(Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         Map<String, Object> status = checkinService.getTodayStatus(userId);
         return Result.success(status);
     }
@@ -113,7 +113,7 @@ public class CheckinController {
      */
     @GetMapping("/statistics")
     public Result<Map<String, Object>> getStatistics(Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         Map<String, Object> statistics = checkinService.getStatistics(userId);
         return Result.success(statistics);
     }
@@ -196,7 +196,7 @@ public class CheckinController {
      */
     @GetMapping("/status")
     public Result<Map<String, Object>> getStatus(Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         Map<String, Object> status = checkinService.getTodayStatus(userId);
         return Result.success(status);
     }
@@ -209,7 +209,7 @@ public class CheckinController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize,
             Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         Page<CheckinRecord> records = checkinService.getCheckinRecords(userId, page, pageSize);
 
         Map<String, Object> data = new HashMap<>();

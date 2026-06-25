@@ -71,6 +71,7 @@ public class SecondhandProduct implements Serializable {
     /**
      * 浏览次数
      */
+    @TableField("view_count")
     private Integer views;
     
     /**

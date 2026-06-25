@@ -249,7 +249,7 @@
             <button id="contactBtn" class="contact-btn" type="button">联系作者</button>
             <span>欢迎回来，同学 👋</span>
             <!-- 退出登录返回到首页 -->
-            <a href="index.html" class="logout-btn">退出登录</a>
+            <a href="index.html" class="logout-btn" id="logoutBtn">退出登录</a>
         </div>
     </header>
 
@@ -416,6 +416,11 @@
             signInBtn.addEventListener('click', handleSignIn);
             contactBtn.addEventListener('click', () => {
                 window.location.href = 'contact.html';
+            });
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                clearAuthSession();
+                window.location.href = 'index.html';
             });
         }
 
