@@ -393,10 +393,18 @@ function showMessage(message, type = 'info', duration = 3000) {
         info: 'ℹ',
     };
 
+    // 计算垂直偏移避免多条消息重叠
+    const existingToasts = document.querySelectorAll('[data-global-toast]');
+    let topOffset = 20;
+    existingToasts.forEach(function (toast) {
+        topOffset += toast.offsetHeight + 10;
+    });
+
     const messageDiv = document.createElement('div');
+    messageDiv.setAttribute('data-global-toast', '');
     messageDiv.style.cssText = `
         position: fixed;
-        top: 20px;
+        top: ${topOffset}px;
         left: 50%;
         transform: translateX(-50%);
         background: ${colors[type] || colors.info};
@@ -468,7 +476,7 @@ function handleError(error, defaultMessage = '操作失败，请稍后重试') {
         clearAuthSession();
         // 跳转到登录页
         setTimeout(() => {
-            window.location.href = 'index.html';
+            window.location.href = window.location.pathname.includes('/pages/') ? 'index.html' : 'pages/index.html';
         }, 1500);
     } else if (status === 403 || message.includes('403') || message.includes('Forbidden')) {
         message = '没有权限执行此操作';

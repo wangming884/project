@@ -302,18 +302,22 @@ public class SecondhandService {
      * 获取商品统计
      */
     public Map<String, Object> getStatistics(Long userId) {
-        LambdaQueryWrapper<SecondhandProduct> query = new LambdaQueryWrapper<>();
-        query.eq(SecondhandProduct::getSellerId, userId);
+        // 总发布数
+        LambdaQueryWrapper<SecondhandProduct> totalQuery = new LambdaQueryWrapper<>();
+        totalQuery.eq(SecondhandProduct::getSellerId, userId);
+        Long totalCount = productMapper.selectCount(totalQuery);
 
-        Long totalCount = productMapper.selectCount(query);
+        // 在售数量（独立 wrapper 避免条件累积）
+        LambdaQueryWrapper<SecondhandProduct> availableQuery = new LambdaQueryWrapper<>();
+        availableQuery.eq(SecondhandProduct::getSellerId, userId)
+                     .eq(SecondhandProduct::getStatus, "available");
+        Long availableCount = productMapper.selectCount(availableQuery);
 
-        query.eq(SecondhandProduct::getStatus, "available");
-        Long availableCount = productMapper.selectCount(query);
-
-        query.clear();
-        query.eq(SecondhandProduct::getSellerId, userId)
-            .eq(SecondhandProduct::getStatus, "sold");
-        Long soldCount = productMapper.selectCount(query);
+        // 已售数量
+        LambdaQueryWrapper<SecondhandProduct> soldQuery = new LambdaQueryWrapper<>();
+        soldQuery.eq(SecondhandProduct::getSellerId, userId)
+                .eq(SecondhandProduct::getStatus, "sold");
+        Long soldCount = productMapper.selectCount(soldQuery);
 
         Map<String, Object> result = new HashMap<>();
         result.put("totalCount", totalCount);

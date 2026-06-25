@@ -108,6 +108,7 @@ public class AuthService {
         userData.put("email", user.getEmail());
         userData.put("avatar", user.getAvatar());
         userData.put("points", user.getPoints());
+        userData.put("role", "user");
         
         Map<String, Object> result = new HashMap<>();
         result.put("token", token);

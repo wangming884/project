@@ -275,21 +275,27 @@ public class SubstituteService {
      * 获取任务统计
      */
     public Map<String, Object> getStatistics(Long userId) {
-        // 发布的任务统计
+        // 发布的任务总数
         LambdaQueryWrapper<SubstituteTask> publishQuery = new LambdaQueryWrapper<>();
         publishQuery.eq(SubstituteTask::getPublisherId, userId);
         Long publishedCount = taskMapper.selectCount(publishQuery);
         
-        publishQuery.eq(SubstituteTask::getStatus, "completed");
-        Long publishedCompletedCount = taskMapper.selectCount(publishQuery);
+        // 发布的已完成任务数（独立 wrapper 避免条件累积）
+        LambdaQueryWrapper<SubstituteTask> publishCompletedQuery = new LambdaQueryWrapper<>();
+        publishCompletedQuery.eq(SubstituteTask::getPublisherId, userId)
+                            .eq(SubstituteTask::getStatus, "completed");
+        Long publishedCompletedCount = taskMapper.selectCount(publishCompletedQuery);
         
-        // 接的任务统计
+        // 接的任务总数
         LambdaQueryWrapper<SubstituteTask> acceptQuery = new LambdaQueryWrapper<>();
         acceptQuery.eq(SubstituteTask::getAccepterId, userId);
         Long acceptedCount = taskMapper.selectCount(acceptQuery);
         
-        acceptQuery.eq(SubstituteTask::getStatus, "completed");
-        Long acceptedCompletedCount = taskMapper.selectCount(acceptQuery);
+        // 接的已完成任务数（独立 wrapper 避免条件累积）
+        LambdaQueryWrapper<SubstituteTask> acceptCompletedQuery = new LambdaQueryWrapper<>();
+        acceptCompletedQuery.eq(SubstituteTask::getAccepterId, userId)
+                           .eq(SubstituteTask::getStatus, "completed");
+        Long acceptedCompletedCount = taskMapper.selectCount(acceptCompletedQuery);
         
         Map<String, Object> result = new HashMap<>();
         result.put("publishedCount", publishedCount);

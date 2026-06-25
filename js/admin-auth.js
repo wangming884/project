@@ -46,7 +46,7 @@ function hasAdminPermission(permission = 'all') {
 function requireAdminAuth() {
     const session = getAdminSession();
     if (!session) {
-        window.location.href = 'index.html';
+        window.location.href = window.location.pathname.includes('/pages/') ? 'index.html' : 'pages/index.html';
         return false;
     }
     return true;
@@ -55,5 +55,5 @@ function requireAdminAuth() {
 function adminLogout() {
     removeStorage(ADMIN_SESSION_KEY);
     clearAuthSession();
-    window.location.href = 'index.html';
+    window.location.href = window.location.pathname.includes('/pages/') ? 'index.html' : 'pages/index.html';
 }

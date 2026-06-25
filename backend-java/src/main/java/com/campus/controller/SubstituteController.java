@@ -42,7 +42,7 @@ public class SubstituteController {
     public Result<Map<String, Object>> publishTask(
             @RequestBody Map<String, String> request,
             Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         String title = request.get("title");
         String course = request.get("course");
         LocalDateTime time = LocalDateTime.parse(request.get("time"), formatter);
@@ -86,7 +86,7 @@ public class SubstituteController {
     public Result<Map<String, Object>> acceptTask(
             @PathVariable Long taskId,
             Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         Map<String, Object> result = substituteService.acceptTask(taskId, userId);
         return Result.success(result);
     }
@@ -98,7 +98,7 @@ public class SubstituteController {
     public Result<Map<String, Object>> cancelAccept(
             @PathVariable Long taskId,
             Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         Map<String, Object> result = substituteService.cancelAccept(taskId, userId);
         return Result.success(result);
     }
@@ -110,7 +110,7 @@ public class SubstituteController {
     public Result<Map<String, Object>> completeTask(
             @PathVariable Long taskId,
             Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         Map<String, Object> result = substituteService.completeTask(taskId, userId);
         return Result.success(result);
     }
@@ -122,7 +122,7 @@ public class SubstituteController {
     public Result<Map<String, Object>> cancelTask(
             @PathVariable Long taskId,
             Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         Map<String, Object> result = substituteService.cancelTask(taskId, userId);
         return Result.success(result);
     }
@@ -135,7 +135,7 @@ public class SubstituteController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize,
             Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         Page<SubstituteTask> tasks = substituteService.getMyPublishedTasks(userId, page, pageSize);
         return Result.success(tasks);
     }
@@ -148,7 +148,7 @@ public class SubstituteController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize,
             Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         Page<SubstituteTask> tasks = substituteService.getMyAcceptedTasks(userId, page, pageSize);
         return Result.success(tasks);
     }
@@ -158,7 +158,7 @@ public class SubstituteController {
      */
     @GetMapping("/statistics")
     public Result<Map<String, Object>> getStatistics(Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
+        Long userId = currentUserId(authentication);
         Map<String, Object> statistics = substituteService.getStatistics(userId);
         return Result.success(statistics);
     }

@@ -341,9 +341,6 @@
             return getStorage('userInfo');
         }
 
-        function isLoggedIn() {
-            return !!getStorage('authToken');
-        }
 
         function ensureSuccess(response, fallbackMessage) {
             if (!response || response.success !== true) {
@@ -464,7 +461,7 @@
                         <p class="order-meta">酬金/感谢方式：${escapeHtml(task.reward || '-')}</p>
                         <p class="order-meta">状态：${escapeHtml(task.status || '-')}</p>
                         <p class="order-meta">发布者：${escapeHtml(task.publisherName || '-')} | 接单者：${escapeHtml(task.accepterName || '暂无')}</p>
-                        <p class="order-meta">${escapeHtml(task.description || '暂无补充说明').replace(/\n/g, '<br>')}</p>
+                        <p class="order-meta" style="white-space:pre-line">${escapeHtml(task.description || '暂无补充说明')}</p>
                         <p class="order-muted">创建时间：${escapeHtml(formatTaskTime(task.createdAt))}</p>
                         <div class="order-actions">${actions.join('')}</div>
                     </article>

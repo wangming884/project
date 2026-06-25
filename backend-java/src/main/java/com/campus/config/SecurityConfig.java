@@ -71,7 +71,6 @@ public class SecurityConfig {
                     "/course-brush/automation/**",
                     "/secondhand/list",
                     "/secondhand/search",
-                    "/substitute/list",
                     "/substitute/tasks",
                     "/substitute/tasks/*",
                     "/recommend/list",
