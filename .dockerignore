@@ -1,0 +1,36 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation (保留 README)
+docs/
+*.md
+
+# Backend (不在前端镜像中包含)
+backend-java/
+
+# Docker 自身
+docker-compose*.yml
+**/Dockerfile
+.env
+.env.*
+
+# 数据卷
+mysql-data/
+redis-data/
+
+# 日志
+*.log
+logs/
+
+# Node
+node_modules/
