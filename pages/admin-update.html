@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统更新 - 管理后台</title>
+    <style>
+        :root { --bg: #f3f6fb; --surface: #ffffff; --text: #1f2937; --muted: #6b7280; --brand: #2563eb; --success: #10b981; --danger: #ef4444; --border: #e5e7eb; }
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; }
+        .topbar { max-width: 1200px; margin: 0 auto; padding: 0.95rem 5%; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        .topbar h1 { margin: 0; font-size: 1.2rem; }
+        .topbar small { color: var(--muted); display: block; margin-top: 0.15rem; }
+        .top-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+        .btn { border: none; border-radius: 10px; cursor: pointer; padding: 0.55rem 0.95rem; font-weight: 600; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; }
+        .btn-primary { background: var(--brand); color: #fff; }
+        .btn-muted { background: #eef2ff; color: #3730a3; }
+        .btn-danger { background: #fee2e2; color: #b91c1c; }
+        .btn-success { background: #dcfce7; color: #166534; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .container { max-width: 1200px; margin: 1.2rem auto; padding: 0 5% 2rem; }
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem; margin-bottom: 1rem; }
+        .panel h2 { margin: 0 0 0.7rem; font-size: 1rem; }
+        .info-grid { display: grid; grid-template-columns: 120px 1fr; gap: 0.5rem 1rem; font-size: 0.9rem; }
+        .info-label { color: var(--muted); font-weight: 600; }
+        .commit-list { list-style: none; padding: 0; margin: 0.5rem 0 0; }
+        .commit-list li { padding: 0.4rem 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; font-family: 'Courier New', monospace; }
+        .commit-list li:last-child { border-bottom: none; }
+        .status-box { margin-top: 1rem; padding: 1rem; background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; font-size: 0.88rem; white-space: pre-wrap; word-break: break-all; max-height: 400px; overflow-y: auto; font-family: 'Courier New', monospace; line-height: 1.6; }
+        .status-box.success { background: #f0fdf4; border-color: #86efac; }
+        .status-box.error { background: #fef2f2; border-color: #fca5a5; }
+        .status-box.loading { background: #eff6ff; border-color: #93c5fd; }
+        .badge { display: inline-block; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 700; }
+        .badge-ok { background: #dcfce7; color: #166534; }
+        .badge-warn { background: #fef9c3; color: #854d0e; }
+        .badge-new { background: #dbeafe; color: #1e40af; }
+        .actions { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 1rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="topbar">
+            <div>
+                <h1>系统更新</h1>
+                <small id="adminIdentity">正在校验管理员身份...</small>
+            </div>
+            <div class="top-actions">
+                <a class="btn btn-muted" href="admin-dashboard.html">返回后台</a>
+                <a class="btn btn-muted" href="main.html">前台大厅</a>
+                <button class="btn btn-danger" type="button" id="logoutBtn">退出管理员</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 当前版本 -->
+        <section class="panel">
+            <h2>当前版本</h2>
+            <div class="info-grid">
+                <span class="info-label">当前 Commit</span>
+                <span id="currentCommit">加载中...</span>
+                <span class="info-label">当前分支</span>
+                <span id="currentBranch">加载中...</span>
+                <span class="info-label">更新时间</span>
+                <span id="versionTime">-</span>
+            </div>
+            <h2 style="margin-top:1rem;">最近提交记录</h2>
+            <ul class="commit-list" id="commitHistory"><li>加载中...</li></ul>
+        </section>
+
+        <!-- 检查更新 -->
+        <section class="panel">
+            <h2>检查更新</h2>
+            <p style="font-size:0.9rem;color:var(--muted);margin:0 0 0.8rem;">
+                从 GitHub 仓库拉取最新代码，检查是否有新版本可用。
+            </p>
+            <div class="actions">
+                <button class="btn btn-primary" type="button" id="checkBtn" onclick="checkUpdate()">检查更新</button>
+                <button class="btn btn-muted" type="button" onclick="loadVersion()">刷新版本信息</button>
+            </div>
+            <div id="checkResult" style="margin-top:0.8rem;"></div>
+        </section>
+
+        <!-- 执行更新 -->
+        <section class="panel">
+            <h2>执行更新</h2>
+            <p style="font-size:0.9rem;color:var(--muted);margin:0 0 0.8rem;">
+                一键拉取最新代码并重新构建部署前端容器。更新过程中服务可能会短暂中断。
+            </p>
+            <div class="actions">
+                <button class="btn btn-success" type="button" id="deployBtn" onclick="doDeploy()">立即更新部署</button>
+                <button class="btn btn-muted" type="button" id="pullBtn" onclick="doPull()">仅拉取代码</button>
+            </div>
+            <div id="deployResult" class="status-box" style="display:none;"></div>
+        </section>
+    </div>
+
+    <script src="../js/api-config.js"></script>
+    <script src="../js/api-utils.js"></script>
+    <script src="../js/admin-auth.js"></script>
+    <script>
+        // 更新服务 API 基础地址（通过 nginx 代理）
+        var UPDATE_API = '/api/update';
+        var UPDATE_TOKEN = '';
+
+        function updateHeaders() {
+            var headers = { 'Content-Type': 'application/json' };
+            var token = getAuthToken();
+            if (UPDATE_TOKEN) {
+                headers['Authorization'] = 'Bearer ' + UPDATE_TOKEN;
+            }
+            return headers;
+        }
+
+        async function updateRequest(method, path, body) {
+            var opts = { method: method, headers: updateHeaders() };
+            if (body) opts.body = JSON.stringify(body);
+            var resp = await fetch(UPDATE_API + path, opts);
+            return resp.json();
+        }
+
+        async function loadVersion() {
+            try {
+                var data = await updateRequest('GET', '/status');
+                document.getElementById('currentCommit').textContent = data.current || '-';
+                document.getElementById('currentBranch').textContent = data.branch || '-';
+                document.getElementById('versionTime').textContent = data.time || '-';
+
+                var list = document.getElementById('commitHistory');
+                if (data.history && data.history.length) {
+                    list.innerHTML = data.history.map(function(c) {
+                        return '<li>' + escapeHtml(c) + '</li>';
+                    }).join('');
+                } else {
+                    list.innerHTML = '<li>无法获取提交记录</li>';
+                }
+            } catch (e) {
+                showMessage('获取版本信息失败', 'error');
+            }
+        }
+
+        async function checkUpdate() {
+            var btn = document.getElementById('checkBtn');
+            var result = document.getElementById('checkResult');
+            btn.disabled = true;
+            btn.textContent = '检查中...';
+            result.innerHTML = '';
+
+            try {
+                var data = await updateRequest('GET', '/check');
+                if (data.error) {
+                    result.innerHTML = '<span class="badge badge-warn">检查失败</span> ' + escapeHtml(data.error);
+                } else if (data.hasUpdate) {
+                    var commitsHtml = (data.commits || []).map(function(c) {
+                        return '<li>' + escapeHtml(c) + '</li>';
+                    }).join('');
+                    result.innerHTML = '<span class="badge badge-new">发现新版本</span> '
+                        + '本地: ' + escapeHtml(data.local) + ' → 远程: ' + escapeHtml(data.remote)
+                        + '<ul class="commit-list">' + commitsHtml + '</ul>';
+                } else {
+                    result.innerHTML = '<span class="badge badge-ok">已是最新</span> ' + escapeHtml(data.message || '');
+                }
+            } catch (e) {
+                result.innerHTML = '<span class="badge badge-warn">检查失败</span> 无法连接更新服务';
+            }
+
+            btn.disabled = false;
+            btn.textContent = '检查更新';
+        }
+
+        async function doPull() {
+            var btn = document.getElementById('pullBtn');
+            var result = document.getElementById('deployResult');
+            btn.disabled = true;
+            btn.textContent = '拉取中...';
+            result.style.display = 'block';
+            result.className = 'status-box loading';
+            result.textContent = '正在拉取最新代码...\n';
+
+            try {
+                var data = await updateRequest('POST', '/pull');
+                if (data.success) {
+                    result.className = 'status-box success';
+                    result.textContent += '拉取成功！\n\n' + (data.output || '');
+                    await loadVersion();
+                    showMessage('代码拉取成功', 'success');
+                } else {
+                    result.className = 'status-box error';
+                    result.textContent += '拉取失败\n\n' + (data.output || '') + '\n' + (data.error || '');
+                    showMessage('代码拉取失败', 'error');
+                }
+            } catch (e) {
+                result.className = 'status-box error';
+                result.textContent = '无法连接更新服务';
+                showMessage('连接更新服务失败', 'error');
+            }
+
+            btn.disabled = false;
+            btn.textContent = '仅拉取代码';
+        }
+
+        async function doDeploy() {
+            if (!confirm('确认执行更新部署？\n\n更新过程中前端服务会短暂中断。')) return;
+
+            var btn = document.getElementById('deployBtn');
+            var result = document.getElementById('deployResult');
+            btn.disabled = true;
+            btn.textContent = '部署中...';
+            result.style.display = 'block';
+            result.className = 'status-box loading';
+            result.textContent = '正在执行更新部署，请稍候...\n\n';
+
+            try {
+                var data = await updateRequest('POST', '/deploy');
+                if (data.success) {
+                    result.className = 'status-box success';
+                    result.textContent += '✅ ' + (data.message || '更新完成') + '\n\n';
+                    if (data.steps) {
+                        data.steps.forEach(function(s) {
+                            result.textContent += (s.success ? '✅' : '❌') + ' ' + s.step + '\n';
+                            if (s.output) result.textContent += s.output + '\n';
+                            if (s.error) result.textContent += '错误: ' + s.error + '\n';
+                            result.textContent += '\n';
+                        });
+                    }
+                    await loadVersion();
+                    showMessage('更新部署成功！请刷新页面查看最新版本', 'success');
+                } else {
+                    result.className = 'status-box error';
+                    result.textContent += '❌ ' + (data.message || '更新失败') + '\n\n';
+                    if (data.steps) {
+                        data.steps.forEach(function(s) {
+                            result.textContent += (s.success ? '✅' : '❌') + ' ' + s.step + '\n';
+                            if (s.output) result.textContent += s.output + '\n';
+                            if (s.error) result.textContent += '错误: ' + s.error + '\n';
+                            result.textContent += '\n';
+                        });
+                    }
+                    showMessage('更新部署失败', 'error');
+                }
+            } catch (e) {
+                result.className = 'status-box error';
+                result.textContent = '无法连接更新服务，请检查 updater 容器是否正常运行';
+                showMessage('连接更新服务失败', 'error');
+            }
+
+            btn.disabled = false;
+            btn.textContent = '立即更新部署';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof requireAdminAuth === 'function' && !requireAdminAuth()) return;
+            var s = getAdminSession();
+            document.getElementById('adminIdentity').textContent = '当前管理员：' + (s && s.username ? s.username : '未知');
+            document.getElementById('logoutBtn').addEventListener('click', adminLogout);
+            loadVersion();
+        });
+    </script>
+</body>
+</html>

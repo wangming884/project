@@ -98,6 +98,23 @@ services:
     networks:
       - campus-network
 
+  # ========== 自动更新服务 ==========
+  updater:
+    build:
+      context: ./updater
+      dockerfile: Dockerfile
+    container_name: campus-updater
+    restart: always
+    environment:
+      UPDATE_SECRET: ${UPDATE_SECRET:-campus-update-secret}
+      PROJECT_DIR: /app/project
+      COMPOSE_CMD: docker compose
+    volumes:
+      - .:/app/project
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - campus-network
+
 volumes:
   mysql-data:
   redis-data:
