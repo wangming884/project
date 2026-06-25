@@ -1,0 +1,28 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Maven
+!.mvn/wrapper/maven-wrapper.jar
+target/
+
+# Docker
+Dockerfile
+docker-compose*.yml
+
+# 文档
+*.md
+docs/
+
+# 日志
+*.log
+logs/
