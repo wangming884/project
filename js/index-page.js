@@ -133,17 +133,19 @@
             closeModal('loginModal');
 
             setTimeout(function () {
-                if (isAdmin) {
-                    window.location.href = 'admin-dashboard.html';
-                } else {
-                    window.location.href = 'main.html';
+                var target = isAdmin ? 'admin-dashboard.html' : 'main.html';
+                if (!window.location.pathname.includes('/pages/')) {
+                    target = 'pages/' + target;
                 }
+                window.location.href = target;
             }, 600);
         } catch (error) {
             hideLoading();
             loginCaptcha.refresh();
             document.getElementById('login-captcha').value = '';
-            showMessage('账号或密码错误', 'error');
+            var msg = (error && error.message) ? error.message : '登录失败，请稍后重试';
+            showMessage(msg, 'error');
+            console.error('登录异常:', error);
         }
     }
 
@@ -250,7 +252,11 @@
 
     function redirectLoggedInUser() {
         if (isLoggedIn()) {
-            window.location.href = 'main.html';
+            var target = 'main.html';
+            if (!window.location.pathname.includes('/pages/')) {
+                target = 'pages/' + target;
+            }
+            window.location.href = target;
         }
     }
 
