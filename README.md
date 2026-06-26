@@ -21,7 +21,7 @@
 
 ### 管理员侧
 
-1. 管理员独立登录页：`pages/admin-login.html`
+1. 管理员通过首页登录弹窗进入后台：`pages/index.html`
 2. 管理后台：`pages/admin-dashboard.html`
 3. 签到审核与强制状态修改
 4. 用户积分增加/扣除
@@ -60,7 +60,6 @@
 │   ├── resources.html
 │   ├── learning_materials.html
 │   ├── learning_software.html
-│   ├── admin-login.html
 │   ├── admin-dashboard.html
 │   └── ...
 ├── js/
@@ -113,7 +112,7 @@ mvn spring-boot:run
 
 当前管理员能力说明：
 
-1. 管理员登录成功后，后端签发管理员专属 JWT，业务层以保留身份 `userId=0` 识别超级权限
+1. 在首页登录弹窗输入管理员账号后，后端通过 `POST /api/auth/login` 签发管理员专属 JWT，业务层以保留身份 `userId=0` 识别超级权限
 2. 前端 `pages/substitute.html` 会自动切换到管理员视图，展示全量代课任务
 3. 管理员可直接在代课大厅强制修改任务状态
 4. `pages/substitute-manage.html` 会自动锁定管理员的普通发布入口，避免误以超级身份发布用户任务
@@ -172,7 +171,7 @@ mvn spring-boot:run
 
 ## 8. 关键接口（节选）
 
-1. 管理员登录：`POST /api/auth/admin-login`
+1. 用户/管理员登录：`POST /api/auth/login`
 2. 公开代课任务列表：`GET /api/substitute/tasks`
 3. 发布代课任务：`POST /api/substitute/publish`
 4. 管理员代课全量任务：`GET /api/substitute/admin/tasks`

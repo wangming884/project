@@ -64,7 +64,6 @@ public class SecurityConfig {
                 // 允许访问的接口（无需认证）
                 .requestMatchers(
                     "/auth/login",
-                    "/auth/admin-login",
                     "/auth/register",
                     "/checkin/automation/**",
                     "/course-brush/courses",

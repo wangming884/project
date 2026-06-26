@@ -76,6 +76,10 @@ public class AuthService {
      * 用户登录
      */
     public Map<String, Object> login(String username, String password) {
+        if (adminUsername.equals(username)) {
+            return loginAsAdmin(username, password);
+        }
+
         // 查找用户
         LambdaQueryWrapper<User> query = new LambdaQueryWrapper<>();
         query.eq(User::getUsername, username)
@@ -120,11 +124,15 @@ public class AuthService {
     /**
      * 管理员登录
      */
-    public Map<String, Object> adminLogin(String username, String password) {
+    private Map<String, Object> loginAsAdmin(String username, String password) {
         if (!adminUsername.equals(username) || !adminPassword.equals(password)) {
             throw new RuntimeException("管理员账号或密码错误");
         }
 
+        return buildAdminLoginResult();
+    }
+
+    private Map<String, Object> buildAdminLoginResult() {
         // 管理员使用保留ID=0，便于在业务层识别超级权限
         String token = jwtUtil.generateToken(0L);
 

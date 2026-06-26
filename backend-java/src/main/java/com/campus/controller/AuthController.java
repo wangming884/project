@@ -62,22 +62,6 @@ public class AuthController {
     }
 
     /**
-     * 管理员登录
-     */
-    @PostMapping("/admin-login")
-    public Result<Map<String, Object>> adminLogin(@Validated @RequestBody LoginRequest request) {
-        try {
-            Map<String, Object> data = authService.adminLogin(
-                request.getUsername(),
-                request.getPassword()
-            );
-            return Result.success("管理员登录成功", data);
-        } catch (Exception e) {
-            return Result.error(e.getMessage());
-        }
-    }
-    
-    /**
      * 获取用户信息
      */
     @GetMapping("/user")

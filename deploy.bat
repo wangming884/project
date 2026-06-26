@@ -31,7 +31,7 @@ docker compose up -d --build
 echo [INFO] 部署完成！
 echo [INFO]   前端地址: http://localhost
 echo [INFO]   后端 API: http://localhost:8080/api
-echo [INFO]   管理后台: http://localhost/pages/admin-login.html
+echo [INFO]   管理后台: 通过 http://localhost/pages/index.html 登录管理员账号进入
 goto eof
 
 :stop

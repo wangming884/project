@@ -8,7 +8,7 @@
 部署完成后你将得到：
 
 1. 前端首页：`https://你的域名/pages/index.html`
-2. 管理员登录页：`https://你的域名/pages/admin-login.html`
+2. 管理员入口：在首页登录弹窗输入管理员账号后进入后台
 3. 代课大厅：`https://你的域名/pages/substitute.html`
 4. 代课发布/我的任务：`https://你的域名/pages/substitute-manage.html`
 5. API 地址：`https://你的域名/api/...`
@@ -195,7 +195,7 @@ location ~* \.(css|js|jpg|jpeg|png|gif|svg|ico|woff|woff2)$ {
 浏览器检查：
 
 1. `https://你的域名/pages/index.html`
-2. `https://你的域名/pages/admin-login.html`
+2. 在首页登录弹窗输入管理员账号，成功后进入 `/pages/admin-dashboard.html`
 3. `https://你的域名/pages/substitute.html`
 4. `https://你的域名/pages/substitute-manage.html`
 5. 登录后管理员后台可进入：`/pages/admin-dashboard.html`
@@ -249,7 +249,7 @@ pm2 logs campus-backend --lines 200
 2. 后端是否已经导入 `substitute_tasks` 表
 3. 普通大厅使用的是 `GET /api/substitute/tasks`
 4. 管理员全量视图使用的是 `GET /api/substitute/admin/tasks`
-5. 管理员是否通过 `pages/admin-login.html` 登录并拿到管理员 token
+5. 管理员是否通过 `pages/index.html` 登录弹窗登录并拿到管理员 token
 
 ### 14.5 学习资源上传返回“预留模式”
 

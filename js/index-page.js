@@ -8,6 +8,10 @@
     // 验证码实例
     var loginCaptcha = null;
     var registerCaptcha = null;
+    var LOCAL_ADMIN = {
+        username: 'admin',
+        password: 'Admin@123456',
+    };
 
     function getModal(modalId) {
         return document.getElementById(modalId);
@@ -76,6 +80,36 @@
         return response && response.data ? response.data : response;
     }
 
+    function isAdminUser(user) {
+        return !!user && (user.role === 'admin' || user.userId === 0);
+    }
+
+    function getPagePath(page) {
+        if (!window.location.pathname.includes('/pages/')) {
+            return 'pages/' + page;
+        }
+        return page;
+    }
+
+    function saveAdminLoginSession(token, user, mode) {
+        setAuthSession(token, user);
+
+        if (typeof saveAdminSession === 'function') {
+            saveAdminSession({
+                token: token,
+                username: user.username,
+                userId: user.userId,
+                role: user.role,
+                permissions: user.permissions,
+                mode: mode || 'server',
+            });
+        }
+    }
+
+    function redirectAfterLogin(isAdmin) {
+        window.location.href = getPagePath(isAdmin ? 'admin-dashboard.html' : 'main.html');
+    }
+
     async function handleLogin(event) {
         event.preventDefault();
 
@@ -116,33 +150,43 @@
                 return;
             }
 
-            setAuthSession(payload.token, payload.user);
-
-            // 管理员：保存管理会话并跳转后台
-            var isAdmin = payload.user.role === 'admin' || payload.user.userId === 0;
-            if (isAdmin && typeof saveAdminSession === 'function') {
-                saveAdminSession({
-                    token: payload.token,
-                    username: payload.user.username,
-                    userId: payload.user.userId,
-                    role: payload.user.role,
-                });
+            var isAdmin = isAdminUser(payload.user);
+            if (isAdmin) {
+                saveAdminLoginSession(payload.token, payload.user, 'server');
+            } else {
+                setAuthSession(payload.token, payload.user);
             }
 
             showMessage('登录成功！', 'success');
             closeModal('loginModal');
 
             setTimeout(function () {
-                var target = isAdmin ? 'admin-dashboard.html' : 'main.html';
-                if (!window.location.pathname.includes('/pages/')) {
-                    target = 'pages/' + target;
-                }
-                window.location.href = target;
+                redirectAfterLogin(isAdmin);
             }, 600);
         } catch (error) {
             hideLoading();
             loginCaptcha.refresh();
             document.getElementById('login-captcha').value = '';
+
+            if (
+                isOfflineFallbackError(error)
+                && username === LOCAL_ADMIN.username
+                && password === LOCAL_ADMIN.password
+            ) {
+                saveAdminLoginSession('', {
+                    userId: 0,
+                    username: username,
+                    role: 'admin',
+                    permissions: 'all',
+                }, 'offline');
+                showMessage('后端不可用，已进入离线管理模式', 'warning');
+                closeModal('loginModal');
+                setTimeout(function () {
+                    redirectAfterLogin(true);
+                }, 700);
+                return;
+            }
+
             var msg = (error && error.message) ? error.message : '登录失败，请稍后重试';
             showMessage(msg, 'error');
             console.error('登录异常:', error);
@@ -252,11 +296,22 @@
 
     function redirectLoggedInUser() {
         if (isLoggedIn()) {
-            var target = 'main.html';
-            if (!window.location.pathname.includes('/pages/')) {
-                target = 'pages/' + target;
+            var user = getUserInfo();
+            if (isAdminUser(user)) {
+                if (typeof isAdminLoggedIn === 'function' && isAdminLoggedIn()) {
+                    redirectAfterLogin(true);
+                } else {
+                    clearAuthSession();
+                }
+                return;
             }
-            window.location.href = target;
+
+            redirectAfterLogin(false);
+            return;
+        }
+
+        if (typeof isAdminLoggedIn === 'function' && isAdminLoggedIn()) {
+            redirectAfterLogin(true);
         }
     }
 

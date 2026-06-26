@@ -66,7 +66,6 @@ const API_ENDPOINTS = {
     // 用户认证相关
     auth: {
         login: `${API_BASE_URL}/auth/login`,           // POST - 用户登录
-        adminLogin: `${API_BASE_URL}/auth/admin-login`, // POST - 管理员登录
         register: `${API_BASE_URL}/auth/register`,     // POST - 用户注册
         logout: `${API_BASE_URL}/auth/logout`,         // POST - 用户登出
         checkAuth: `${API_BASE_URL}/auth/check`,       // GET - 检查登录状态

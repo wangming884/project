@@ -38,7 +38,7 @@ start() {
     info "部署完成！"
     info "  前端地址: http://localhost:${FRONTEND_PORT:-80}"
     info "  后端 API: http://localhost:${BACKEND_PORT:-8080}/api"
-    info "  管理后台: http://localhost:${FRONTEND_PORT:-80}/pages/admin-login.html"
+    info "  管理后台: 通过 http://localhost:${FRONTEND_PORT:-80}/pages/index.html 登录管理员账号进入"
     echo ""
     info "查看日志: bash deploy.sh logs"
     info "查看状态: bash deploy.sh status"
