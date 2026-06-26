@@ -80,6 +80,35 @@
         return response && response.data ? response.data : response;
     }
 
+    function resetCaptcha(captcha, inputId) {
+        if (captcha && typeof captcha.refresh === 'function') {
+            captcha.refresh();
+        }
+        var input = document.getElementById(inputId);
+        if (input) {
+            input.value = '';
+        }
+    }
+
+    function verifyCaptcha(captcha, inputId) {
+        var captchaInput = document.getElementById(inputId);
+        var value = captchaInput ? captchaInput.value.trim() : '';
+        if (!value) {
+            showMessage('请输入验证码', 'warning');
+            return false;
+        }
+        if (!captcha || typeof captcha.verify !== 'function') {
+            showMessage('验证码初始化失败，请刷新页面后重试', 'error');
+            return false;
+        }
+        if (!captcha.verify(value)) {
+            showMessage('验证码错误，请重新输入', 'warning');
+            resetCaptcha(captcha, inputId);
+            return false;
+        }
+        return true;
+    }
+
     function isAdminUser(user) {
         return !!user && (user.role === 'admin' || user.userId === 0);
     }
@@ -121,16 +150,7 @@
             return;
         }
 
-        // 验证码校验
-        var captchaInput = document.getElementById('login-captcha').value.trim();
-        if (!captchaInput) {
-            showMessage('请输入验证码', 'warning');
-            return;
-        }
-        if (!loginCaptcha.verify(captchaInput)) {
-            showMessage('验证码错误，请重新输入', 'warning');
-            loginCaptcha.refresh();
-            document.getElementById('login-captcha').value = '';
+        if (!verifyCaptcha(loginCaptcha, 'login-captcha')) {
             return;
         }
 
@@ -145,8 +165,7 @@
             var payload = getAuthPayload(response);
             if (!response.success || !payload) {
                 showMessage('账号或密码错误', 'error');
-                loginCaptcha.refresh();
-                document.getElementById('login-captcha').value = '';
+                resetCaptcha(loginCaptcha, 'login-captcha');
                 return;
             }
 
@@ -165,8 +184,7 @@
             }, 600);
         } catch (error) {
             hideLoading();
-            loginCaptcha.refresh();
-            document.getElementById('login-captcha').value = '';
+            resetCaptcha(loginCaptcha, 'login-captcha');
 
             if (
                 isOfflineFallbackError(error)
@@ -205,16 +223,7 @@
             return;
         }
 
-        // 验证码校验
-        var captchaInput = document.getElementById('reg-captcha').value.trim();
-        if (!captchaInput) {
-            showMessage('请输入验证码', 'warning');
-            return;
-        }
-        if (!registerCaptcha.verify(captchaInput)) {
-            showMessage('验证码错误，请重新输入', 'warning');
-            registerCaptcha.refresh();
-            document.getElementById('reg-captcha').value = '';
+        if (!verifyCaptcha(registerCaptcha, 'reg-captcha')) {
             return;
         }
 
@@ -239,8 +248,7 @@
 
             if (!response.success) {
                 showMessage(response.message || '注册失败', 'error');
-                registerCaptcha.refresh();
-                document.getElementById('reg-captcha').value = '';
+                resetCaptcha(registerCaptcha, 'reg-captcha');
                 return;
             }
 
@@ -253,8 +261,7 @@
             }, 600);
         } catch (error) {
             hideLoading();
-            registerCaptcha.refresh();
-            document.getElementById('reg-captcha').value = '';
+            resetCaptcha(registerCaptcha, 'reg-captcha');
             handleError(error, '注册失败，请稍后重试');
         }
     }
@@ -281,16 +288,16 @@
             var regCanvas = document.getElementById('reg-captcha-canvas');
             if (loginCanvas) {
                 loginCanvas.addEventListener('click', function () {
-                    loginCaptcha.refresh();
-                    document.getElementById('login-captcha').value = '';
+                    resetCaptcha(loginCaptcha, 'login-captcha');
                 });
             }
             if (regCanvas) {
                 regCanvas.addEventListener('click', function () {
-                    registerCaptcha.refresh();
-                    document.getElementById('reg-captcha').value = '';
+                    resetCaptcha(registerCaptcha, 'reg-captcha');
                 });
             }
+        } else {
+            console.error('验证码组件加载失败');
         }
     }
 

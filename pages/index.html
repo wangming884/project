@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>网站首页 - 欢迎</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233182ce'/%3E%3Ctext x='32' y='42' font-size='32' text-anchor='middle' fill='white' font-family='Arial,sans-serif' font-weight='700'%3EM%3C/text%3E%3C/svg%3E">
     <style>
         /* 基础样式重置与全局字体 */
         body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #eaedee 100%); color: #333; min-height: 100vh; }
@@ -155,7 +156,8 @@
     <script src="../js/index-page.js?v=20260625"></script>
     <script>
         // 初始化粒子特效
-        particlesJS("particles-js", {
+        if (typeof particlesJS === 'function') {
+            particlesJS("particles-js", {
             "particles": {
                 "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
                 "color": { "value": "#3182ce" },
@@ -178,7 +180,8 @@
                 }
             },
             "retina_detect": true
-        });
+            });
+        }
     </script>
 </body>
 </html>
