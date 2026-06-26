@@ -18,7 +18,7 @@ spring:
     username: root
     password: root
     hikari:
-      connection-init-sql: SET NAMES utf8mb4
+      connection-init-sql: SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci
 
   # Redis 配置
   data:
