@@ -157,6 +157,9 @@ curl http://127.0.0.1:8080/api/auth/check
 在站点 Nginx 配置中加入：
 
 ```nginx
+charset utf-8;
+charset_types text/plain text/css application/json application/javascript application/xml image/svg+xml;
+
 location /api/ {
     proxy_pass http://127.0.0.1:8080/api/;
     proxy_http_version 1.1;
@@ -164,6 +167,7 @@ location /api/ {
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Accept-Charset utf-8;
 }
 
 location = / {

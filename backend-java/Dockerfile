@@ -12,7 +12,9 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
 # 设置时区
-ENV TZ=Asia/Shanghai
+ENV TZ=Asia/Shanghai \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8
 RUN apk add --no-cache tzdata curl \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone
@@ -28,5 +30,7 @@ ENTRYPOINT ["java", \
   "-Xms256m", "-Xmx512m", \
   "-XX:+UseG1GC", \
   "-XX:MaxGCPauseMillis=200", \
+  "-Dfile.encoding=UTF-8", \
+  "-Dsun.jnu.encoding=UTF-8", \
   "-Dspring.profiles.active=prod", \
   "-jar", "app.jar"]
